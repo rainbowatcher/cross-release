@@ -1,0 +1,28 @@
+{
+  "name": "cross-bump-cli",
+  "version": "0.0.0",
+  "description": "command line app for cross language bump utility",
+  "author": {
+    "name": "rainbowatcher",
+    "email": "rainbow-w@qq.com",
+    "url": "https://github.com/rainbowatcher"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/rainbowatcher/cross-release/blob/main/packages/cross-bump-cli/README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rainbowatcher/cross-release.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rainbowatcher/cross-release/issues"
+  },
+  "bin": {
+    "cross-bump": "./bin/cmd.js"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.6.3",
+    "c12": "^1.4.2",
+    "cac": "^6.7.14",
+    "cross-bump": "workspace:*"
+  }
+}
