@@ -1,0 +1,40 @@
+{
+  "name": "cross-bump",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "cross language bump utility",
+  "author": {
+    "name": "rainbowatcher",
+    "email": "rainbow-w@qq.com",
+    "url": "https://github.com/rainbowatcher"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/rainbowatcher/cross-release/blob/main/packages/cross-bump/README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rainbowatcher/cross-release.git"
+  },
+  "bugs": "https://github.com/rainbowatcher/cross-release/issues",
+  "keywords": ["cross", "bump", "cross-bump", "release"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["./dist"],
+  "scripts": {
+    "build": "pkgroll"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "cheerio": "1.0.0-rc.12",
+    "colorette": "^2.0.20",
+    "detect-indent": "^7.0.1",
+    "semver": "^7.5.4"
+  }
+}
