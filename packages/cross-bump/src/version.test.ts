@@ -28,7 +28,7 @@ beforeAll(async () => {
 
 describe("Javascript project version related operation", async () => {
   const projectFiles = await findProjectFiles("fixture")
-  const projectFile = projectFiles.findLast(p => p.category === "javascript")
+  const projectFile = projectFiles.find(p => p.category === "javascript")
 
   it("should return the project version", async () => {
     const version = await getJSProjectVersion(projectFile!.path)
