@@ -8,31 +8,31 @@ describe("findProjectFiles", () => {
       [
         {
           "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/java/pom.xml",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/java/pom.xml",
         },
         {
           "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/package.json",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/package.json",
         },
         {
           "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/pom.xml",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/pom.xml",
         },
         {
           "category": "rust",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/rust/Cargo.toml",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/rust/Cargo.toml",
         },
         {
           "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/package.json",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/package.json",
         },
         {
           "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/packages/cross-bump/package.json",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/packages/cross-bump/package.json",
         },
         {
           "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/packages/cross-bump-cli/package.json",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/packages/cross-bump-cli/package.json",
         },
       ]
     `)
@@ -44,31 +44,31 @@ describe("findProjectFiles", () => {
       [
         {
           "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/java/pom.xml",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/java/pom.xml",
         },
         {
           "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/package.json",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/package.json",
         },
         {
           "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/pom.xml",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/pom.xml",
         },
         {
           "category": "rust",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/rust/Cargo.toml",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/rust/Cargo.toml",
         },
         {
           "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/package.json",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/package.json",
         },
         {
           "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/packages/cross-bump/package.json",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/packages/cross-bump/package.json",
         },
         {
           "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/packages/cross-bump-cli/package.json",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/packages/cross-bump-cli/package.json",
         },
       ]
     `)
@@ -80,7 +80,7 @@ describe("findProjectFiles", () => {
       [
         {
           "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/java/pom.xml",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/java/pom.xml",
         },
       ]
     `)
@@ -92,7 +92,7 @@ describe("findProjectFiles", () => {
       [
         {
           "category": "rust",
-          "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/rust/Cargo.toml",
+          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/rust/Cargo.toml",
         },
       ]
     `)
@@ -109,7 +109,7 @@ describe("findProjectFile", () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "category": "javascript",
-        "path": "/Users/rainb/WorkSpace/Private/unbump/package.json",
+        "path": "/Users/rainb/WorkSpace/Private/cross-release/package.json",
       }
     `)
   })
@@ -119,7 +119,7 @@ describe("findProjectFile", () => {
     expect(result).toMatchInlineSnapshot(`
       {
         "category": "javascript",
-        "path": "/Users/rainb/WorkSpace/Private/unbump/fixture/package.json",
+        "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/package.json",
       }
     `)
   })
