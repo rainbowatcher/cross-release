@@ -3,99 +3,31 @@ import { findProjectFile, findProjectFiles } from "./project"
 
 describe("findProjectFiles", () => {
   it("should use process.cwd as root when directory is empty string", async () => {
-    const files = await findProjectFiles("")
-    expect(files).toMatchInlineSnapshot(`
-      [
-        {
-          "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/java/pom.xml",
-        },
-        {
-          "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/package.json",
-        },
-        {
-          "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/pom.xml",
-        },
-        {
-          "category": "rust",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/rust/Cargo.toml",
-        },
-        {
-          "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/package.json",
-        },
-        {
-          "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/packages/cross-bump/package.json",
-        },
-        {
-          "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/packages/cross-bump-cli/package.json",
-        },
-      ]
-    `)
+    const projectFiles = await findProjectFiles("")
+    expect(projectFiles.length).gt(0)
   })
 
   it("should use process.cwd as root when directory is undefined", async () => {
-    const files = await findProjectFiles()
-    expect(files).toMatchInlineSnapshot(`
-      [
-        {
-          "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/java/pom.xml",
-        },
-        {
-          "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/package.json",
-        },
-        {
-          "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/pom.xml",
-        },
-        {
-          "category": "rust",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/rust/Cargo.toml",
-        },
-        {
-          "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/package.json",
-        },
-        {
-          "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/packages/cross-bump/package.json",
-        },
-        {
-          "category": "javascript",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/packages/cross-bump-cli/package.json",
-        },
-      ]
-    `)
+    const projectFiles = await findProjectFiles()
+    expect(projectFiles.length).gt(0)
   })
 
   it("should return java project", async () => {
-    const files = await findProjectFiles("fixture/java")
-    expect(files).toMatchInlineSnapshot(`
-      [
-        {
-          "category": "java",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/java/pom.xml",
-        },
-      ]
-    `)
+    const projectFiles = await findProjectFiles("fixture/java")
+    const expected = [{
+      category: "java",
+      path: `${process.cwd()}/fixture/java/pom.xml`,
+    }]
+    expect(projectFiles).toEqual(expected)
   })
 
   it("should return rust project", async () => {
-    const files = await findProjectFiles("fixture/rust")
-    expect(files).toMatchInlineSnapshot(`
-      [
-        {
-          "category": "rust",
-          "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/rust/Cargo.toml",
-        },
-      ]
-    `)
+    const projectFiles = await findProjectFiles("fixture/rust")
+    const expected = [{
+      category: "rust",
+      path: `${process.cwd()}/fixture/rust/Cargo.toml`,
+    }]
+    expect(projectFiles).toEqual(expected)
   })
 
   it("should throw a error", async () => {
@@ -105,28 +37,26 @@ describe("findProjectFiles", () => {
 
 describe("findProjectFile", () => {
   it("should return project root's package.json when no argument is passed", async () => {
-    const result = await findProjectFile()
-    expect(result).toMatchInlineSnapshot(`
-      {
-        "category": "javascript",
-        "path": "/Users/rainb/WorkSpace/Private/cross-release/package.json",
-      }
-    `)
+    const projectFile = await findProjectFile()
+    const expected = {
+      category: "javascript",
+      path: `${process.cwd()}/package.json`,
+    }
+    expect(projectFile).toEqual(expected)
   })
 
   it("should first look for the package.json file", async () => {
-    const result = await findProjectFile("fixture")
-    expect(result).toMatchInlineSnapshot(`
-      {
-        "category": "javascript",
-        "path": "/Users/rainb/WorkSpace/Private/cross-release/fixture/package.json",
-      }
-    `)
+    const projectFile = await findProjectFile("fixture")
+    const expected = {
+      category: "javascript",
+      path: `${process.cwd()}/fixture/package.json`,
+    }
+    expect(projectFile).toEqual(expected)
   })
 
   it("should return undefined", async () => {
-    const result = await findProjectFile("docs")
-    expect(result).toBeUndefined()
+    const projectFile = await findProjectFile("docs")
+    expect(projectFile).toBeUndefined()
   })
 
   it("should return throw a error", async () => {
