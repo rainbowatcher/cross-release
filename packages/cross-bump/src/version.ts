@@ -8,7 +8,16 @@ import detectIndent from "detect-indent"
 import * as TOML from "@iarna/toml"
 import { isJsonMap } from "./util"
 
-
+const FALLBACK_VERSION = "undefined"
+type VersionNumbers = {
+  nextMajor: string
+  nextMinor: string
+  nextPatch: string
+  nextRelease: string
+  nextPreMajor: string
+  nextPreMinor: string
+  nextPrePatch: string
+}
 
 /**
  * Generates the next versions based on the given version.
@@ -17,7 +26,7 @@ import { isJsonMap } from "./util"
  * @param coerce - Optional. Whether to coerce the version or not. Defaults to false.
  * @return An object containing the next major, minor, patch, release, pre-major, pre-minor, and pre-patch versions.
  */
-export function getNextVersions(version?: string | semver.SemVer, coerce = false) {
+export function getNextVersions(version?: string | semver.SemVer, coerce = false): VersionNumbers {
   let versionNum: string | semver.SemVer
   let id: string | undefined
 
@@ -33,13 +42,13 @@ export function getNextVersions(version?: string | semver.SemVer, coerce = false
     id = defaultId
   }
 
-  const nextMajor = semver.inc(versionNum, "major") || "undefined"
-  const nextMinor = semver.inc(versionNum, "minor") || "undefined"
-  const nextPatch = semver.inc(versionNum, "patch") || "undefined"
-  const nextRelease = id ? semver.inc(versionNum, "prerelease", id, "1") : semver.inc(versionNum, "patch")
-  const nextPreMajor = semver.inc(versionNum, "premajor", defaultId, "1") || "undefined"
-  const nextPreMinor = semver.inc(versionNum, "preminor", defaultId, "1") || "undefined"
-  const nextPrePatch = semver.inc(versionNum, "prepatch", defaultId, "1") || "undefined"
+  const nextMajor = semver.inc(versionNum, "major") || FALLBACK_VERSION
+  const nextMinor = semver.inc(versionNum, "minor") || FALLBACK_VERSION
+  const nextPatch = semver.inc(versionNum, "patch") || FALLBACK_VERSION
+  const nextRelease = (id ? semver.inc(versionNum, "prerelease", id, "1") : semver.inc(versionNum, "patch")) || FALLBACK_VERSION
+  const nextPreMajor = semver.inc(versionNum, "premajor", defaultId, "1") || FALLBACK_VERSION
+  const nextPreMinor = semver.inc(versionNum, "preminor", defaultId, "1") || FALLBACK_VERSION
+  const nextPrePatch = semver.inc(versionNum, "prepatch", defaultId, "1") || FALLBACK_VERSION
   return {
     nextMajor,
     nextMinor,
@@ -59,7 +68,7 @@ export function getNextVersions(version?: string | semver.SemVer, coerce = false
  * @param [dry=false] - Whether to perform a dry run or not.
  * @return A promise that resolves when the version upgrade is complete.
  */
-export async function upgradePomVersion(filePath: PathLike, version: string, dry = false) {
+export async function upgradePomVersion(filePath: PathLike, version: string, dry = false): Promise<void> {
   const content = await fs.readFile(filePath, "utf-8")
   const $ = cheerio.load(content, {
     xml: { decodeEntities: false },
@@ -79,14 +88,22 @@ export async function upgradePomVersion(filePath: PathLike, version: string, dry
  *
  * @return The version of the Java project.
  */
-export async function getJavaProjectVersion(filePath: PathLike) {
+export async function getJavaProjectVersion(filePath: PathLike): Promise<string | undefined> {
   const pom = await fs.readFile(filePath, "utf-8")
   const $ = cheerio.load(pom)
   const currVersion = $("project>version").text()
   return currVersion
 }
 
-export async function upgradePackageVersion(filePath: PathLike, version: string, dry = false) {
+/**
+ * Updates the version of a package in a specified file.
+ *
+ * @param filePath - The path to the file.
+ * @param version - The new version to set.
+ * @param dry - Whether to perform a dry run. @default false
+ * @return A promise that resolves when the version is upgraded.
+ */
+export async function upgradePackageVersion(filePath: PathLike, version: string, dry = false): Promise<void> {
   const file = await fs.readFile(filePath, "utf-8")
   const { amount } = detectIndent(file)
   const packageJson = JSON.parse(file)
@@ -97,7 +114,14 @@ export async function upgradePackageVersion(filePath: PathLike, version: string,
   }
 }
 
-function printVersion(version: string, filePath: PathLike) {
+/**
+ * Prints the version and file path to the console.
+ *
+ * @param version - The version to print.
+ * @param filePath - The file path to print.
+ * @return This function does not return a value.
+ */
+function printVersion(version: string, filePath: PathLike): void {
   console.log(
     `| upgrade version to ${blue(version)} for ${path.relative(
       process.cwd(),
@@ -106,23 +130,43 @@ function printVersion(version: string, filePath: PathLike) {
   )
 }
 
-export async function getJSProjectVersion(filePath: PathLike) {
+/**
+ * Reads the package.json file at the specified file path and returns the version number.
+ *
+ * @param filePath - The path to the package.json file.
+ * @return The version number as a string, or undefined if the file cannot be read or parsed.
+ */
+export async function getJSProjectVersion(filePath: PathLike): Promise<string | undefined> {
   const packageJson = await fs.readFile(filePath, "utf-8")
   const { version } = JSON.parse(packageJson)
-  return version
+  return version as string
 }
 
-export async function getRustProjectVersion(filePath: PathLike) {
+/**
+ * Retrieves the version of a Rust project based on the contents of a specified file.
+ *
+ * @param filePath - The path to the file containing the Rust project details.
+ * @return The version of the Rust project, or undefined if the version is not available.
+ */
+export async function getRustProjectVersion(filePath: PathLike): Promise<string | undefined> {
   const file = await fs.readFile(filePath, "utf-8")
   const { package: cargoPackage } = TOML.parse(file)
   if (isJsonMap(cargoPackage)) {
     if (cargoPackage.version) {
-      return cargoPackage.version
+      return cargoPackage.version as string
     }
   }
 }
 
-export async function upgradeCargoVersion(filePath: PathLike, version: string, dry = false) {
+/**
+ * Upgrade the cargo version in the specified file.
+ *
+ * @param filePath - The path to the file.
+ * @param version - The version to upgrade to.
+ * @param dry - Whether to perform a dry run. @default false
+ * @return A promise that resolves when the upgrade is complete.
+ */
+export async function upgradeCargoVersion(filePath: PathLike, version: string, dry = false): Promise<void> {
   const file = await fs.readFile(filePath, "utf-8")
   // const { amount } = detectIndent(file)
   const cargoToml = TOML.parse(file)
