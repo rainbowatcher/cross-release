@@ -18,7 +18,7 @@ const projectCategoryMap: Record<ProjectFiles, ProjectCategory> = {
   // go: "go.mod",
 }
 
-export type Project = {
+export type ProjectFile = {
   /**
    * project category
    */
@@ -36,8 +36,8 @@ const DEFAULT_EXCLUDE = ["node_modules", ".git"]
  * @param root - The directory to search in.
  * @return An array of file paths that match the search criteria.
  */
-export async function findProjectFiles(root?: PathLike, excludes?: string[]): Promise<Project[]> {
-  const files: Project[] = []
+export async function findProjectFiles(root?: PathLike, excludes?: string[]): Promise<ProjectFile[]> {
+  const files: ProjectFile[] = []
   const searchRoot = !isBlankPath(root) ? root : process.cwd()
   const excludeDirs = Object.assign(DEFAULT_EXCLUDE, excludes)
   const dirEntries = await fs.readdir(searchRoot, { withFileTypes: true })
@@ -58,7 +58,7 @@ export async function findProjectFiles(root?: PathLike, excludes?: string[]): Pr
   return files
 }
 
-export async function findProjectFile(root?: PathLike, excludes?: string[]): Promise<Project | undefined> {
+export async function findProjectFile(root?: PathLike, excludes?: string[]): Promise<ProjectFile | undefined> {
   const searchRoot = !isBlankPath(root) ? root : process.cwd()
   const excludeDirs = Object.assign(DEFAULT_EXCLUDE, excludes)
   const dirEntries = await fs.readdir(searchRoot, { withFileTypes: true })

@@ -1,4 +1,4 @@
-import type { Project, ProjectCategory, ProjectFiles } from "./project"
+import type { ProjectCategory, ProjectFile, ProjectFiles } from "./project"
 import { findProjectFile, findProjectFiles } from "./project"
 import {
   getJSProjectVersion,
@@ -12,7 +12,7 @@ import {
 
 
 export {
-  type Project,
+  type ProjectFile,
   type ProjectCategory,
   type ProjectFiles,
   findProjectFile,
