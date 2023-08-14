@@ -19,15 +19,15 @@ import { isJsonMap } from "./util"
  */
 export function getNextVersions(version?: string | semver.SemVer, coerce = false) {
   let versionNum: string | semver.SemVer
-  let id: string
+  let id: string | undefined
 
   const defaultId = "alpha"
   if (version instanceof semver.SemVer) {
     versionNum = version.version
-    id = `${version.prerelease[0]}`
+    id = `${version.prerelease[0] ?? ""}`
   } else if (typeof version === "string") {
     versionNum = coerce ? semver.coerce(version)?.version ?? version : version
-    id = `${semver.prerelease(version)?.[0] ?? defaultId}`
+    id = `${semver.prerelease(version)?.[0] ?? ""}`
   } else {
     versionNum = "0.0.0"
     id = defaultId
@@ -36,7 +36,7 @@ export function getNextVersions(version?: string | semver.SemVer, coerce = false
   const nextMajor = semver.inc(versionNum, "major") || "undefined"
   const nextMinor = semver.inc(versionNum, "minor") || "undefined"
   const nextPatch = semver.inc(versionNum, "patch") || "undefined"
-  const nextRelease = semver.inc(versionNum, "prerelease", id, "1") || "undefined"
+  const nextRelease = id ? semver.inc(versionNum, "prerelease", id, "1") : semver.inc(versionNum, "patch")
   const nextPreMajor = semver.inc(versionNum, "premajor", defaultId, "1") || "undefined"
   const nextPreMinor = semver.inc(versionNum, "preminor", defaultId, "1") || "undefined"
   const nextPrePatch = semver.inc(versionNum, "prepatch", defaultId, "1") || "undefined"

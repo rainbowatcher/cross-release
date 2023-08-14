@@ -82,7 +82,7 @@ describe("getNextVersions", () => {
       nextMajor: "2.0.0",
       nextMinor: "1.3.0",
       nextPatch: "1.2.4",
-      nextRelease: "1.2.3-alpha.1",
+      nextRelease: "1.2.4",
       nextPreMajor: "2.0.0-alpha.1",
       nextPreMinor: "1.3.0-alpha.1",
       nextPrePatch: "1.2.4-alpha.1",
@@ -97,7 +97,22 @@ describe("getNextVersions", () => {
       nextMajor: "2.0.0",
       nextMinor: "1.3.0",
       nextPatch: "1.2.4",
-      nextRelease: "1.2.3-alpha.1",
+      nextRelease: "1.2.4",
+      nextPreMajor: "2.0.0-alpha.1",
+      nextPreMinor: "1.3.0-alpha.1",
+      nextPrePatch: "1.2.4-alpha.1",
+    }
+
+    expect(getNextVersions(version)).toEqual(expected)
+  })
+
+  it("should generate next versions from a given semver object with prerelease", () => {
+    const version = new semver.SemVer("1.2.3-beta.1")
+    const expected = {
+      nextMajor: "2.0.0",
+      nextMinor: "1.3.0",
+      nextPatch: "1.2.3",
+      nextRelease: "1.2.3-beta.2",
       nextPreMajor: "2.0.0-alpha.1",
       nextPreMinor: "1.3.0-alpha.1",
       nextPrePatch: "1.2.4-alpha.1",
@@ -111,11 +126,11 @@ describe("getNextVersions", () => {
     const expected = {
       nextMajor: "2.0.0",
       nextMinor: "1.3.0",
-      nextPatch: "1.2.0",
-      nextRelease: "1.2.0-alpha.1",
+      nextPatch: "1.2.1",
+      nextRelease: "1.2.1",
       nextPreMajor: "2.0.0-alpha.1",
       nextPreMinor: "1.3.0-alpha.1",
-      nextPrePatch: "1.2.0-alpha.1",
+      nextPrePatch: "1.2.1-alpha.1",
     }
 
     expect(getNextVersions(version, true)).toEqual(expected)
@@ -126,7 +141,7 @@ describe("getNextVersions", () => {
       nextMajor: "1.0.0",
       nextMinor: "0.1.0",
       nextPatch: "0.0.1",
-      nextRelease: "0.0.0-alpha.1",
+      nextRelease: "0.0.1-alpha.1",
       nextPreMajor: "1.0.0-alpha.1",
       nextPreMinor: "0.1.0-alpha.1",
       nextPrePatch: "0.0.1-alpha.1",
