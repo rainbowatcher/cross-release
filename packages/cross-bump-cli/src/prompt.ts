@@ -9,7 +9,7 @@ import { select, text } from "@clack/prompts"
  * @param projectVersion - The project version.
  * @return The chosen version.
  */
-export async function chooseVersion(argv: Record<string, unknown>, projectVersion: string) {
+export async function chooseVersion(argv: Record<string, unknown>, projectVersion?: string) {
   const versionObj = semver.parse(projectVersion)
   const {
     nextMajor,
