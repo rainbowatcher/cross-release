@@ -65,10 +65,10 @@ export function getNextVersions(version?: string | semver.SemVer, coerce = false
  *
  * @param filePath - The path to the POM file.
  * @param version - The new version to set.
- * @param [dry=false] - Whether to perform a dry run or not.
+ * @param dry - Whether to perform a dry run or not. @default process.env.DRY
  * @return A promise that resolves when the version upgrade is complete.
  */
-export async function upgradePomVersion(filePath: PathLike, version: string, dry = false): Promise<void> {
+export async function upgradePomVersion(filePath: PathLike, version: string, dry = process.env.DRY): Promise<void> {
   const content = await fs.readFile(filePath, "utf-8")
   const $ = cheerio.load(content, {
     xml: { decodeEntities: false },
@@ -100,14 +100,13 @@ export async function getJavaProjectVersion(filePath: PathLike): Promise<string 
  *
  * @param filePath - The path to the file.
  * @param version - The new version to set.
- * @param dry - Whether to perform a dry run. @default false
+ * @param dry - Whether to perform a dry run. @default process.env.DRY
  * @return A promise that resolves when the version is upgraded.
  */
-export async function upgradePackageVersion(filePath: PathLike, version: string, dry = false): Promise<void> {
+export async function upgradePackageVersion(filePath: PathLike, version: string, dry = process.env.DRY): Promise<void> {
   const file = await fs.readFile(filePath, "utf-8")
   const { amount } = detectIndent(file)
   const packageJson = JSON.parse(file)
-  printVersion(version, filePath)
   if (!dry) {
     packageJson.version = version
     await fs.writeFile(filePath, JSON.stringify(packageJson, null, amount ?? 2))
@@ -163,14 +162,12 @@ export async function getRustProjectVersion(filePath: PathLike): Promise<string 
  *
  * @param filePath - The path to the file.
  * @param version - The version to upgrade to.
- * @param dry - Whether to perform a dry run. @default false
+ * @param dry - Whether to perform a dry run. @default process.env.DRY
  * @return A promise that resolves when the upgrade is complete.
  */
-export async function upgradeCargoVersion(filePath: PathLike, version: string, dry = false): Promise<void> {
+export async function upgradeCargoVersion(filePath: PathLike, version: string, dry = process.env.DRY): Promise<void> {
   const file = await fs.readFile(filePath, "utf-8")
-  // const { amount } = detectIndent(file)
   const cargoToml = TOML.parse(file)
-  printVersion(version, filePath)
   if (!dry) {
     if (isJsonMap(cargoToml.package)) {
       if (cargoToml.package.version) {
