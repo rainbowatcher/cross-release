@@ -1,8 +1,6 @@
 import * as fs from "node:fs/promises"
-import * as path from "node:path"
 import type { PathLike } from "node:fs"
 import * as cheerio from "cheerio"
-import { blue } from "colorette"
 import semver from "semver"
 import detectIndent from "detect-indent"
 import * as TOML from "@iarna/toml"
@@ -77,7 +75,6 @@ export async function upgradePomVersion(filePath: PathLike, version: string, dry
   const parentVersion = $("project>parent>version")
   projectVersion?.text(version)
   parentVersion?.text(version)
-  printVersion(version, filePath)
   if (!dry) {
     await fs.writeFile(filePath, $.xml())
   }
@@ -111,22 +108,6 @@ export async function upgradePackageVersion(filePath: PathLike, version: string,
     packageJson.version = version
     await fs.writeFile(filePath, JSON.stringify(packageJson, null, amount ?? 2))
   }
-}
-
-/**
- * Prints the version and file path to the console.
- *
- * @param version - The version to print.
- * @param filePath - The file path to print.
- * @return This function does not return a value.
- */
-function printVersion(version: string, filePath: PathLike): void {
-  console.log(
-    `| upgrade version to ${blue(version)} for ${path.relative(
-      process.cwd(),
-      filePath.toString(),
-    )}`,
-  )
 }
 
 /**
