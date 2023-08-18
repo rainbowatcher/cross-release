@@ -180,3 +180,7 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, d
     await fs.writeFile(filePath, TOML.stringify(cargoToml))
   }
 }
+
+export function isVersionValid(version?: string): boolean {
+  return !!semver.valid(version)
+}

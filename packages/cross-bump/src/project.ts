@@ -1,17 +1,14 @@
 import * as fs from "node:fs/promises"
 import path from "node:path"
 import type { PathLike } from "node:fs"
-import createDebug from "debug"
 import { isBlankPath } from "./util"
-
-const debug = createDebug("cross-bump:project")
 
 const supportedProjectCategory = ["java", "javascript", "rust"/* , "go" */] as const
 const supportedProjectFiles = ["package.json", "pom.xml", "Cargo.toml"] as const
 export type ProjectCategory = typeof supportedProjectCategory[number]
-export type ProjectFiles = typeof supportedProjectFiles[number]
+export type ProjectFileName = typeof supportedProjectFiles[number]
 
-const projectCategoryMap: Record<ProjectFiles, ProjectCategory> = {
+const projectCategoryMap: Record<ProjectFileName, ProjectCategory> = {
   "pom.xml": "java",
   "package.json": "javascript",
   "Cargo.toml": "rust",
@@ -47,10 +44,9 @@ export async function findProjectFiles(root?: PathLike, excludes?: string[]): Pr
     const filePath = path.resolve(process.cwd(), searchRoot.toString(), filename)
     if (dirEntry.isDirectory()) {
       files.push(...(await findProjectFiles(filePath)))
-    } else if (supportedProjectFiles.includes(filename as ProjectFiles)) {
-      debug("find project file:", filePath)
+    } else if (supportedProjectFiles.includes(filename as ProjectFileName)) {
       files.push({
-        category: projectCategoryMap[filename as ProjectFiles],
+        category: projectCategoryMap[filename as ProjectFileName],
         path: filePath,
       })
     }
@@ -66,10 +62,9 @@ export async function findProjectFile(root?: PathLike, excludes?: string[]): Pro
     const { name: filename } = dirEntry
     if (excludeDirs.includes(filename)) continue
     const filePath = path.resolve(process.cwd(), searchRoot.toString(), filename)
-    if (supportedProjectFiles.includes(filename as ProjectFiles)) {
-      debug("find project file:", filePath)
+    if (supportedProjectFiles.includes(filename as ProjectFileName)) {
       return {
-        category: projectCategoryMap[filename as ProjectFiles],
+        category: projectCategoryMap[filename as ProjectFileName],
         path: filePath,
       }
     }

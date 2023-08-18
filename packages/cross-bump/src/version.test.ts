@@ -5,11 +5,13 @@ import {
   getJavaProjectVersion,
   getNextVersions,
   getRustProjectVersion,
+  isVersionValid,
   upgradeCargoVersion,
   upgradePackageVersion,
   upgradePomVersion,
 } from "./version"
 import { findProjectFiles } from "./project"
+
 
 beforeAll(async () => {
   const defaultVersion = "1.1.1"
@@ -148,5 +150,40 @@ describe("getNextVersions", () => {
     }
 
     expect(getNextVersions()).toEqual(expected)
+  })
+})
+
+describe("isValidVersion", () => {
+  it("should return true for a valid version", () => {
+    expect(isVersionValid("1.2.3")).toBe(true)
+    expect(isVersionValid("1.2.3-alpha-1")).toBe(true)
+    expect(isVersionValid("1.2.3-alpha")).toBe(true)
+    expect(isVersionValid("1.2.3-alpha.1")).toBe(true)
+    expect(isVersionValid("1.2.3-any.1")).toBe(true)
+    expect(isVersionValid("1.2.3-any-1")).toBe(true)
+    expect(isVersionValid("1.2.3-ANY-1")).toBe(true)
+    expect(isVersionValid("1.2.3-ANY.1")).toBe(true)
+  })
+
+  it("should return false for an invalid version", () => {
+    expect(isVersionValid("1.2.3_alpha.1")).toBe(false)
+    expect(isVersionValid("1.2.3.alpha.1")).toBe(false)
+    expect(isVersionValid("1.2.alpha.1")).toBe(false)
+    expect(isVersionValid("1.2.3.4-alpha.1")).toBe(false)
+    expect(isVersionValid("1.2")).toBe(false)
+    expect(isVersionValid("invalid")).toBe(false)
+  })
+
+  it("should return false for an empty string", () => {
+    expect(isVersionValid("")).toBe(false)
+  })
+
+  it("should return false for a null value", () => {
+    // @ts-expect-error type
+    expect(isVersionValid(null)).toBe(false)
+  })
+
+  it("should return false for undefined", () => {
+    expect(isVersionValid(undefined)).toBe(false)
   })
 })
