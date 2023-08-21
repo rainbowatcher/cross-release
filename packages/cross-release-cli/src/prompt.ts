@@ -25,10 +25,10 @@ export async function chooseVersion(projectVersion?: string): Promise<string | s
   const C_CUSTOM = "custom"
   const versions = [
     { label: "custom...", value: C_CUSTOM },
+    { label: `recommend (${nextRelease})`, value: nextRelease },
     { label: `patch (${nextPatch})`, value: nextPatch },
     { label: `minor (${nextMinor})`, value: nextMinor },
     { label: `major (${nextMajor})`, value: nextMajor },
-    { label: `pre-release (${nextRelease})`, value: nextRelease },
     {
       label: `patch pre-release (${nextPrePatch})`,
       value: nextPrePatch,
@@ -43,7 +43,7 @@ export async function chooseVersion(projectVersion?: string): Promise<string | s
     },
   ]
   const selectedValue = await select({
-    message: "Pick a project version.",
+    message: `Pick a project version. (current: ${projectVersion})`,
     options: versions,
     initialValue:
       versions[versionObj?.prerelease.length ? 4 : 1].value ?? C_CUSTOM,

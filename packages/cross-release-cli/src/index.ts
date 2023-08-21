@@ -89,7 +89,6 @@ async function getGivenVersion(userSpecifyVersion: string): Promise<string> {
   if (isCancel(nextVersion)) {
     handleUserCancel()
   }
-  log.message(`choose version: ${nextVersion as string}`)
   return nextVersion as string
 }
 
