@@ -31,5 +31,10 @@ module.exports = {
         "test",
       ],
     ],
+    "scope-enum": [
+      2,
+      "always",
+      ["cross-release-cli", "cross-bump"],
+    ],
   },
 }
