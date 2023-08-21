@@ -5,6 +5,7 @@ import semver from "semver"
 import detectIndent from "detect-indent"
 import * as TOML from "@iarna/toml"
 import { isJsonMap } from "./util"
+import type { ProjectFile } from "./project"
 
 const FALLBACK_VERSION = "undefined"
 type VersionNumbers = {
@@ -157,6 +158,35 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, d
     }
     await fs.writeFile(filePath, TOML.stringify(cargoToml))
   }
+}
+
+export async function upgradeProjectVersion(projectFile: ProjectFile, nextVersion: string): Promise<void> {
+  switch (projectFile.category) {
+    case "java":
+      await upgradePomVersion(projectFile.path, nextVersion)
+      break
+    case "javascript":
+      await upgradePackageVersion(projectFile.path, nextVersion)
+      break
+    case "rust":
+      await upgradeCargoVersion(projectFile.path, nextVersion)
+      break
+  }
+}
+
+export async function getProjectVersion(projectFile: ProjectFile) {
+  let projectVersion
+  switch (projectFile?.category) {
+    case "java":
+      projectVersion = await getJavaProjectVersion(projectFile.path)
+      break
+    case "javascript":
+      projectVersion = await getJSProjectVersion(projectFile.path)
+      break
+    case "rust":
+      projectVersion = await getRustProjectVersion(projectFile.path)
+  }
+  return projectVersion
 }
 
 export function isVersionValid(version?: string): boolean {

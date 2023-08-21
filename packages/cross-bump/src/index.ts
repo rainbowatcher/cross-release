@@ -5,26 +5,34 @@ import {
   getJSProjectVersion,
   getJavaProjectVersion,
   getNextVersions,
+  getProjectVersion,
   getRustProjectVersion,
   isVersionValid,
   upgradeCargoVersion,
   upgradePackageVersion,
   upgradePomVersion,
+  upgradeProjectVersion,
 } from "./version"
 
 export {
+  // types
   type ProjectFile,
   type ProjectCategory,
   type ProjectFileName,
+  // project related
   findProjectFile,
   findProjectFiles,
+  // version related
   getJSProjectVersion,
   getJavaProjectVersion,
+  getNextVersions,
+  getProjectVersion,
   getRustProjectVersion,
+  isVersionValid,
   upgradeCargoVersion,
   upgradePackageVersion,
   upgradePomVersion,
-  getNextVersions,
-  isVersionValid,
+  upgradeProjectVersion,
+  // re-export from semver
   parse as parseVersion,
 }

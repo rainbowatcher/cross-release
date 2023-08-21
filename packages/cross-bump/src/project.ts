@@ -31,6 +31,7 @@ const DEFAULT_EXCLUDE = ["node_modules", ".git"]
  * Searches for all project files in the specified directory and its subdirectories.
  *
  * @param root - The directory to search in.
+ * @param excludes - The directories to exclude from the search.
  * @return An array of file paths that match the search criteria.
  */
 export async function findProjectFiles(root?: PathLike, excludes?: string[]): Promise<ProjectFile[]> {
