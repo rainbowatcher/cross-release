@@ -42,6 +42,7 @@
     "test": "vitest",
     "coverage": "vitest --coverage",
     "release": "jiti packages/cross-release-cli/src/index.ts -r",
+    "publish": "pnpm -r publish",
     "typecheck": "tsc --noEmit",
     "up": "taze -I"
   },
@@ -63,5 +64,10 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,vue,json}": "eslint --fix"
+  },
+  "cross-release": {
+    "excludes": [
+      "fixture"
+    ]
   }
 }
