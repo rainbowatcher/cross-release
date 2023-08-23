@@ -9,22 +9,15 @@ import {
   upgradeCargoVersion,
   upgradePackageVersion,
   upgradePomVersion,
+  upgradeProjectVersion,
 } from "./version"
 import { findProjectFiles } from "./project"
 
 
 beforeAll(async () => {
   const defaultVersion = "1.1.1"
-  const projectFiles = await findProjectFiles("fixture")
-  for await (const file of projectFiles) {
-    if (file.category === "rust") {
-      await upgradeCargoVersion(file.path, defaultVersion)
-    } else if (file.category === "javascript") {
-      await upgradePackageVersion(file.path, defaultVersion)
-    } else if (file.category === "java") {
-      await upgradePomVersion(file.path, defaultVersion)
-    }
-  }
+  const projectFiles = await findProjectFiles("fixture", undefined, true)
+  await Promise.all(projectFiles.map(file => upgradeProjectVersion(defaultVersion, file)))
 })
 
 
@@ -40,13 +33,13 @@ describe("Javascript project version related operation", async () => {
   it("should upgrade Javascript project version", async () => {
     await upgradePackageVersion(projectFile!.path, "1.2.3")
     const version = await getJSProjectVersion(projectFile!.path)
-    expect(semver.valid(version)).toMatchInlineSnapshot('"1.2.3"')
+    expect(semver.valid(version)).toEqual("1.2.3")
   })
 })
 
 
 describe("Java project version related operation", async () => {
-  const projectFiles = await findProjectFiles("fixture")
+  const projectFiles = await findProjectFiles("fixture/java")
   const projectFile = projectFiles.find(p => p.category === "java")
 
   it("should return the project version", async () => {
@@ -57,7 +50,7 @@ describe("Java project version related operation", async () => {
   it("should upgrade Java project version", async () => {
     await upgradePomVersion(projectFile!.path, "1.2.3")
     const version = await getJavaProjectVersion(projectFile!.path)
-    expect(semver.valid(version)).toMatchInlineSnapshot('"1.2.3"')
+    expect(semver.valid(version)).toEqual("1.2.3")
   })
 })
 
@@ -73,7 +66,7 @@ describe("Rust project version related operation", async () => {
   it("should upgrade Rust project version", async () => {
     await upgradeCargoVersion(projectFile!.path, "1.2.3")
     const version = await getRustProjectVersion(projectFile!.path)
-    expect(version).toMatchInlineSnapshot('"1.2.3"')
+    expect(version).toEqual("1.2.3")
   })
 })
 
@@ -179,7 +172,7 @@ describe("isValidVersion", () => {
   })
 
   it("should return false for a null value", () => {
-    // @ts-expect-error type
+    // @ts-expect-error param type incompatible
     expect(isVersionValid(null)).toBe(false)
   })
 

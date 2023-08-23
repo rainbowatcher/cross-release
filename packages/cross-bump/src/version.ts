@@ -160,8 +160,8 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, d
   }
 }
 
-export async function upgradeProjectVersion(projectFile: ProjectFile, nextVersion: string): Promise<void> {
-  switch (projectFile.category) {
+export async function upgradeProjectVersion(nextVersion: string, projectFile?: ProjectFile): Promise<void> {
+  switch (projectFile?.category) {
     case "java":
       await upgradePomVersion(projectFile.path, nextVersion)
       break

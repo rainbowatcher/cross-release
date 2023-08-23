@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest"
-import { findProjectFile, findProjectFiles } from "./project"
+import { findProjectFiles } from "./project"
 
 describe("findProjectFiles", () => {
-  it("should use process.cwd as root when directory is empty string", async () => {
+  it("should return an empty array when dir is empty", async () => {
     const projectFiles = await findProjectFiles("")
-    expect(projectFiles.length).gt(0)
+    expect(projectFiles).toEqual([])
   })
 
-  it("should use process.cwd as root when directory is undefined", async () => {
+  it("should return an empty array when dir is undefined", async () => {
     const projectFiles = await findProjectFiles()
-    expect(projectFiles.length).gt(0)
+    expect(projectFiles).toEqual([])
+  })
+
+  it("should recursively search", async () => {
+    const projectFiles = await findProjectFiles(process.cwd(), ["node_modules", ".git"], true)
+    expect(projectFiles.length).gte(7)
   })
 
   it("should return java project", async () => {
@@ -30,36 +35,19 @@ describe("findProjectFiles", () => {
     expect(projectFiles).toEqual(expected)
   })
 
-  it("should throw a error", async () => {
-    await expect(() => findProjectFiles("not/exists")).rejects.toThrowError("ENOENT")
-  })
-})
-
-describe("findProjectFile", () => {
-  it("should return project root's package.json when no argument is passed", async () => {
-    const projectFile = await findProjectFile()
-    const expected = {
-      category: "javascript",
-      path: `${process.cwd()}/package.json`,
-    }
-    expect(projectFile).toEqual(expected)
-  })
-
-  it("should first look for the package.json file", async () => {
-    const projectFile = await findProjectFile("fixture")
-    const expected = {
+  it("should return java and javascript project", async () => {
+    const projectFiles = await findProjectFiles("fixture")
+    const expected = [{
       category: "javascript",
       path: `${process.cwd()}/fixture/package.json`,
-    }
-    expect(projectFile).toEqual(expected)
+    }, {
+      category: "java",
+      path: `${process.cwd()}/fixture/pom.xml`,
+    }]
+    expect(projectFiles).toEqual(expected)
   })
 
-  it("should return undefined", async () => {
-    const projectFile = await findProjectFile("docs")
-    expect(projectFile).toBeUndefined()
-  })
-
-  it("should return throw a error", async () => {
-    await expect(() => findProjectFile("not/exists")).rejects.toThrowError()
+  it("should throw a error", async () => {
+    await expect(() => findProjectFiles("not/exists")).rejects.toThrowError("ENOENT")
   })
 })

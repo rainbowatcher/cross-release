@@ -1,6 +1,6 @@
 import { parse } from "semver"
 import type { ProjectCategory, ProjectFile, ProjectFileName } from "./project"
-import { findProjectFile, findProjectFiles } from "./project"
+import { findProjectFiles } from "./project"
 import {
   getJSProjectVersion,
   getJavaProjectVersion,
@@ -20,7 +20,6 @@ export {
   type ProjectCategory,
   type ProjectFileName,
   // project related
-  findProjectFile,
   findProjectFiles,
   // version related
   getJSProjectVersion,
