@@ -1,5 +1,11 @@
 {
   "name": "cross-bump",
   "version": "1.2.3",
-  "private": true
+  "private": true,
+  "cross-release": {
+    "excludes": [
+      "fixture",
+      "test"
+    ]
+  }
 }

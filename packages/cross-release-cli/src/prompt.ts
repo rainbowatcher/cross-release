@@ -1,7 +1,7 @@
 import { getNextVersions, isVersionValid, parseVersion } from "cross-bump"
 import { cancel, confirm, isCancel, select, text } from "@clack/prompts"
 import { ExitCode } from "./exit-code"
-import type { UserFlags } from "./cmd"
+import type { CommandArgs } from "./cmd"
 
 /**
  * Generates the version to be chosen based on command line arguments and project version.
@@ -25,7 +25,7 @@ export async function chooseVersion(projectVersion?: string): Promise<string | s
   const C_CUSTOM = "custom"
   const versions = [
     { label: "custom...", value: C_CUSTOM },
-    { label: `recommend (${nextRelease})`, value: nextRelease },
+    { label: `next (${nextRelease})`, value: nextRelease },
     { label: `patch (${nextPatch})`, value: nextPatch },
     { label: `minor (${nextMinor})`, value: nextMinor },
     { label: `major (${nextMajor})`, value: nextMajor },
@@ -46,7 +46,7 @@ export async function chooseVersion(projectVersion?: string): Promise<string | s
     message: `Pick a project version. (current: ${projectVersion})`,
     options: versions,
     initialValue:
-      versions[versionObj?.prerelease.length ? 4 : 1].value ?? C_CUSTOM,
+      versions[1].value ?? C_CUSTOM,
   })
 
   if (!selectedValue || selectedValue === C_CUSTOM) {
@@ -64,12 +64,13 @@ export async function chooseVersion(projectVersion?: string): Promise<string | s
   }
 }
 
-export async function foo(flags: UserFlags) {
-  async function confirmAndUpdateOption(property: keyof UserFlags, message: string) {
-    if (!flags[property]) {
+export async function confirmReleaseOptions(args: CommandArgs) {
+  async function confirmAndUpdateOption(property: keyof CommandArgs, message: string) {
+    if (args && property in args) {
       const confirmation = await confirm({ message })
-      if (!isCancel(confirmation)) {
-        flags[property] = confirmation
+      if (!isCancel(confirmation) && typeof args[property] === "boolean") {
+        // @ts-expect-error implicitly any
+        args[property] = confirmation
       } else {
         handleUserCancel()
       }

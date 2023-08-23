@@ -1,7 +1,7 @@
+import type { PathLike } from "node:fs"
 import { intro, isCancel, log, outro } from "@clack/prompts"
 import { blue, gray, inverse } from "colorette"
 import {
-  findProjectFile,
   findProjectFiles,
   getProjectVersion,
   isVersionValid,
@@ -9,7 +9,7 @@ import {
 } from "cross-bump"
 import isUnicodeSupported from "is-unicode-supported"
 import { ExitCode } from "./exit-code"
-import { chooseVersion, foo as confirmReleaseOptions, handleUserCancel } from "./prompt"
+import { chooseVersion, confirmReleaseOptions, handleUserCancel } from "./prompt"
 import { parseArgs } from "./cmd"
 import { gitCommit, gitPush, gitTag } from "./git"
 
@@ -20,12 +20,60 @@ type Gav = {
   scope: string
 }
 
+async function getVersion(dir: PathLike, excludes: string[], userSpecifyVersion: string): Promise<string> {
+  let nextVersion
+  // whether there are a version number is given
+  if (isVersionValid(userSpecifyVersion)) {
+    nextVersion = userSpecifyVersion
+  } else {
+    const projectFile = await findProjectFiles(dir, excludes)
+    if (!projectFile.length) {
+      throw new Error("can't found any project file in the project root")
+    }
+
+    const projectVersion = await getProjectVersion(projectFile[0])
+    nextVersion = await chooseVersion(projectVersion)
+  }
+  if (isCancel(nextVersion)) {
+    handleUserCancel()
+  }
+  return nextVersion as string
+}
+
+async function upgradeProjects(dir: PathLike, excludes: string[], isRecursive: boolean, nextVersion: string) {
+  const projectFiles = await findProjectFiles(dir, excludes, isRecursive)
+  const tasks = projectFiles.map((projectFile) => {
+    if (projectFile) {
+      return upgradeProjectVersion(nextVersion, projectFile).then(() => {
+        message(`upgrade version to ${blue(nextVersion)} for ${gray(projectFile.path)}`)
+      }).catch((e) => {
+        log.error(e)
+      })
+    }
+    return undefined
+  })
+
+  await Promise.all(tasks)
+}
+
+export function message(msg: string): void {
+  const bar = isUnicodeSupported() ? "│" : "|"
+  console.log(`${gray(bar)}  ${msg}`)
+}
+
 async function main() {
   const parsedArgs = parseArgs()
-
-  const { isQuiet, version, showHelp, showVersion, flags: options } = parsedArgs
-  const { isRecursive, isDry, isAllYes } = options
-  console.log({ isQuiet, version, showHelp, options })
+  const {
+    isQuiet,
+    dir,
+    excludes,
+    version,
+    showHelp,
+    showVersion,
+    isRecursive,
+    isDry,
+    isAllYes,
+  } = parsedArgs
 
   if (showHelp || showVersion)
     process.exit(ExitCode.Success)
@@ -38,63 +86,20 @@ async function main() {
     log.info(inverse(blue(" DRY RUN ")))
     process.env.DRY = "true"
   }
-  const nextVersion = await getGivenVersion(version)
+  const nextVersion = await getVersion(dir, excludes, version)
 
   if (!isAllYes) {
-    await confirmReleaseOptions(options)
+    await confirmReleaseOptions(parsedArgs)
   }
-  console.log({ options })
-  const projectFiles = await getProjectFiles(isRecursive)
 
-  for await (const projectFile of projectFiles) {
-    if (!projectFile) {
-      continue
-    }
-    await upgradeProjectVersion(projectFile, nextVersion)
-    message(`upgrade version to ${blue(nextVersion)} for ${projectFile.path}`)
-  }
+  await upgradeProjects(dir, excludes, isRecursive, nextVersion)
 
   const tagName = `v${nextVersion}`
-  gitTag(tagName)
-  gitCommit(tagName)
-  gitPush()
+  if (parsedArgs.shouldTag) gitTag(tagName)
+  if (parsedArgs.shouldCommit) gitCommit(tagName)
+  if (parsedArgs.shouldPush) gitPush()
 
   outro("Done")
-}
-
-async function getProjectFiles(isRecursive: boolean) {
-  let projectFiles = []
-  if (isRecursive) {
-    projectFiles = await findProjectFiles()
-  } else {
-    projectFiles = [await findProjectFile()]
-  }
-  return projectFiles
-}
-
-async function getGivenVersion(userSpecifyVersion: string): Promise<string> {
-  let nextVersion
-  // whether there are a version number is given
-  if (isVersionValid(userSpecifyVersion)) {
-    nextVersion = userSpecifyVersion
-  } else {
-    const projectFile = await findProjectFile()
-    if (!projectFile) {
-      throw new Error("can't found any project file in the project root")
-    }
-
-    const projectVersion = await getProjectVersion(projectFile)
-    nextVersion = await chooseVersion(projectVersion)
-  }
-  if (isCancel(nextVersion)) {
-    handleUserCancel()
-  }
-  return nextVersion as string
-}
-
-export function message(msg: string): void {
-  const bar = isUnicodeSupported() ? "│" : "|"
-  console.log(`${gray(bar)} ${msg}`)
 }
 
 void main()
