@@ -53,7 +53,7 @@ export function parseOptions() {
     .usage("[flags] version")
     .option("-r, --recursive", "Run the command for each project in the workspace (default: false)")
     .option("-d, --dry", "Dry run (default: false)")
-    .option("-D, --dir <dir>", "Set working directory (default: project root)")
+    .option("-D, --dir [dir]", "Set working directory (default: project root)")
     .option("-p, --publish", "Publish the project (default: false)")
     .option("-c, --commit", "Commit current changes (default: false)")
     .option("-p, --push", "Push the project to remote (default: false)")
