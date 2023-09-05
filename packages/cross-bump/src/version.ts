@@ -160,16 +160,16 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, d
   }
 }
 
-export async function upgradeProjectVersion(nextVersion: string, projectFile?: ProjectFile): Promise<void> {
+export async function upgradeProjectVersion(nextVersion: string, projectFile?: ProjectFile, dry = process.env.DRY): Promise<void> {
   switch (projectFile?.category) {
     case "java":
-      await upgradePomVersion(projectFile.path, nextVersion)
+      await upgradePomVersion(projectFile.path, nextVersion, dry)
       break
     case "javascript":
-      await upgradePackageVersion(projectFile.path, nextVersion)
+      await upgradePackageVersion(projectFile.path, nextVersion, dry)
       break
     case "rust":
-      await upgradeCargoVersion(projectFile.path, nextVersion)
+      await upgradeCargoVersion(projectFile.path, nextVersion, dry)
       break
   }
 }
