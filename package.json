@@ -20,21 +20,6 @@
     "url": "https://github.com/rainbowatcher/cross-release/issues"
   },
   "sideEffects": false,
-  "main": "./dist/index.cjs",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*",
-        "./dist/index.d.ts"
-      ]
-    }
-  },
-  "bin": {
-    "sum": "./bin/cmd.js"
-  },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "pnpm run clean && pnpm run -r build",
     "clean": "pnpm run -r clean",
@@ -42,7 +27,7 @@
     "dev": "jiti packages/cross-release-cli/src/index.ts -rd",
     "lint": "eslint .",
     "prepare": "husky install",
-    "release": "node packages/cross-release-cli/bin/cross-release.js -r",
+    "release": "node packages/cross-release-cli/dist/index.mjs -r",
     "publish": "pnpm -r publish",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
