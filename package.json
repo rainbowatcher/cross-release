@@ -27,8 +27,8 @@
     "dev": "jiti packages/cross-release-cli/src/index.ts -rd",
     "lint": "eslint .",
     "prepare": "husky install",
-    "release": "node packages/cross-release-cli/dist/index.mjs -r",
-    "publish": "pnpm -r publish",
+    "release": "node packages/cross-release-cli/dist/index.mjs",
+    "publish": "pnpm run release -r && pnpm run build && pnpm -r publish",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
     "up": "taze -rI"

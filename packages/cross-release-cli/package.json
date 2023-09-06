@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/rainbowatcher/cross-release/issues"
   },
-  "main": "dist/index.cjs",
+  "main": "dist/index.mjs",
   "bin": {
     "cross-release": "./bin/cross-release.js"
   },
