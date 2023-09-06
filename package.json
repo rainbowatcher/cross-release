@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "pnpm@8.7.1",
+  "packageManager": "pnpm@8.7.4",
   "description": "the cross release project",
   "author": {
     "name": "rainbowatcher",
@@ -47,7 +47,7 @@
     "up": "taze -rI"
   },
   "devDependencies": {
-    "@rainbowatcher/eslint-config": "0.3.2",
+    "@rainbowatcher/eslint-config": "0.3.3",
     "@types/debug": "^4.1.8",
     "@types/node": "^20.5.9",
     "@types/semver": "^7.5.1",

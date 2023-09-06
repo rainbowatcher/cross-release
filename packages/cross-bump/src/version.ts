@@ -33,10 +33,12 @@ export function getNextVersions(version?: string | semver.SemVer, coerce = false
   if (version instanceof semver.SemVer) {
     versionNum = version.version
     id = `${version.prerelease[0] ?? ""}`
-  } else if (typeof version === "string") {
+  }
+  else if (typeof version === "string") {
     versionNum = coerce ? semver.coerce(version)?.version ?? version : version
     id = `${semver.prerelease(version)?.[0] ?? ""}`
-  } else {
+  }
+  else {
     versionNum = "0.0.0"
     id = defaultId
   }

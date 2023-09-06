@@ -68,7 +68,8 @@ export async function chooseVersion(projectVersion?: string): Promise<string | s
         }
       },
     })
-  } else {
+  }
+  else {
     return selectedValue
   }
 }
@@ -93,7 +94,8 @@ export class App {
     for await (const task of this.taskQueue) {
       if (this.taskStatus === "failed") {
         break
-      } else {
+      }
+      else {
         await task.exec()
       }
     }
@@ -108,7 +110,8 @@ export class App {
   formatMessageString(template: string, nextVersion: string): string {
     if (template.includes("%s")) {
       return template.replace(/%s/g, nextVersion)
-    } else {
+    }
+    else {
       return template + nextVersion
     }
   }
@@ -135,11 +138,13 @@ export class App {
     // whether there are a version number is given
     if (isVersionValid(version)) {
       this.nextVersion = version
-    } else {
+    }
+    else {
       const nextVersion = await chooseVersion(projectVersion)
       if (isCancel(nextVersion)) {
         handleUserCancel()
-      } else {
+      }
+      else {
         this.nextVersion = nextVersion
       }
     }
@@ -178,11 +183,13 @@ export class App {
     ) => {
       if (isAllYes) {
         this.options[optionName] = true
-      } else if (!this.options[optionName]) {
+      }
+      else if (!this.options[optionName]) {
         const confirmation = await confirm({ message })
         if (!isCancel(confirmation)) {
           this.options[optionName] = confirmation
-        } else {
+        }
+        else {
           handleUserCancel()
         }
       }
@@ -197,7 +204,13 @@ export class App {
 
     const message = this.formatMessageString(commit.template, this.nextVersion)
     await confirmAndSet("shouldCommit", "should commit this release?", "commit",
-      async () => { this.#check(await gitCommit(message, { modifiedFiles: this.modifiedFiles, shouldStageAll: false })) },
+      async () => {
+        this.#check(await gitCommit(message, {
+          modifiedFiles: this.modifiedFiles,
+          shouldStageAll: commit.shouldStageAll,
+          shouldVerify: commit.shouldVerify,
+        }))
+      },
     )
 
     const tagName = `v${this.nextVersion}`

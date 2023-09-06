@@ -47,7 +47,8 @@ export async function findProjectFiles(dir?: PathLike, excludes?: string[], recu
     const filePath = path.resolve(process.cwd(), dir.toString(), filename)
     if (recursive && dirEntry.isDirectory()) {
       files.push(...(await findProjectFiles(filePath, excludes, recursive)))
-    } else if (supportedProjectFiles.includes(filename as ProjectFileName)) {
+    }
+    else if (supportedProjectFiles.includes(filename as ProjectFileName)) {
       files.push({
         category: projectCategoryMap[filename as ProjectFileName],
         path: filePath,
