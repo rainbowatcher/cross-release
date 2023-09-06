@@ -1,7 +1,9 @@
 import { execa } from "execa"
 import { blue, gray, green, red } from "colorette"
 import { log, spinner } from "@clack/prompts"
+import createDebug from "./debug"
 
+const debug = createDebug("git")
 
 type GitTagOptions = {
   isDel?: boolean
@@ -42,7 +44,7 @@ export async function gitTag(tagName: string, options?: GitTagOptions): Promise<
   if (!process.env.DRY) {
     try {
       const { command } = await execa("git", ["tag", ...args])
-      console.log(command)
+      debug(`command: ${command}`)
     }
     catch (e: any) {
       s.stop(red(e.shortMessage))
@@ -70,10 +72,9 @@ export async function gitCommit(message: string, options?: GitCommitOptions): Pr
     args.push("--dry-run")
   }
 
-  args.push("--message", `"${message}"`)
+  args.push("--message", message)
 
   if (!shouldStageAll && modifiedFiles.length) {
-    await gitAdd(modifiedFiles)
     args.push("--", ...modifiedFiles)
   }
   else {
@@ -85,7 +86,8 @@ export async function gitCommit(message: string, options?: GitCommitOptions): Pr
   }
 
   try {
-    await execa("git", ["commit", ...args])
+    const { command } = await execa("git", ["commit", ...args])
+    debug(`command: ${command}`)
     s.stop(`commit message: ${green(message)}`)
   }
   catch (e: any) {
@@ -121,7 +123,8 @@ export async function gitPush(options?: GitPushOptions): Promise<boolean> {
   }
 
   try {
-    await execa("git", ["push", ...args])
+    const { command } = await execa("git", ["push", ...args])
+    debug(`command: ${command}`)
     s.stop(`pushed to repo: ${gray(originUrl)}`)
   }
   catch (e: any) {

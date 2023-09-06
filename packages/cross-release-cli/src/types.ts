@@ -1,4 +1,4 @@
-export type Status = "finished" | "failed" | "pending"
+export type Status = "finished" | "failed" | "pending" | "running"
 
 export type Task = {
   name: string

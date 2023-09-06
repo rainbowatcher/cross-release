@@ -179,7 +179,6 @@ export class App {
       message: string,
       taskName: string,
       execFn: () => Promise<void> | void,
-      // rollbackFn: () => Promise<void> | void,
     ) => {
       if (isAllYes) {
         this.options[optionName] = true
@@ -203,7 +202,7 @@ export class App {
     }
 
     const message = this.formatMessageString(commit.template, this.nextVersion)
-    await confirmAndSet("shouldCommit", "should commit this release?", "commit",
+    await confirmAndSet("shouldCommit", "should commit?", "commit",
       async () => {
         this.#check(await gitCommit(message, {
           modifiedFiles: this.modifiedFiles,
@@ -214,11 +213,11 @@ export class App {
     )
 
     const tagName = `v${this.nextVersion}`
-    await confirmAndSet("shouldTag", "should create a tag for this release?", "tag",
+    await confirmAndSet("shouldTag", "should create tag?", "tag",
       async () => { this.#check(await gitTag(tagName, { message })) },
     )
 
-    await confirmAndSet("shouldPush", "should push to remote repository?", "push",
+    await confirmAndSet("shouldPush", "should push to remote?", "push",
       async () => { this.#check(await gitPush({ shouldFollowTags: this.options.push.shouldFollowTags })) },
     )
   }
@@ -231,10 +230,12 @@ export class App {
   #start(): void {
     intro("Cross release")
     this.#checkDryRun()
+    this.taskStatus = "running"
   }
 
   #done(): void {
     outro("Done")
+    this.taskStatus = "finished"
   }
 
   #check(status: boolean) {
