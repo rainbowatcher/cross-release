@@ -36,13 +36,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm run clean && pnpm run -r build",
+    "clean": "pnpm run -r clean",
+    "coverage": "vitest --coverage",
+    "dev": "jiti packages/cross-release-cli/src/index.ts -rd",
     "lint": "eslint .",
     "prepare": "husky install",
-    "test": "vitest",
-    "coverage": "vitest --coverage",
-    "release": "jiti packages/cross-release-cli/src/index.ts -r",
+    "release": "node packages/cross-release-cli/bin/cross-release.js -r",
     "publish": "pnpm -r publish",
+    "test": "vitest",
     "typecheck": "tsc --noEmit",
     "up": "taze -rI"
   },
@@ -58,6 +60,7 @@
     "jiti": "^1.19.3",
     "lint-staged": "^14.0.1",
     "pkgroll": "^1.11.0",
+    "rimraf": "^5.0.1",
     "taze": "^0.11.2",
     "typescript": "^5.2.2",
     "vitest": "^0.34.3"

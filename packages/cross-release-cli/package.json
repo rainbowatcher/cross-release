@@ -25,6 +25,7 @@
     "bin"
   ],
   "scripts": {
+    "clean": "rimraf dist/*",
     "build": "pkgroll"
   },
   "dependencies": {

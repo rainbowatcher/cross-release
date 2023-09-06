@@ -35,6 +35,7 @@
     "./dist"
   ],
   "scripts": {
+    "clean": "rimraf dist/*",
     "build": "pkgroll"
   },
   "dependencies": {
