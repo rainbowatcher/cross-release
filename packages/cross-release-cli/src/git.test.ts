@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest"
 import { gitOriginUrl } from "./git"
 
 describe("getOriginUrl", () => {
-  it("should return the origin url", () => {
+  it("should return the origin url", async () => {
     const mockStdout = "https://github.com/rainbowatcher/cross-release.git"
-    const result = gitOriginUrl()
+    const result = await gitOriginUrl()
     expect(result).toEqual(mockStdout)
   })
 })
