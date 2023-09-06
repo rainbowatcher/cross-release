@@ -26,7 +26,6 @@ export type ProjectFile = {
   path: string
 }
 
-const DEFAULT_EXCLUDE = ["node_modules", ".git"]
 /**
  * Searches for all project files in the specified directory and its subdirectories.
  *

@@ -65,7 +65,7 @@ type GitCommitOptions = {
 export async function gitCommit(message: string, options?: GitCommitOptions): Promise<boolean> {
   const s = spinner()
   s.start("committing")
-  const { modifiedFiles = [], shouldStageAll = true, shouldVerify = true } = options || {}
+  const { modifiedFiles = [], shouldStageAll, shouldVerify } = options || {}
   const args = []
 
   if (process.env.DRY) {

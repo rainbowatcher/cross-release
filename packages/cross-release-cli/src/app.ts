@@ -25,11 +25,11 @@ function handleUserCancel() {
  * Generates the version to be chosen based on command line arguments and project version.
  *
  * @param argv - The command line arguments.
- * @param projectVersion - The project version.
+ * @param currentVersion - The current project version.
  * @return The chosen version.
  */
-export async function chooseVersion(projectVersion?: string): Promise<string | symbol> {
-  const versionObj = parseVersion(projectVersion)
+export async function chooseVersion(currentVersion?: string): Promise<string | symbol> {
+  const versionObj = parseVersion(currentVersion)
   const {
     nextMajor,
     nextMinor,
@@ -44,6 +44,7 @@ export async function chooseVersion(projectVersion?: string): Promise<string | s
   const versions = [
     { label: "custom...", value: C_CUSTOM },
     { label: `next (${nextRelease})`, value: nextRelease },
+    { label: `keep (${currentVersion})`, value: currentVersion || "" },
     { label: `patch (${nextPatch})`, value: nextPatch },
     { label: `minor (${nextMinor})`, value: nextMinor },
     { label: `major (${nextMajor})`, value: nextMajor },
@@ -52,7 +53,7 @@ export async function chooseVersion(projectVersion?: string): Promise<string | s
     { label: `pre-major (${nextPreMajor})`, value: nextPreMajor },
   ]
   const selectedValue = await select({
-    message: `Pick a project version. (current: ${projectVersion})`,
+    message: `Pick a project version. (current: ${currentVersion})`,
     options: versions,
     initialValue:
       versions[1].value ?? C_CUSTOM,
@@ -140,7 +141,7 @@ export class App {
       this.nextVersion = version
     }
     else {
-      const nextVersion = await chooseVersion(projectVersion)
+      const nextVersion = await chooseVersion(this.currentVersion)
       if (isCancel(nextVersion)) {
         handleUserCancel()
       }
@@ -151,19 +152,21 @@ export class App {
   }
 
   async #getProjects(): Promise<void> {
-    const { options: { dir, excludes, isRecursive }, nextVersion, currentVersion } = this
+    const { options: { dir, excludes, isRecursive }, nextVersion } = this
     const projectFiles = await findProjectFiles(dir, excludes, isRecursive)
     this.#addTask({
       name: "upgradeVersion",
       exec: () => {
         return Promise.all(projectFiles.map(async (projectFile) => {
-          await upgradeProjectVersion(nextVersion, projectFile).then(() => {
+          try {
+            await upgradeProjectVersion(nextVersion, projectFile)
             this.modifiedFiles.push(projectFile.path)
-            message(`upgrade version to ${blue(nextVersion)} for ${gray(path.relative(dir, projectFile.path))}`)
-          }).catch((e) => {
+            message(`upgrade to ${blue(nextVersion)} for ${gray(path.relative(dir, projectFile.path))}`)
+          }
+          catch (e) {
             this.taskStatus = "failed"
             log.error(String(e))
-          })
+          }
         }))
       },
     })
