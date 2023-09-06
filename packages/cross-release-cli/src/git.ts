@@ -16,10 +16,12 @@ export async function gitTag(tagName: string, options?: GitTagOptions): Promise<
   const args = []
   if (isDel) {
     args.push("--delete")
-  } else {
+  }
+  else {
     if (!message || message?.length === 0) {
       log.warn("no message provided, is recommended to provide a message for create an annotated tag")
-    } else {
+    }
+    else {
       args.push(
         // Create an annotated tag, which is recommended for releases.
         // See https://git-scm.com/docs/git-tag
@@ -41,7 +43,8 @@ export async function gitTag(tagName: string, options?: GitTagOptions): Promise<
     try {
       const { command } = await execa("git", ["tag", ...args])
       console.log(command)
-    } catch (e: any) {
+    }
+    catch (e: any) {
       s.stop(red(e.shortMessage))
       return false
     }
@@ -69,10 +72,11 @@ export async function gitCommit(message: string, options?: GitCommitOptions): Pr
 
   args.push("--message", `"${message}"`)
 
-  if (modifiedFiles.length) {
+  if (!shouldStageAll && modifiedFiles.length) {
     await gitAdd(modifiedFiles)
-    args.push(...modifiedFiles)
-  } else if (shouldStageAll) {
+    args.push("--", ...modifiedFiles)
+  }
+  else {
     args.push("--all")
   }
 
@@ -83,7 +87,8 @@ export async function gitCommit(message: string, options?: GitCommitOptions): Pr
   try {
     await execa("git", ["commit", ...args])
     s.stop(`commit message: ${green(message)}`)
-  } catch (e: any) {
+  }
+  catch (e: any) {
     s.stop(red(e.shortMessage))
     return false
   }
@@ -118,7 +123,8 @@ export async function gitPush(options?: GitPushOptions): Promise<boolean> {
   try {
     await execa("git", ["push", ...args])
     s.stop(`pushed to repo: ${gray(originUrl)}`)
-  } catch (e: any) {
+  }
+  catch (e: any) {
     s.stop(red(e.shortMessage))
     return false
   }
@@ -147,7 +153,8 @@ export async function gitReset(options: GitResetOptions): Promise<boolean> {
   try {
     const { command } = await execa("git", ["reset", ...args])
     console.log(command)
-  } catch (e) {
+  }
+  catch (e) {
     return false
   }
   return true
@@ -168,7 +175,8 @@ export async function gitAdd(files: string[]): Promise<boolean> {
 
   try {
     await execa("git", ["add", ...args])
-  } catch (e) {
+  }
+  catch (e) {
     return false
   }
   return true
