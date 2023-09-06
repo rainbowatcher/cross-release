@@ -22,7 +22,7 @@ const configDefaults: ReleaseOptions = {
   dir: process.cwd(),
   commit: {
     shouldVerify: true,
-    shouldStageAll: false,
+    shouldStageAll: true,
     template: "chore: release v%s",
   },
   push: {
