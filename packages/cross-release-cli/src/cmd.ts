@@ -6,7 +6,6 @@ import { version } from "../package.json"
 import type { ReleaseOptions } from "./types"
 
 
-
 const configDefaults: ReleaseOptions = {
   showHelp: false,
   showVersion: false,
@@ -15,11 +14,11 @@ const configDefaults: ReleaseOptions = {
   isDry: false,
   isRecursive: false,
   shouldCommit: false,
-  shouldPublish: false,
   shouldPush: false,
   shouldTag: false,
   excludes: ["node_modules", ".git"],
   dir: process.cwd(),
+  main: "javascript",
   commit: {
     shouldVerify: true,
     shouldStageAll: true,
@@ -52,13 +51,13 @@ export function parseOptions() {
     .version(version)
     .usage("[flags] version")
     .option("-r, --recursive", "Run the command for each project in the workspace (default: false)")
-    .option("-d, --dry", "Dry run (default: false)")
-    .option("-D, --dir [dir]", "Set working directory (default: project root)")
-    .option("-p, --publish", "Publish the project (default: false)")
     .option("-c, --commit", "Commit current changes (default: false)")
+    .option("-d, --dry", "Dry run (default: false)")
+    .option("-e, --exclude [dir]", "Folders to exclude from search (default: [node_modules, .git])")
+    .option("-m, --main", "Base project language (e.g. java, rust, javascript default: javascript)")
+    .option("-D, --dir [dir]", "Set working directory (default: project root)")
     .option("-p, --push", "Push the project to remote (default: false)")
     .option("-t, --tag", "Create a tag for current version (default: false)")
-    .option("-e, --exclude [dir]", "Folders to exclude from search (default: [node_modules, .git])")
     .option("-y, --yes", "Answer yes to all prompts (default: false)")
     .help()
     .parse()
@@ -73,7 +72,6 @@ export function parseOptions() {
     showHelp: options.help,
     showVersion: options.version,
     shouldCommit: options.commit,
-    shouldPublish: options.publish,
     shouldPush: options.push,
     shouldTag: options.tag,
     version: args[0],

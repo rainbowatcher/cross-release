@@ -128,12 +128,16 @@ export class App {
     const { dir, excludes, version } = this.options
 
     // read current project version
-    // we will get the project version in order with the following priority, package.json > pom.xml > Cargo.toml
-    const projectFile = await findProjectFiles(dir, excludes)
-    if (!projectFile.length) {
+    // project file is in alphabetical order
+    const projectFiles = await findProjectFiles(dir, excludes)
+    if (!projectFiles.length) {
       throw new Error("can't found any project file in the project root")
     }
-    const projectVersion = await getProjectVersion(projectFile[0])
+    const mainProjectFile = projectFiles.find(file => file.category === this.options.main)
+    if (!mainProjectFile) {
+      throw new Error(`can't found ${this.options.main} project file in the project root`)
+    }
+    const projectVersion = await getProjectVersion(mainProjectFile)
     this.currentVersion = projectVersion || ""
 
     // whether there are a version number is given

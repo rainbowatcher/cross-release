@@ -36,17 +36,17 @@ pnpm run release
 
 ## Command line
 
-| short | long            | description                                       | default                    |
-| ----- | --------------- | ------------------------------------------------- | -------------------------- |
-| -r    | --recursive     | Run the command for each project in the workspace | `false`                    |
-| -d    | --dry           | Dry run                                           | `false`                    |
-| -D    | --dir [dir]     | Set working directory                             | `project root`             |
-| -p    | --publish       | Publish the project                               | `false`                    |
-| -c    | --commit        | Commit current changes                            | `false`                    |
-| -p    | --push          | Push the project to remote                        | `false`                    |
-| -t    | --tag           | Create a tag for current version                  | `false`                    |
-| -e    | --exclude [dir] | Folders to exclude from search                    | `["node_modules", ".git"]` |
-| -y    | --yes           | Answer yes to all prompts                         | `false`                    |
+| short | long            | description                                         | default                    |
+| ----- | --------------- | --------------------------------------------------- | -------------------------- |
+| -m    | --main          | Main project language e.g. java / javascript / rust | `false`                    |
+| -r    | --recursive     | Run the command for each project in the workspace   | `false`                    |
+| -d    | --dry           | Dry run                                             | `false`                    |
+| -D    | --dir [dir]     | Set working directory                               | `project root`             |
+| -c    | --commit        | Commit current changes                              | `false`                    |
+| -p    | --push          | Push the project to remote                          | `false`                    |
+| -t    | --tag           | Create a tag for current version                    | `false`                    |
+| -e    | --exclude [dir] | Folders to exclude from search                      | `["node_modules", ".git"]` |
+| -y    | --yes           | Answer yes to all prompts                           | `false`                    |
 
 ## Configuration
 
@@ -65,7 +65,6 @@ You can specify various runtime settings by using the "package.json" file. Here 
     "isDry": false,
     "isRecursive": false,
     "shouldCommit": false,
-    "shouldPublish": false,
     "shouldPush": false,
     "shouldTag": false,
     // default exclude folders are `["node_modules", ".git"]`, your config will be append within it

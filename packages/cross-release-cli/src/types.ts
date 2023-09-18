@@ -1,3 +1,5 @@
+import type { ProjectCategory } from "cross-bump"
+
 export type Status = "finished" | "failed" | "pending" | "running"
 
 export type Task = {
@@ -35,12 +37,6 @@ export type ReleaseOptions = {
    * @default false
    */
   isRecursive: boolean
-
-  /**
-   * Indicates whether to publish the changes.
-   * @default false
-   */
-  shouldPublish: boolean
 
   /**
    * Indicates whether to commit the changes.
@@ -97,6 +93,11 @@ export type ReleaseOptions = {
    * Whether the command should display help or usage information.
    */
   showHelp: boolean
+
+  /**
+   * Specifies the main project category.
+   */
+  main: ProjectCategory
 
   /**
    * Git commit related options
