@@ -22,6 +22,7 @@
 - [x] bump
 - [x] git (tag/push)
 - [x] user config
+- [ ] tauri support
 - [ ] changelog
 - [ ] release github action
 
