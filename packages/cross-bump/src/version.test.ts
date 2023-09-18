@@ -55,7 +55,7 @@ describe("Java project version related operation", async () => {
 })
 
 describe("Rust project version related operation", async () => {
-  const projectFiles = await findProjectFiles("fixture/rust")
+  const projectFiles = await findProjectFiles("fixture/rust-mod1")
   const projectFile = projectFiles.find(p => p.category === "rust")
 
   it("should return the project version", async () => {

@@ -1,0 +1,8 @@
+[package]
+name = "cross-bump"
+authors = [ "rainbowatcher" ]
+edition = "2021"
+rust-version = "1.70"
+
+  [package.version]
+  workspace = true

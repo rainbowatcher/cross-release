@@ -27,10 +27,10 @@ describe("findProjectFiles", () => {
   })
 
   it("should return rust project", async () => {
-    const projectFiles = await findProjectFiles("fixture/rust")
+    const projectFiles = await findProjectFiles("fixture/rust-mod1")
     const expected = [{
       category: "rust",
-      path: `${process.cwd()}/fixture/rust/Cargo.toml`,
+      path: `${process.cwd()}/fixture/rust-mod1/Cargo.toml`,
     }]
     expect(projectFiles).toEqual(expected)
   })
@@ -38,6 +38,9 @@ describe("findProjectFiles", () => {
   it("should return java and javascript project", async () => {
     const projectFiles = await findProjectFiles("fixture")
     const expected = [{
+      category: "rust",
+      path: `${process.cwd()}/fixture/Cargo.toml`,
+    }, {
       category: "javascript",
       path: `${process.cwd()}/fixture/package.json`,
     }, {

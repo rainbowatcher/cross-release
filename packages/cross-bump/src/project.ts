@@ -31,6 +31,7 @@ export type ProjectFile = {
  *
  * @param dir - The directory to search in.
  * @param excludes - The directories to exclude from the search.
+ * @param recursive - Whether to recursively search. @default false
  * @return An array of file paths that match the search criteria.
  */
 export async function findProjectFiles(dir?: PathLike, excludes?: string[], recursive = false): Promise<ProjectFile[]> {

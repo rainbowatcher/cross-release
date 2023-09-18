@@ -153,10 +153,17 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, d
   const file = await fs.readFile(filePath, "utf-8")
   const cargoToml = TOML.parse(file)
   if (!dry) {
-    if (isJsonMap(cargoToml.package)) {
-      if (cargoToml.package.version) {
-        cargoToml.package.version = version
-      }
+    const { package: cargoPackage, workspace } = cargoToml
+    if (isJsonMap(cargoPackage) &&
+        cargoPackage.version &&
+        typeof cargoPackage.version === "string") {
+      cargoPackage.version = version
+    }
+    if (isJsonMap(workspace) &&
+        isJsonMap(workspace.package) &&
+        workspace.package.version &&
+        typeof workspace.package.version === "string") {
+      workspace.package.version = version
     }
     await fs.writeFile(filePath, TOML.stringify(cargoToml))
   }
