@@ -1,11 +1,11 @@
 {
-  "name": "cross-bump",
-  "version": "1.2.3",
-  "private": true,
-  "cross-release": {
-    "excludes": [
-      "fixture",
-      "test"
-    ]
-  }
+    "name": "cross-bump",
+    "version": "1.2.3",
+    "private": true,
+    "cross-release": {
+        "excludes": [
+            "fixture",
+            "test"
+        ]
+    }
 }

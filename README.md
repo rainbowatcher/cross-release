@@ -4,7 +4,7 @@
 
 ## Feature
 
-- Support Java/JavaScript/Rust 
+- Support Java/JavaScript/Rust
   > current support `package.json`/`pom.xml`/`Cargo.toml`
 - Prompt based cli operation
 - Monorepo support

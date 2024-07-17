@@ -1,6 +1,6 @@
 [package]
 name = "cross-bump"
-authors = [ "rainbowatcher" ]
+authors = ["rainbowatcher"]
 edition = "2021"
 version = "1.2.3"
 rust-version = "1.70"

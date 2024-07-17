@@ -1,7 +1,8 @@
 import * as fs from "node:fs/promises"
 import path from "node:path"
-import type { PathLike } from "node:fs"
+import process from "node:process"
 import { isBlankPath } from "./util"
+import type { PathLike } from "node:fs"
 
 const supportedProjectCategory = ["java", "javascript", "rust"/* , "go" */] as const
 const supportedProjectFiles = ["package.json", "pom.xml", "Cargo.toml"] as const
@@ -9,21 +10,22 @@ export type ProjectCategory = typeof supportedProjectCategory[number]
 export type ProjectFileName = typeof supportedProjectFiles[number]
 
 const projectCategoryMap: Record<ProjectFileName, ProjectCategory> = {
-  "pom.xml": "java",
-  "package.json": "javascript",
-  "Cargo.toml": "rust",
-  // go: "go.mod",
+    "Cargo.toml": "rust",
+    "package.json": "javascript",
+    "pom.xml": "java",
+    // go: "go.mod",
 }
 
 export type ProjectFile = {
-  /**
+    /**
    * project category
    */
-  category: ProjectCategory
-  /**
+    category: ProjectCategory
+
+    /**
    * project file path
    */
-  path: string
+    path: string
 }
 
 /**
@@ -35,25 +37,24 @@ export type ProjectFile = {
  * @return An array of file paths that match the search criteria.
  */
 export async function findProjectFiles(dir?: PathLike, excludes?: string[], recursive = false): Promise<ProjectFile[]> {
-  const files: ProjectFile[] = []
-  if (isBlankPath(dir)) {
-    return files
-  }
+    const files: ProjectFile[] = []
+    if (isBlankPath(dir)) {
+        return files
+    }
 
-  const dirEntries = await fs.readdir(dir, { withFileTypes: true })
-  for await (const dirEntry of dirEntries) {
-    const { name: filename } = dirEntry
-    if (excludes?.includes(filename)) continue
-    const filePath = path.resolve(process.cwd(), dir.toString(), filename)
-    if (recursive && dirEntry.isDirectory()) {
-      files.push(...(await findProjectFiles(filePath, excludes, recursive)))
+    const dirEntries = await fs.readdir(dir, { withFileTypes: true })
+    for await (const dirEntry of dirEntries) {
+        const { name: filename } = dirEntry
+        if (excludes?.includes(filename)) continue
+        const filePath = path.resolve(process.cwd(), dir.toString(), filename)
+        if (recursive && dirEntry.isDirectory()) {
+            files.push(...await findProjectFiles(filePath, excludes, recursive))
+        } else if (supportedProjectFiles.includes(filename as ProjectFileName)) {
+            files.push({
+                category: projectCategoryMap[filename as ProjectFileName],
+                path: filePath,
+            })
+        }
     }
-    else if (supportedProjectFiles.includes(filename as ProjectFileName)) {
-      files.push({
-        category: projectCategoryMap[filename as ProjectFileName],
-        path: filePath,
-      })
-    }
-  }
-  return files
+    return files
 }

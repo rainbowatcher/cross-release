@@ -1,23 +1,23 @@
 {
-  "compilerOptions": {
-    "target": "es2020",
-    "module": "esnext",
-    "lib": [
-      "ESNext"
+    "compilerOptions": {
+        "target": "es2020",
+        "lib": [
+            "ESNext"
+        ],
+        "module": "esnext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "esModuleInterop": true,
+        "skipDefaultLibCheck": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "packages/**/*.ts",
+        "vitest.config.ts"
     ],
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true
-  },
-  "include": [
-    "packages/**/*.ts",
-    "vitest.config.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "exclude": [
+        "node_modules"
+    ]
 }

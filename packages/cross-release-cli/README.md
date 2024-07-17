@@ -22,9 +22,9 @@ yarn add cross-release --global
 
 ```json
 {
-  "scripts": {
-    "release": "cross-release"
-  }
+    "scripts": {
+        "release": "cross-release"
+    }
 }
 ```
 
@@ -54,33 +54,33 @@ You can specify various runtime settings by using the "package.json" file. Here 
 
 ```json
 {
-  "...": "...",
-  "cross-release": {
+    "...": "...",
+    "cross-release": {
     // show the help message
-    "showHelp": false,
-    // show the version about cross-release
-    "showVersion": false,
-    "version": "",
-    "isAllYes": false,
-    "isDry": false,
-    "isRecursive": false,
-    "shouldCommit": false,
-    "shouldPush": false,
-    "shouldTag": false,
-    // default exclude folders are `["node_modules", ".git"]`, your config will be append within it
-    "excludes": ["path/to/exclude"],
-    "dir": "/path/to/run",
-    "commit": {
-      // Whether to invoke git pre-commit and commit-msg hook
-      "shouldVerify": true,
-      // Whether to stage all un-staged files or stage only changed files
-      "shouldStageAll": false,
-      // the symbol '%s' will be replace to the version number that you specified
-      "template": "chore: release v%s"
-    },
-    "push": {
-      "shouldFollowTags": false
+        "showHelp": false,
+        // show the version about cross-release
+        "showVersion": false,
+        "version": "",
+        "isAllYes": false,
+        "isDry": false,
+        "isRecursive": false,
+        "shouldCommit": false,
+        "shouldPush": false,
+        "shouldTag": false,
+        // default exclude folders are `["node_modules", ".git"]`, your config will be append within it
+        "excludes": ["path/to/exclude"],
+        "dir": "/path/to/run",
+        "commit": {
+            // Whether to invoke git pre-commit and commit-msg hook
+            "shouldVerify": true,
+            // Whether to stage all un-staged files or stage only changed files
+            "shouldStageAll": false,
+            // the symbol '%s' will be replace to the version number that you specified
+            "template": "chore: release v%s"
+        },
+        "push": {
+            "shouldFollowTags": false
+        }
     }
-  }
 }
 ```
