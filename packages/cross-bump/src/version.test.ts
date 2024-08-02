@@ -1,6 +1,6 @@
 import * as semver from "semver"
 import {
-    beforeAll, describe, expect, it,
+    afterAll, describe, expect, it,
 } from "vitest"
 import { findProjectFiles } from "./project"
 import {
@@ -15,10 +15,10 @@ import {
     upgradeProjectVersion,
 } from "./version"
 
+const defaultVersion = "1.1.1"
 
-beforeAll(async () => {
-    const defaultVersion = "1.1.1"
-    const projectFiles = await findProjectFiles("fixture", undefined, true)
+afterAll(async () => {
+    const projectFiles = await findProjectFiles("fixture", ["ignored"], true)
     await Promise.all(projectFiles.map(file => upgradeProjectVersion(defaultVersion, file)))
 })
 

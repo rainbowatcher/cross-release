@@ -8,9 +8,4 @@ export default defineConfig({
     toml: true,
     typescript: true,
     yaml: true,
-}, {
-    files: ["**/*.ts"],
-    rules: {
-        "perfectionist/sort-classes": "off",
-    },
 })

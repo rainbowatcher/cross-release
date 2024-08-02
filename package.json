@@ -58,7 +58,7 @@
         "vitest": "^2.0.5"
     },
     "lint-staged": {
-        "*.{js,jsx,ts,tsx,vue,json}": "eslint --fix"
+        "*.{js,ts,vue,json,jsonc,md,toml}": "eslint"
     },
     "cross-release": {
         "excludes": [
