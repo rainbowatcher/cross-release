@@ -1,9 +1,7 @@
 import process from "node:process"
 import { log, spinner } from "@clack/prompts"
-import {
-    blue, gray, green, red,
-} from "colorette"
 import { execa } from "execa"
+import color from "picocolors"
 import createDebug from "./debug"
 
 const debug = createDebug("git")
@@ -47,12 +45,12 @@ export async function gitTag(tagName: string, options?: GitTagOptions): Promise<
             const { command } = await execa("git", ["tag", ...args])
             debug(`command: ${command}`)
         } catch (error: any) {
-            s.stop(red(error.shortMessage))
+            s.stop(color.red(error.shortMessage))
             return false
         }
     }
 
-    s.stop(`create git tag: ${blue(tagName)}`)
+    s.stop(`create git tag: ${color.blue(tagName)}`)
     return true
 }
 
@@ -87,9 +85,9 @@ export async function gitCommit(message: string, options?: GitCommitOptions): Pr
     try {
         const { command } = await execa("git", ["commit", ...args])
         debug(`command: ${command}`)
-        s.stop(`commit message: ${green(message)}`)
+        s.stop(`commit message: ${color.green(message)}`)
     } catch (error: any) {
-        s.stop(red(error.shortMessage))
+        s.stop(color.red(error.shortMessage))
         return false
     }
     return true
@@ -123,9 +121,9 @@ export async function gitPush(options?: GitPushOptions): Promise<boolean> {
     try {
         const { command } = await execa("git", ["push", ...args])
         debug(`command: ${command}`)
-        s.stop(`pushed to repo: ${gray(originUrl)}`)
+        s.stop(`pushed to repo: ${color.gray(originUrl)}`)
     } catch (error: any) {
-        s.stop(red(error.shortMessage))
+        s.stop(color.red(error.shortMessage))
         return false
     }
     return true

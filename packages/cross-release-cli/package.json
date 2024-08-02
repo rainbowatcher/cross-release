@@ -31,11 +31,11 @@
     "dependencies": {
         "@clack/prompts": "^0.7.0",
         "cac": "^6.7.14",
-        "colorette": "^2.0.20",
         "cross-bump": "workspace:*",
         "debug": "^4.3.5",
         "defu": "^6.1.4",
         "execa": "^9.3.0",
-        "is-unicode-supported": "^2.0.0"
+        "is-unicode-supported": "^2.0.0",
+        "picocolors": "^1.0.1"
     }
 }

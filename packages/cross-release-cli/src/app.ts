@@ -3,11 +3,11 @@ import process from "node:process"
 import {
     cancel, confirm, intro, isCancel, log, outro, select, text,
 } from "@clack/prompts"
-import { bgBlue, blue, gray } from "colorette"
 import {
     findProjectFiles, getNextVersions, getProjectVersion, isVersionValid, parseVersion, upgradeProjectVersion,
 } from "cross-bump"
 import isUnicodeSupported from "is-unicode-supported"
+import color from "picocolors"
 import { parseOptions } from "./cmd"
 import { ExitCode } from "./exitCode"
 import { gitCommit, gitPush, gitTag } from "./git"
@@ -18,7 +18,7 @@ type ExtractBooleanKeys<T> = keyof Pick<T, { [K in keyof T]: T[K] extends boolea
 
 function message(msg: string): void {
     const bar = isUnicodeSupported() ? "│" : "|"
-    console.log(`${gray(bar)}  ${msg}`)
+    console.log(`${color.gray(bar)}  ${msg}`)
 }
 
 function handleUserCancel() {
@@ -139,7 +139,7 @@ export class App {
 
     #checkDryRun() {
         if (this.options.isDry) {
-            log.message(bgBlue(" DRY RUN "))
+            log.message(color.bgBlue(" DRY RUN "))
             process.env.DRY = "true"
         }
     }
@@ -236,7 +236,7 @@ export class App {
                     try {
                         await upgradeProjectVersion(nextVersion, projectFile)
                         this.modifiedFiles.push(projectFile.path)
-                        message(`upgrade to ${blue(nextVersion)} for ${gray(path.relative(dir, projectFile.path))}`)
+                        message(`upgrade to ${color.blue(nextVersion)} for ${color.gray(path.relative(dir, projectFile.path))}`)
                     } catch (error) {
                         this.taskStatus = "failed"
                         log.error(String(error))
