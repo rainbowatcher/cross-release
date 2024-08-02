@@ -4,8 +4,8 @@ import {
 } from "vitest"
 import { findProjectFiles } from "./project"
 import {
-    getJSProjectVersion,
     getJavaProjectVersion,
+    getJSProjectVersion,
     getNextVersions,
     getRustProjectVersion,
     isVersionValid,

@@ -1,8 +1,8 @@
 import { parse } from "semver"
 import { findProjectFiles } from "./project"
 import {
-    getJSProjectVersion,
     getJavaProjectVersion,
+    getJSProjectVersion,
     getNextVersions,
     getProjectVersion,
     getRustProjectVersion,
@@ -14,24 +14,29 @@ import {
 } from "./version"
 import type { ProjectCategory, ProjectFile, ProjectFileName } from "./project"
 
+// version related
 export {
-    type ProjectCategory,
-    // types
-    type ProjectFile,
-    type ProjectFileName,
-    // project related
-    findProjectFiles,
-    // version related
-    getJSProjectVersion,
     getJavaProjectVersion,
+    getJSProjectVersion,
     getNextVersions,
     getProjectVersion,
     getRustProjectVersion,
     isVersionValid,
-    // re-export from semver
-    parse as parseVersion,
     upgradeCargoVersion,
     upgradePackageVersion,
     upgradePomVersion,
     upgradeProjectVersion,
+}
+
+// re-export from semver
+export { parse as parseVersion }
+
+// project related
+export { findProjectFiles }
+
+// types
+export type {
+    ProjectCategory,
+    ProjectFile,
+    ProjectFileName,
 }

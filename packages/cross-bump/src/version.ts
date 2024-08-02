@@ -4,8 +4,8 @@ import initTomlEdit, { edit, parse } from "@rainbowatcher/toml-edit-js"
 import * as cheerio from "cheerio"
 import detectIndent from "detect-indent"
 import semver from "semver"
-import type { ProjectFile } from "./project"
 import type { PathLike } from "node:fs"
+import type { ProjectFile } from "./project"
 
 const FALLBACK_VERSION = "undefined"
 type VersionNumbers = {
