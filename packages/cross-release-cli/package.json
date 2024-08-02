@@ -1,5 +1,6 @@
 {
     "name": "cross-release-cli",
+    "type": "module",
     "version": "0.0.1-alpha.5",
     "description": "command line app for cross language bump utility",
     "author": {
@@ -37,6 +38,7 @@
         "execa": "^9.3.0",
         "is-unicode-supported": "^2.0.0",
         "parse-gitignore": "^2.0.0",
-        "picocolors": "^1.0.1"
+        "picocolors": "^1.0.1",
+        "unconfig": "^0.5.5"
     }
 }

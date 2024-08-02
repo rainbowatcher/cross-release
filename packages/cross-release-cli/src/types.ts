@@ -2,7 +2,7 @@ import type { ProjectCategory } from "cross-bump"
 
 export type Status = "failed" | "finished" | "pending" | "running"
 
-export type ExtractBooleanKeys<T> = keyof Pick<T, { [K in keyof T]: T[K] extends boolean ? K : never }[keyof T]>
+export type ExtractBooleanKeys<T> = keyof Pick<T, { [K in keyof T]: T[K] extends boolean | Record<string, unknown> ? K : never }[keyof T]>
 
 export type Task = {
     exec: () => Promise<void | void[]> | void
@@ -33,11 +33,21 @@ export type Execution = {
     taskQueue: Task[]
 }
 
+export type ReleaseOptionsDefault = Omit<ReleaseOptions, "config">
+
+export type DefineConfigOptions = Partial<Omit<ReleaseOptions, "config">>
+
 export type ReleaseOptions = {
     /**
-     * Git commit related options
+     * Indicates whether to commit the changes.
+     * @default false
      */
-    commit: CommitOptions
+    commit: boolean | CommitOptions
+
+    /**
+     * Specifies the path to the configuration file.
+     */
+    config: string
 
     /**
      * The directory path where the operation will be performed.
@@ -46,27 +56,15 @@ export type ReleaseOptions = {
     dir: string
 
     /**
+     * Whether the operation is being run in a dry-run mode (simulated execution).
+     */
+    dry: boolean
+
+    /**
      * The list of directories to exclude from the search.
      * @default ["node_modules", ".git"]
      */
     excludes: string[]
-
-    /**
-     * Whether all prompts requiring user input will be answered with "yes".
-     * @default false
-     */
-    isAllYes: boolean
-
-    /**
-     * Whether the operation is being run in a dry-run mode (simulated execution).
-     */
-    isDry: boolean
-
-    /**
-     * Specifies whether the operation should be performed recursively.
-     * @default false
-     */
-    isRecursive: boolean
 
     /**
      * Specifies the main project category.
@@ -74,37 +72,16 @@ export type ReleaseOptions = {
     main: ProjectCategory
 
     /**
-     * Git push related options
-     */
-    push: {
-        /**
-         * Whether to follow tags
-         */
-        shouldFollowTags: boolean
-    }
-
-    /**
-     * Indicates whether to commit the changes.
+     * Whether push changes to remote and push options
      * @default false
      */
-    shouldCommit: boolean
+    push: boolean | PushOptions
 
     /**
-     * Indicates whether to push the changes to a remote repository.
+     * Specifies whether the operation should be performed recursively.
      * @default false
      */
-    shouldPush: boolean
-
-    /**
-     * Indicates whether to create a tag for a release.
-     * @default false
-     */
-    shouldTag: boolean
-
-    /**
-     * Whether the command should display help or usage information.
-     */
-    showHelp: boolean
+    recursive: boolean
 
     /**
      * Whether the command should display the version information.
@@ -112,26 +89,45 @@ export type ReleaseOptions = {
     showVersion: boolean
 
     /**
+     * Indicates whether to create a tag for a release.
+     * @default false
+     */
+    tag: boolean
+
+    /**
      * The version string associated with the command or operation.
      */
     version: string
+
+    /**
+     * Whether all prompts requiring user input will be answered with "yes".
+     * @default false
+     */
+    yes: boolean
 }
 
 export type CommitOptions = {
     /**
      * Whether to stage all files or only modified files.
      */
-    shouldStageAll: boolean
-
-    /**
-     * Whether to enable git pre-commit and commit-msg hook.
-     * @default true
-     */
-    shouldVerify: boolean
+    stageAll?: boolean
 
     /**
      * The template string for the commit message. if the template contains any "%s" placeholders,
      * then they are replaced with the version number;
      */
-    template: string
+    template?: string
+
+    /**
+     * Whether to enable git pre-commit and commit-msg hook.
+     * @default true
+     */
+    verify?: boolean
+}
+
+export type PushOptions = {
+    /**
+     * Whether to follow tags
+     */
+    followTags?: boolean
 }

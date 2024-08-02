@@ -9,10 +9,11 @@ import {
 import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
 import { parseOptions } from "./cmd"
-import createDebug from "./debug"
 import { ExitCode } from "./exitCode"
 import { gitCommit, gitPush, gitTag } from "./git"
 import { chooseVersion } from "./prompt"
+import { resolveAltOptions } from "./util"
+import createDebug from "./util/debug"
 import type {
     ExtractBooleanKeys, ReleaseOptions, Status, Task,
 } from "./types"
@@ -40,6 +41,10 @@ function handleUserCancel<T = boolean>(result: symbol | T): T {
 
 export class App {
 
+    static async create(): Promise<App> {
+        return new App(await parseOptions())
+    }
+
     private currentVersion = ""
 
     private modifiedFiles: string[] = []
@@ -52,8 +57,8 @@ export class App {
 
     private taskStatus: Status = "pending"
 
-    constructor() {
-        this.options = parseOptions()
+    constructor(opts: ReleaseOptions) {
+        this.options = opts
     }
 
     /**
@@ -100,53 +105,51 @@ export class App {
     }
 
     #checkDryRun() {
-        if (this.options.isDry) {
+        if (this.options.dry) {
             log.message(color.bgBlue(" DRY RUN "))
             process.env.DRY = "true"
         }
     }
 
     async #confirmReleaseOptions() {
-        const { commit, isAllYes } = this.options
+        const { yes } = this.options
 
 
         const confirmAndSet = async (
-            optionName: ExtractBooleanKeys<ReleaseOptions>,
+            name: ExtractBooleanKeys<ReleaseOptions>,
             message: string,
-            taskName: string,
-            execFn: () => Promise<void> | void,
+            exec: () => Promise<void> | void,
         ) => {
-            if (isAllYes) {
-                this.options[optionName] = true
-            } else if (!this.options[optionName]) {
+            if (yes) {
+                this.options[name] = true
+            } else if (!this.options[name]) {
                 const confirmation = await confirm({ message })
-                this.options[optionName] = handleUserCancel<boolean>(confirmation)
+                this.options[name] = handleUserCancel<boolean>(confirmation)
             }
 
-            if (this.options[optionName]) {
-                this.#addTask({
-                    exec: execFn,
-                    name: taskName,
-                })
+            if (this.options[name]) {
+                this.#addTask({ exec, name })
             }
         }
 
-        const message = this.formatMessageString(commit.template, this.nextVersion)
-        await confirmAndSet("shouldCommit", "should commit?", "commit", async () => {
+        const { stageAll, template, verify } = resolveAltOptions(this.options, "commit")
+        const message = this.formatMessageString(template!, this.nextVersion)
+        await confirmAndSet("commit", "should commit?", async () => {
             this.#check(await gitCommit(message, {
                 modifiedFiles: this.modifiedFiles,
-                shouldStageAll: commit.shouldStageAll,
-                shouldVerify: commit.shouldVerify,
+                shouldStageAll: stageAll,
+                shouldVerify: verify,
             }))
         })
 
         const tagName = `v${this.nextVersion}`
-        await confirmAndSet("shouldTag", "should create tag?", "tag", async () => {
+        await confirmAndSet("tag", "should create tag?", async () => {
             this.#check(await gitTag(tagName, { message }))
         })
 
-        await confirmAndSet("shouldPush", "should push to remote?", "push", async () => {
-            this.#check(await gitPush({ shouldFollowTags: this.options.push.shouldFollowTags }))
+        await confirmAndSet("push", "should push to remote?", async () => {
+            const { followTags } = resolveAltOptions(this.options, "push")
+            this.#check(await gitPush({ shouldFollowTags: followTags }))
         })
     }
 
@@ -182,7 +185,7 @@ export class App {
     }
 
     async #getProjects(): Promise<void> {
-        const { nextVersion, options: { dir, excludes, isRecursive } } = this
+        const { nextVersion, options: { dir, excludes, recursive: isRecursive } } = this
         const projectFiles = await findProjectFiles(dir, excludes, isRecursive)
         debug(`found ${projectFiles.length} project files`)
         this.#addTask({
@@ -210,4 +213,6 @@ export class App {
 
 }
 
-export default new App()
+const app = await App.create()
+
+export default app

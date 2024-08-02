@@ -1,3 +1,3 @@
-import app from "./app"
-
-void app.run()
+export function defineConfig(config: unknown) {
+    return config
+}

@@ -1,53 +1,52 @@
-import fs from "node:fs"
-import path from "node:path"
 import process from "node:process"
 import cac from "cac"
 import { defu } from "defu"
+import { loadConfig } from "unconfig"
 import { version } from "../package.json"
-import type { ReleaseOptions } from "./types"
+import type { ReleaseOptions, ReleaseOptionsDefault } from "./types"
 
 
-const CONFIG_DEFAULT: ReleaseOptions = {
+export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     commit: {
-        shouldStageAll: true,
-        shouldVerify: true,
+        stageAll: true,
         template: "chore: release v%s",
+        verify: true,
     },
     dir: process.cwd(),
+    dry: false,
     excludes: ["node_modules", ".git"],
-    isAllYes: false,
-    isDry: false,
-    isRecursive: false,
     main: "javascript",
     push: {
-        shouldFollowTags: false,
+        followTags: false,
     },
-    shouldCommit: false,
-    shouldPush: false,
-    shouldTag: false,
-    showHelp: false,
+    recursive: false,
     showVersion: false,
+    tag: true,
     version: "",
+    yes: false,
 }
 
 // TODO: should give more approches for config
-export function loadUserConfig(overrides: Partial<ReleaseOptions>) {
-    const file = fs.readFileSync(path.resolve(process.cwd(), "package.json"), "utf8")
-    const userConfig = JSON.parse(file)["cross-release"]
+export async function loadUserConfig(overrides: Partial<ReleaseOptions>): Promise<ReleaseOptions> {
+    const { config: userConfig } = await loadConfig<Partial<ReleaseOptions>>({
+        sources: [
+            { files: "cross-release.config" },
+            {
+                extensions: ["json"],
+                files: "package",
+                rewrite(config: any) {
+                    // eslint-disable-next-line ts/no-unsafe-return
+                    return config["cross-release"]
+                },
+            },
+        ],
+    })
+
     return defu<ReleaseOptions, any>(overrides, userConfig, CONFIG_DEFAULT)
 }
 
-function _filterNull(obj: any) {
-    const result: Record<string, any> = {}
-    for (const [key, value] of Object.entries(obj)) {
-        if (value) {
-            result[key] = value
-        }
-    }
-    return result
-}
 
-export function parseOptions() {
+export async function parseOptions(): Promise<ReleaseOptions> {
     const cli = cac("cross-release")
         .version(version)
         .usage("[flags] version")
@@ -64,16 +63,8 @@ export function parseOptions() {
         .parse()
 
     const { args, options } = cli
-    const parsedArgs: ReleaseOptions = loadUserConfig({
-        dir: options.dir,
-        excludes: options.exclude,
-        isAllYes: options.yes,
-        isDry: options.dry,
-        isRecursive: options.recursive,
-        shouldCommit: options.commit,
-        shouldPush: options.push,
-        shouldTag: options.tag,
-        showHelp: options.help,
+    const parsedArgs: ReleaseOptions = await loadUserConfig({
+        ...options,
         showVersion: options.version,
         version: args[0],
     })

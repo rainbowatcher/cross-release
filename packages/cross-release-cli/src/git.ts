@@ -2,7 +2,7 @@ import process from "node:process"
 import { log, spinner } from "@clack/prompts"
 import { execa } from "execa"
 import color from "picocolors"
-import createDebug from "./debug"
+import createDebug from "./util/debug"
 
 const debug = createDebug("git")
 
@@ -121,7 +121,7 @@ export async function gitPush(options?: GitPushOptions): Promise<boolean> {
     try {
         const { command } = await execa("git", ["push", ...args])
         debug(`command: ${command}`)
-        s.stop(`pushed to repo: ${color.gray(originUrl)}`)
+        s.stop(`pushed to repo: ${color.underline(originUrl)}`)
     } catch (error: any) {
         s.stop(color.red(error.shortMessage))
         return false

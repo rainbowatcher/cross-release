@@ -8,6 +8,7 @@
         "defu",
         "iarna",
         "outro",
+        "unconfig",
     ],
     "eslint.validate": [
         "javascript",
