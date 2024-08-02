@@ -21,14 +21,14 @@
     },
     "sideEffects": false,
     "scripts": {
-        "build": "pnpm run -r build",
-        "clean": "pnpm run -r clean",
+        "build": "pnpm -r build",
+        "clean": "pnpm -r clean",
         "coverage": "vitest --coverage",
         "dev": "tsx packages/cross-release-cli/src/cli.ts -rd",
         "lint": "eslint .",
         "prepare": "husky",
         "release": "node packages/cross-release-cli/dist/index.js",
-        "publish": "pnpm run release -ry && pnpm run build && pnpm -r publish",
+        "publish": "pnpm release -ry && pnpm build && pnpm -r publish",
         "test": "vitest",
         "typecheck": "tsc --noEmit",
         "up": "taze -rI"
