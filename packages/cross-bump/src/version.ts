@@ -73,6 +73,7 @@ export async function upgradePomVersion(filePath: PathLike, version: string, opt
         dry = process.env.DRY,
         finalNewline = true,
     } = opts
+
     const content = await fs.readFile(filePath, "utf8")
     const $ = cheerio.load(content, {
         xml: { decodeEntities: false },
@@ -81,10 +82,12 @@ export async function upgradePomVersion(filePath: PathLike, version: string, opt
     const parentVersion = $("project>parent>version")
     projectVersion?.text(version)
     parentVersion?.text(version)
+
     let newXml = $.xml().trimEnd()
     if (finalNewline) {
         newXml += "\n"
     }
+
     if (!dry) {
         await fs.writeFile(filePath, newXml)
     }
@@ -168,18 +171,18 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, o
     const {
         dry = process.env.DRY,
     } = opts
+
     await initTomlEdit()
     const cargoFile = await fs.readFile(filePath, "utf8")
     const cargoToml = parse(cargoFile)
     let newCargoFile = cargoFile
+    const { package: cargoPackage, workspace } = cargoToml
+
     if (!dry) {
-        const { package: cargoPackage, workspace } = cargoToml
-        if (cargoPackage?.version
-            && typeof cargoPackage.version === "string") {
+        if (cargoPackage?.version && typeof cargoPackage.version === "string") {
             newCargoFile = edit(cargoFile, "package.version", version)
         }
-        if (workspace?.package?.version
-            && typeof workspace.package.version === "string") {
+        if (workspace?.package?.version && typeof workspace.package.version === "string") {
             newCargoFile = edit(newCargoFile, "workspace.package.version", version)
         }
         await fs.writeFile(filePath, newCargoFile)

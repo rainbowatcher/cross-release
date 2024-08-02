@@ -21,7 +21,7 @@
     },
     "sideEffects": false,
     "scripts": {
-        "build": "pnpm run clean && pnpm run -r build",
+        "build": "pnpm run -r build",
         "clean": "pnpm run -r clean",
         "coverage": "vitest --coverage",
         "dev": "jiti packages/cross-release-cli/src/index.ts -rd",
@@ -51,9 +51,9 @@
         "husky": "^9.1.4",
         "jiti": "^1.21.6",
         "lint-staged": "^15.2.7",
-        "pkgroll": "^2.4.2",
         "rimraf": "^6.0.1",
         "taze": "^0.16.3",
+        "tsup": "^8.2.3",
         "typescript": "^5.5.4",
         "vitest": "^2.0.5"
     },

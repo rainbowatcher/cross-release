@@ -2,6 +2,8 @@ import type { ProjectCategory } from "cross-bump"
 
 export type Status = "failed" | "finished" | "pending" | "running"
 
+export type ExtractBooleanKeys<T> = keyof Pick<T, { [K in keyof T]: T[K] extends boolean ? K : never }[keyof T]>
+
 export type Task = {
     exec: () => Promise<void | void[]> | void
     name: string

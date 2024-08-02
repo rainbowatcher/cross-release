@@ -7,7 +7,7 @@ import { version } from "../package.json"
 import type { ReleaseOptions } from "./types"
 
 
-const configDefaults: ReleaseOptions = {
+const CONFIG_DEFAULT: ReleaseOptions = {
     commit: {
         shouldStageAll: true,
         shouldVerify: true,
@@ -34,7 +34,7 @@ const configDefaults: ReleaseOptions = {
 export function loadUserConfig(overrides: Partial<ReleaseOptions>) {
     const file = fs.readFileSync(path.resolve(process.cwd(), "package.json"), "utf8")
     const userConfig = JSON.parse(file)["cross-release"]
-    return defu<ReleaseOptions, any>(overrides, userConfig, configDefaults)
+    return defu<ReleaseOptions, any>(overrides, userConfig, CONFIG_DEFAULT)
 }
 
 function _filterNull(obj: any) {
@@ -54,7 +54,7 @@ export function parseOptions() {
         .option("-r, --recursive", "Run the command for each project in the workspace (default: false)")
         .option("-c, --commit", "Commit current changes (default: false)")
         .option("-d, --dry", "Dry run (default: false)")
-        .option("-e, --exclude [dir]", "Folders to exclude from search (default: [node_modules, .git])")
+        .option("-e, --exclude [dir]", "Folders to exclude from search")
         .option("-m, --main", "Base project language (e.g. java, rust, javascript default: javascript)")
         .option("-D, --dir [dir]", "Set working directory (default: project root)")
         .option("-p, --push", "Push the project to remote (default: false)")

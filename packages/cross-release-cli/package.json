@@ -16,7 +16,7 @@
     "bugs": {
         "url": "https://github.com/rainbowatcher/cross-release/issues"
     },
-    "main": "dist/index.mjs",
+    "main": "dist/index.js",
     "bin": {
         "cross-release": "./bin/cross-release.js"
     },
@@ -26,7 +26,7 @@
     ],
     "scripts": {
         "clean": "rimraf dist/*",
-        "build": "pkgroll"
+        "build": "tsup-node"
     },
     "dependencies": {
         "@clack/prompts": "^0.7.0",
@@ -36,6 +36,7 @@
         "defu": "^6.1.4",
         "execa": "^9.3.0",
         "is-unicode-supported": "^2.0.0",
+        "parse-gitignore": "^2.0.0",
         "picocolors": "^1.0.1"
     }
 }

@@ -24,19 +24,18 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
-            "import": "./dist/index.mjs",
-            "require": "./dist/index.cjs"
+            "import": "./dist/index.js"
         }
     },
-    "main": "./dist/index.cjs",
-    "module": "./dist/index.mjs",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "files": [
         "./dist"
     ],
     "scripts": {
         "clean": "rimraf dist/*",
-        "build": "pkgroll"
+        "build": "tsup-node"
     },
     "dependencies": {
         "@rainbowatcher/toml-edit-js": "^0.1.1",

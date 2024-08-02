@@ -1,83 +1,41 @@
 import path from "node:path"
 import process from "node:process"
 import {
-    cancel, confirm, intro, isCancel, log, outro, select, text,
+    cancel, confirm, intro, isCancel, log, outro,
 } from "@clack/prompts"
 import {
-    findProjectFiles, getNextVersions, getProjectVersion, isVersionValid, parseVersion, upgradeProjectVersion,
+    findProjectFiles, getProjectVersion, isVersionValid, upgradeProjectVersion,
 } from "cross-bump"
 import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
 import { parseOptions } from "./cmd"
+import createDebug from "./debug"
 import { ExitCode } from "./exitCode"
 import { gitCommit, gitPush, gitTag } from "./git"
-import type { ReleaseOptions, Status, Task } from "./types"
+import { chooseVersion } from "./prompt"
+import type {
+    ExtractBooleanKeys, ReleaseOptions, Status, Task,
+} from "./types"
 
 
-type ExtractBooleanKeys<T> = keyof Pick<T, { [K in keyof T]: T[K] extends boolean ? K : never }[keyof T]>
+const debug = createDebug("app")
+
 
 function message(msg: string): void {
     const bar = isUnicodeSupported() ? "│" : "|"
     console.log(`${color.gray(bar)}  ${msg}`)
 }
 
-function handleUserCancel() {
-    cancel("User cancel")
-    // eslint-disable-next-line unicorn/no-process-exit
-    process.exit(ExitCode.InvalidArgument)
-}
-
 /**
- * Generates the version to be chosen based on command line arguments and project version.
- *
- * @param argv - The command line arguments.
- * @param currentVersion - The current project version.
- * @return The chosen version.
+ * Return the original result if it is not a cancellation symbol. exit process when detect cancel signal
  */
-export async function chooseVersion(currentVersion?: string): Promise<string | symbol> {
-    const versionObj = parseVersion(currentVersion)
-    const {
-        nextMajor,
-        nextMinor,
-        nextPatch,
-        nextPreMajor,
-        nextPreMinor,
-        nextPrePatch,
-        nextRelease,
-    } = getNextVersions(versionObj ?? undefined)
-
-    const C_CUSTOM = "custom"
-    const versions = [
-        { label: "custom...", value: C_CUSTOM },
-        { label: `next (${nextRelease})`, value: nextRelease },
-        { label: `keep (${currentVersion})`, value: currentVersion ?? "" },
-        { label: `patch (${nextPatch})`, value: nextPatch },
-        { label: `minor (${nextMinor})`, value: nextMinor },
-        { label: `major (${nextMajor})`, value: nextMajor },
-        { label: `pre-patch (${nextPrePatch})`, value: nextPrePatch },
-        { label: `pre-minor (${nextPreMinor})`, value: nextPreMinor },
-        { label: `pre-major (${nextPreMajor})`, value: nextPreMajor },
-    ]
-    const selectedValue = await select({
-        initialValue:
-      versions[1].value ?? C_CUSTOM,
-        message: `Pick a project version. (current: ${currentVersion})`,
-        options: versions,
-    })
-
-    if (!selectedValue || selectedValue === C_CUSTOM) {
-        return await text({
-            message: "Input your custom version number",
-            placeholder: "version number",
-            validate: (value) => {
-                if (!isVersionValid(value)) {
-                    return "Invalid"
-                }
-            },
-        })
-    } else {
-        return selectedValue
+function handleUserCancel<T = boolean>(result: symbol | T): T {
+    if (isCancel(result)) {
+        cancel("User cancel")
+        // eslint-disable-next-line unicorn/no-process-exit
+        process.exit(ExitCode.Canceled)
     }
+    return result
 }
 
 export class App {
@@ -110,6 +68,10 @@ export class App {
             return template + nextVersion
         }
     }
+
+    // toString(): string {
+    //     return this.currentVersion
+    // }
 
     async run(): Promise<void> {
         this.#start()
@@ -158,11 +120,7 @@ export class App {
                 this.options[optionName] = true
             } else if (!this.options[optionName]) {
                 const confirmation = await confirm({ message })
-                if (isCancel(confirmation)) {
-                    handleUserCancel()
-                } else {
-                    this.options[optionName] = confirmation
-                }
+                this.options[optionName] = handleUserCancel<boolean>(confirmation)
             }
 
             if (this.options[optionName]) {
@@ -219,17 +177,14 @@ export class App {
             this.nextVersion = version
         } else {
             const nextVersion = await chooseVersion(this.currentVersion)
-            if (isCancel(nextVersion)) {
-                handleUserCancel()
-            } else {
-                this.nextVersion = nextVersion
-            }
+            this.nextVersion = handleUserCancel(nextVersion)
         }
     }
 
     async #getProjects(): Promise<void> {
         const { nextVersion, options: { dir, excludes, isRecursive } } = this
         const projectFiles = await findProjectFiles(dir, excludes, isRecursive)
+        debug(`found ${projectFiles.length} project files`)
         this.#addTask({
             exec: () => {
                 return Promise.all(projectFiles.map(async (projectFile) => {
