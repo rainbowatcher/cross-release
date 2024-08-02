@@ -2,5 +2,12 @@
 name = "cross-bump"
 authors = ["rainbowatcher"]
 edition = "2021"
-version = "1.2.3"
+version = "1.1.1"
 rust-version = "1.70"
+
+[dependencies]
+syn = { version = "1.0", features = ["full"] }
+
+[dependencies.proc-macro2]
+version = "1.0"
+features = ["span-locations"]

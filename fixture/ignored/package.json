@@ -1,5 +1,5 @@
 {
-    "name": "cross-bump",
+    "name": "cross-bump-ignored",
     "version": "1.1.1",
     "private": true,
     "cross-release": {

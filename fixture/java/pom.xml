@@ -3,11 +3,11 @@
     <parent>
         <groupId>com.example.parent</groupId>
         <artifactId>cross-bump-parent</artifactId>
-        <version>1.2.3</version>
+        <version>1.1.1</version>
     </parent>
     <groupId>com.example</groupId>
     <artifactId>cross-bump</artifactId>
-    <version>1.2.3</version>
+    <version>1.1.1</version>
     <packaging>jar</packaging>
     <name>cross-bump project</name>
 </project>
