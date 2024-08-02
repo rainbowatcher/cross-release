@@ -1,10 +1,9 @@
 import * as fs from "node:fs/promises"
 import process from "node:process"
-import * as TOML from "@iarna/toml"
+import initTomlEdit, { edit, parse } from "@rainbowatcher/toml-edit-js"
 import * as cheerio from "cheerio"
 import detectIndent from "detect-indent"
 import semver from "semver"
-import { isJsonMap } from "./util"
 import type { ProjectFile } from "./project"
 import type { PathLike } from "node:fs"
 
@@ -132,8 +131,9 @@ export async function getJSProjectVersion(filePath: PathLike): Promise<string | 
  */
 export async function getRustProjectVersion(filePath: PathLike): Promise<string | undefined> {
     const file = await fs.readFile(filePath, "utf8")
-    const { package: cargoPackage } = TOML.parse(file)
-    if (isJsonMap(cargoPackage) && cargoPackage.version) {
+    await initTomlEdit()
+    const { package: cargoPackage } = parse(file)
+    if (cargoPackage?.version) {
         return cargoPackage.version as string
     }
 }
@@ -147,22 +147,21 @@ export async function getRustProjectVersion(filePath: PathLike): Promise<string 
  * @return A promise that resolves when the upgrade is complete.
  */
 export async function upgradeCargoVersion(filePath: PathLike, version: string, dry = process.env.DRY): Promise<void> {
-    const file = await fs.readFile(filePath, "utf8")
-    const cargoToml = TOML.parse(file)
+    await initTomlEdit()
+    const cargoFile = await fs.readFile(filePath, "utf8")
+    const cargoToml = parse(cargoFile)
+    let newCargoFile = cargoFile
     if (!dry) {
         const { package: cargoPackage, workspace } = cargoToml
-        if (isJsonMap(cargoPackage)
-            && cargoPackage.version
+        if (cargoPackage?.version
             && typeof cargoPackage.version === "string") {
-            cargoPackage.version = version
+            newCargoFile = edit(cargoFile, "package.version", version)
         }
-        if (isJsonMap(workspace)
-            && isJsonMap(workspace.package)
-            && workspace.package.version
+        if (workspace?.package?.version
             && typeof workspace.package.version === "string") {
-            workspace.package.version = version
+            newCargoFile = edit(newCargoFile, "workspace.package.version", version)
         }
-        await fs.writeFile(filePath, TOML.stringify(cargoToml))
+        await fs.writeFile(filePath, newCargoFile)
     }
 }
 
