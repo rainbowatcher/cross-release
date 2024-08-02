@@ -22,7 +22,6 @@ beforeAll(async () => {
     await Promise.all(projectFiles.map(file => upgradeProjectVersion(defaultVersion, file)))
 })
 
-
 describe("Javascript project version related operation", async () => {
     const projectFiles = await findProjectFiles("fixture")
     const projectFile = projectFiles.find(p => p.category === "javascript")
@@ -55,6 +54,7 @@ describe("Java project version related operation", async () => {
         expect(semver.valid(version)).toEqual("1.2.3")
     })
 })
+
 
 describe("Rust project version related operation", async () => {
     const projectFiles = await findProjectFiles("fixture/rust-mod1")

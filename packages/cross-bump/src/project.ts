@@ -18,13 +18,13 @@ const projectCategoryMap: Record<ProjectFileName, ProjectCategory> = {
 
 export type ProjectFile = {
     /**
-   * project category
-   */
+     * project category
+     */
     category: ProjectCategory
 
     /**
-   * project file path
-   */
+     * project file path
+     */
     path: string
 }
 

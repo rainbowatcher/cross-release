@@ -33,101 +33,103 @@ export type Execution = {
 
 export type ReleaseOptions = {
     /**
-   * Git commit related options
-   */
-    commit: {
-    /**
-     * Whether to stage all files or only modified files.
+     * Git commit related options
      */
-        shouldStageAll: boolean
-
-        /**
-     * Whether to enable git pre-commit and commit-msg hook.
-     * @default true
-     */
-        shouldVerify: boolean
-
-        /**
-     * The template string for the commit message. if the template contains any "%s" placeholders,
-     * then they are replaced with the version number;
-     */
-        template: string
-    }
+    commit: CommitOptions
 
     /**
-   * The directory path where the operation will be performed.
-   * @default process.cwd()
-   */
+     * The directory path where the operation will be performed.
+     * @default process.cwd()
+     */
     dir: string
 
     /**
-   * The list of directories to exclude from the search.
-   * @default ["node_modules", ".git"]
-   */
+     * The list of directories to exclude from the search.
+     * @default ["node_modules", ".git"]
+     */
     excludes: string[]
 
     /**
-   * Whether all prompts requiring user input will be answered with "yes".
-   * @default false
-   */
+     * Whether all prompts requiring user input will be answered with "yes".
+     * @default false
+     */
     isAllYes: boolean
 
     /**
-   * Whether the operation is being run in a dry-run mode (simulated execution).
-   */
+     * Whether the operation is being run in a dry-run mode (simulated execution).
+     */
     isDry: boolean
 
     /**
-   * Specifies whether the operation should be performed recursively.
-   * @default false
-   */
+     * Specifies whether the operation should be performed recursively.
+     * @default false
+     */
     isRecursive: boolean
 
     /**
-   * Specifies the main project category.
-   */
+     * Specifies the main project category.
+     */
     main: ProjectCategory
 
     /**
-   * Git push related options
-   */
-    push: {
-    /**
-     * Whether to follow tags
+     * Git push related options
      */
+    push: {
+        /**
+         * Whether to follow tags
+         */
         shouldFollowTags: boolean
     }
 
     /**
-   * Indicates whether to commit the changes.
-   * @default false
-   */
+     * Indicates whether to commit the changes.
+     * @default false
+     */
     shouldCommit: boolean
 
     /**
-   * Indicates whether to push the changes to a remote repository.
-   * @default false
-   */
+     * Indicates whether to push the changes to a remote repository.
+     * @default false
+     */
     shouldPush: boolean
 
     /**
-   * Indicates whether to create a tag for a release.
-   * @default false
-   */
+     * Indicates whether to create a tag for a release.
+     * @default false
+     */
     shouldTag: boolean
 
     /**
-   * Whether the command should display help or usage information.
-   */
+     * Whether the command should display help or usage information.
+     */
     showHelp: boolean
 
     /**
-   * Whether the command should display the version information.
-   */
+     * Whether the command should display the version information.
+     */
     showVersion: boolean
 
     /**
-   * The version string associated with the command or operation.
-   */
+     * The version string associated with the command or operation.
+     */
     version: string
+}
+
+export type CommitOptions = {
+    /**
+     * Whether to stage all files or only modified files.
+     */
+    shouldStageAll: boolean
+
+    /**
+     * Whether to enable git pre-commit and commit-msg hook.
+     * @default true
+     */
+    shouldVerify: boolean
+
+    /**
+     * The template string for the commit message. if the template contains any "%s" placeholders,
+     * then they are replaced with the version number;
+     */
+    template: string
 }
