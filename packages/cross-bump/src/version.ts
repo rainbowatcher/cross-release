@@ -6,6 +6,7 @@ import detectIndent from "detect-indent"
 import semver from "semver"
 import type { PathLike } from "node:fs"
 import type { ProjectFile } from "./project"
+import type { UpgradeOptions } from "./types"
 
 const FALLBACK_VERSION = "undefined"
 type VersionNumbers = {
@@ -67,7 +68,11 @@ export function getNextVersions(version?: semver.SemVer | string, coerce = false
  * @param dry - Whether to perform a dry run or not. @default process.env.DRY
  * @return A promise that resolves when the version upgrade is complete.
  */
-export async function upgradePomVersion(filePath: PathLike, version: string, dry = process.env.DRY): Promise<void> {
+export async function upgradePomVersion(filePath: PathLike, version: string, opts: UpgradeOptions = {}): Promise<void> {
+    const {
+        dry = process.env.DRY,
+        finalNewline = true,
+    } = opts
     const content = await fs.readFile(filePath, "utf8")
     const $ = cheerio.load(content, {
         xml: { decodeEntities: false },
@@ -76,8 +81,12 @@ export async function upgradePomVersion(filePath: PathLike, version: string, dry
     const parentVersion = $("project>parent>version")
     projectVersion?.text(version)
     parentVersion?.text(version)
+    let newXml = $.xml().trimEnd()
+    if (finalNewline) {
+        newXml += "\n"
+    }
     if (!dry) {
-        await fs.writeFile(filePath, $.xml())
+        await fs.writeFile(filePath, newXml)
     }
 }
 
@@ -101,13 +110,22 @@ export async function getJavaProjectVersion(filePath: PathLike): Promise<string 
  * @param dry - Whether to perform a dry run. @default process.env.DRY
  * @return A promise that resolves when the version is upgraded.
  */
-export async function upgradePackageVersion(filePath: PathLike, version: string, dry = process.env.DRY): Promise<void> {
+export async function upgradePackageVersion(filePath: PathLike, version: string, opts: UpgradeOptions = {}): Promise<void> {
+    const {
+        dry = process.env.DRY,
+        finalNewline = true,
+    } = opts
     const file = await fs.readFile(filePath, "utf8")
     const { amount } = detectIndent(file)
     const packageJson = JSON.parse(file)
+    const indent = amount ?? 2
+    packageJson.version = version
+    let newPkgJson = JSON.stringify(packageJson, null, indent)
+    if (finalNewline) {
+        newPkgJson += "\n"
+    }
     if (!dry) {
-        packageJson.version = version
-        await fs.writeFile(filePath, JSON.stringify(packageJson, null, amount ?? 2))
+        await fs.writeFile(filePath, newPkgJson)
     }
 }
 
@@ -146,7 +164,10 @@ export async function getRustProjectVersion(filePath: PathLike): Promise<string 
  * @param dry - Whether to perform a dry run. @default process.env.DRY
  * @return A promise that resolves when the upgrade is complete.
  */
-export async function upgradeCargoVersion(filePath: PathLike, version: string, dry = process.env.DRY): Promise<void> {
+export async function upgradeCargoVersion(filePath: PathLike, version: string, opts: UpgradeOptions = {}): Promise<void> {
+    const {
+        dry = process.env.DRY,
+    } = opts
     await initTomlEdit()
     const cargoFile = await fs.readFile(filePath, "utf8")
     const cargoToml = parse(cargoFile)
@@ -165,18 +186,18 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, d
     }
 }
 
-export async function upgradeProjectVersion(nextVersion: string, projectFile?: ProjectFile, dry = process.env.DRY): Promise<void> {
+export async function upgradeProjectVersion(nextVersion: string, projectFile?: ProjectFile, opts: UpgradeOptions = {}): Promise<void> {
     switch (projectFile?.category) {
         case "java": {
-            await upgradePomVersion(projectFile.path, nextVersion, dry)
+            await upgradePomVersion(projectFile.path, nextVersion, opts)
             break
         }
         case "javascript": {
-            await upgradePackageVersion(projectFile.path, nextVersion, dry)
+            await upgradePackageVersion(projectFile.path, nextVersion, opts)
             break
         }
         case "rust": {
-            await upgradeCargoVersion(projectFile.path, nextVersion, dry)
+            await upgradeCargoVersion(projectFile.path, nextVersion, opts)
             break
         }
     }
