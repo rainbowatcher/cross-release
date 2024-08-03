@@ -47,9 +47,15 @@ importers:
       commitlint:
         specifier: ^19.3.0
         version: 19.3.0(@types/node@22.0.2)(typescript@5.5.4)
+      dedent:
+        specifier: ^1.5.3
+        version: 1.5.3
       eslint:
         specifier: ^9.8.0
         version: 9.8.0
+      execa:
+        specifier: ^9.3.0
+        version: 9.3.0
       husky:
         specifier: ^9.1.4
         version: 9.1.4
@@ -1502,6 +1508,14 @@ packages:
       supports-color: '*'
     peerDependenciesMeta:
       supports-color:
+        optional: true
+
+  dedent@1.5.3:
+    resolution: {integrity: sha512-NHQtfOOW68WD8lgypbLA5oT+Bt0xXJhiYvoR6SmmNXZfpzOGXwdKWmcwG8N7PwVVWV3eF/68nmD9BaJSsTBhyQ==}
+    peerDependencies:
+      babel-plugin-macros: ^3.1.0
+    peerDependenciesMeta:
+      babel-plugin-macros:
         optional: true
 
   deep-eql@5.0.2:
@@ -4469,6 +4483,8 @@ snapshots:
   debug@4.3.6:
     dependencies:
       ms: 2.1.2
+
+  dedent@1.5.3: {}
 
   deep-eql@5.0.2: {}
 

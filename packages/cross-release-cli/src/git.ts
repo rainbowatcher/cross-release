@@ -1,23 +1,34 @@
-import process from "node:process"
 import { log, spinner } from "@clack/prompts"
-import { execa } from "execa"
+import { execa as createExeca } from "execa"
 import color from "picocolors"
 import createDebug from "./util/debug"
 
 const debug = createDebug("git")
+const execa = createExeca({ reject: false })
 
-type GitTagOptions = {
-    isDel?: boolean
-    isForce?: boolean
-    message?: string
+type DryAble = {
+    dry?: boolean
 }
 
-export async function gitTag(tagName: string, options?: GitTagOptions): Promise<boolean> {
+type GitTagOptions = {
+    del?: boolean
+    force?: boolean
+    message?: string
+    tagName: string
+} & DryAble
+
+export async function gitTag(options: GitTagOptions): Promise<boolean> {
+    const {
+        del = false,
+        dry = false,
+        force = false,
+        message,
+        tagName: name,
+    } = options ?? {}
     const s = spinner()
-    s.start("creating tag")
-    const { isDel = false, isForce = false, message } = options ?? {}
+    s.start("creating tag...")
     const args = []
-    if (isDel) {
+    if (del) {
         args.push("--delete")
     } else {
         if (!message || message?.length === 0) {
@@ -36,96 +47,95 @@ export async function gitTag(tagName: string, options?: GitTagOptions): Promise<
         }
     }
 
-    if (isForce) args.push("--force")
+    if (force) args.push("--force")
 
-    args.push(tagName)
+    args.push(name)
 
-    if (!process.env.DRY) {
-        try {
-            const { command } = await execa("git", ["tag", ...args])
-            debug(`command: ${command}`)
-        } catch (error: any) {
-            s.stop(color.red(error.shortMessage))
+    debug(`command: git tag ${args.join(" ")}`)
+    if (!dry) {
+        const { exitCode, failed, shortMessage } = await execa("git", ["tag", ...args])
+        if (failed) {
+            s.stop(color.red(shortMessage), exitCode)
             return false
         }
     }
 
-    s.stop(`create git tag: ${color.blue(tagName)}`)
+    s.stop(`create git tag: ${color.blue(name)}`)
     return true
 }
 
 type GitCommitOptions = {
+    message: string
     modifiedFiles?: string[]
-    shouldStageAll?: boolean
-    shouldVerify?: boolean
-}
+    stageAll?: boolean
+    verify?: boolean
+} & DryAble
 
-export async function gitCommit(message: string, options?: GitCommitOptions): Promise<boolean> {
+export async function gitCommit(options: GitCommitOptions): Promise<boolean> {
+    const {
+        dry = false,
+        message,
+        modifiedFiles = [],
+        stageAll,
+        verify,
+    } = options ?? {}
     const s = spinner()
-    s.start("committing")
-    const { modifiedFiles = [], shouldStageAll, shouldVerify } = options ?? {}
+    s.start("committing...")
     const args = []
-
-    if (process.env.DRY) {
-        args.push("--dry-run")
-    }
 
     args.push("--message", message)
 
-    if (!shouldStageAll && modifiedFiles.length > 0) {
+    if (!stageAll && modifiedFiles.length > 0) {
         args.push("--", ...modifiedFiles)
     } else {
         args.push("--all")
     }
 
-    if (!shouldVerify) {
-        args.push("--no-verify")
-    }
+    dry && args.push("--dry-run")
+    !verify && args.push("--no-verify")
 
-    try {
-        const { command } = await execa("git", ["commit", ...args])
-        debug(`command: ${command}`)
-        s.stop(`commit message: ${color.green(message)}`)
-    } catch (error: any) {
-        s.stop(color.red(error.shortMessage))
+    debug(`command: git commit ${args.join(" ")}`)
+    const { exitCode, failed, shortMessage } = await execa("git", ["commit", ...args])
+    if (failed) {
+        s.stop(color.red(shortMessage), exitCode)
         return false
     }
+
+    s.stop(`commit message: ${color.green(message)}`)
     return true
 }
 
 type GitPushOptions = {
     branch?: string
+    followTags?: boolean
     remote?: string
-    shouldFollowTags?: boolean
-}
-export async function gitPush(options?: GitPushOptions): Promise<boolean> {
-    const { branch, remote, shouldFollowTags = true } = options ?? {}
+} & DryAble
+
+export async function gitPush(options: GitPushOptions = {}): Promise<boolean> {
+    const { branch, dry, followTags = true, remote } = options
     const s = spinner()
-    s.start("pushing")
-    const originUrl = await gitOriginUrl()
+    s.start("pushing...")
     const args = []
 
-    if (shouldFollowTags) {
-        args.push("--follow-tags")
-    }
     if (remote) {
         args.push(remote)
         if (branch) {
             args.push(branch)
         }
     }
-    if (process.env.DRY) {
-        args.push("--dry-run")
-    }
 
-    try {
-        const { command } = await execa("git", ["push", ...args])
-        debug(`command: ${command}`)
-        s.stop(`pushed to repo: ${color.underline(originUrl)}`)
-    } catch (error: any) {
-        s.stop(color.red(error.shortMessage))
+    followTags && args.push("--follow-tags")
+    dry && args.push("--dry-run")
+
+    debug(`command: git push ${args.join(" ")}`)
+    const { exitCode, failed, shortMessage } = await execa("git", ["push", ...args])
+    if (failed) {
+        s.stop(color.red(shortMessage), exitCode)
         return false
     }
+
+    const originUrl = await gitOriginUrl()
+    s.stop(`pushed to repo ${color.underline(originUrl)}`)
     return true
 }
 
@@ -138,9 +148,12 @@ type GitResetOptions = {
     commit?: string
     files?: string[]
     mode?: "hard" | "keep" | "merge" | "mixed" | "soft"
-}
+} & DryAble
+
 export async function gitReset(options: GitResetOptions): Promise<boolean> {
-    const { commit = "HEAD", files = [], mode = "mixed" } = options ?? {}
+    const { commit = "HEAD", dry, files = [], mode = "mixed" } = options ?? {}
+    const s = spinner()
+    s.start("resetting...")
     const args = []
 
     args.push(mode, commit)
@@ -148,12 +161,17 @@ export async function gitReset(options: GitResetOptions): Promise<boolean> {
         args.push("--", ...files)
     }
 
-    try {
-        const { command } = await execa("git", ["reset", ...args])
-        console.log(command)
-    } catch {
-        return false
+    debug(`command: git reset ${args.join(" ")}`)
+    if (!dry) {
+        const { exitCode, failed, shortMessage } = await execa("git", ["reset", ...args])
+        if (failed) {
+            s.stop(color.red(shortMessage), exitCode)
+            return false
+        }
     }
+
+    const hash = await gitHash()
+    s.stop(`reset to commit: ${color.blue(hash)}`)
     return true
 }
 
@@ -162,19 +180,36 @@ export async function gitHash(): Promise<string> {
     return command.stdout.trim()
 }
 
-export async function gitAdd(files: string[]): Promise<boolean> {
-    const args = ["-A"]
+type AddOptions = {
+    all?: boolean
+    files?: string[]
+} & DryAble
 
-    if (process.env.DRY) {
-        args.push("--dry-run")
-    }
+export async function gitAdd(options: AddOptions = {}): Promise<boolean> {
+    const {
+        all = false,
+        dry = false,
+        files = [],
+    } = options
+    const s = spinner()
+    s.start("adding files...")
+    const args = []
 
-    args.push("--", ...files)
+    all && args.push("-A")
+    dry && args.push("--dry-run")
+    files.length > 0 && args.push("--", ...files)
 
+    debug("command: git add", args.join(""))
     try {
-        await execa("git", ["add", ...args])
-    } catch {
+        const { exitCode, failed, shortMessage } = await execa("git", ["add", ...args])
+        if (failed) {
+            s.stop(color.red(shortMessage), exitCode)
+            return false
+        }
+    } catch (error: any) {
+        s.stop(color.red(error.shortMessage), 1)
         return false
     }
+    s.stop("added files")
     return true
 }

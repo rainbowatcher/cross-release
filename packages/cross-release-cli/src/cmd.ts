@@ -3,8 +3,10 @@ import cac from "cac"
 import { defu } from "defu"
 import { loadConfig } from "unconfig"
 import { version } from "../package.json"
+import createDebug from "./util/debug"
 import type { ReleaseOptions, ReleaseOptionsDefault } from "./types"
 
+const debug = createDebug("cmd")
 
 export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     commit: {
@@ -48,7 +50,7 @@ export async function loadUserConfig(overrides: Partial<ReleaseOptions>): Promis
 
 export async function parseOptions(): Promise<ReleaseOptions> {
     const cli = cac("cross-release")
-        .version(version)
+    cli.version(version)
         .usage("[flags] version")
         .option("-r, --recursive", "Run the command for each project in the workspace (default: false)")
         .option("-c, --commit", "Commit current changes (default: false)")
@@ -68,5 +70,11 @@ export async function parseOptions(): Promise<ReleaseOptions> {
         showVersion: options.version,
         version: args[0],
     })
+    debug("parsedArgs:", parsedArgs)
+    if (cli.options.help) {
+        // cli.outputHelp()
+        // eslint-disable-next-line unicorn/no-process-exit
+        process.exit(0)
+    }
     return parsedArgs
 }
