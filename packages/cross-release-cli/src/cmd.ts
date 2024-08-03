@@ -72,7 +72,6 @@ export async function parseOptions(): Promise<ReleaseOptions> {
     })
     debug("parsedArgs:", parsedArgs)
     if (cli.options.help) {
-        // cli.outputHelp()
         // eslint-disable-next-line unicorn/no-process-exit
         process.exit(0)
     }

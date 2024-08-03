@@ -53,7 +53,8 @@ export async function gitTag(options: GitTagOptions): Promise<boolean> {
 
     debug(`command: git tag ${args.join(" ")}`)
     if (!dry) {
-        const { exitCode, failed, shortMessage } = await execa("git", ["tag", ...args])
+        const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["tag", ...args])
+        debug("git tag stdout:", stdout, stderr)
         if (failed) {
             s.stop(color.red(shortMessage), exitCode)
             return false
@@ -95,7 +96,8 @@ export async function gitCommit(options: GitCommitOptions): Promise<boolean> {
     !verify && args.push("--no-verify")
 
     debug(`command: git commit ${args.join(" ")}`)
-    const { exitCode, failed, shortMessage } = await execa("git", ["commit", ...args])
+    const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["commit", ...args])
+    debug("git commit stdout:", stdout, stderr)
     if (failed) {
         s.stop(color.red(shortMessage), exitCode)
         return false
@@ -128,7 +130,8 @@ export async function gitPush(options: GitPushOptions = {}): Promise<boolean> {
     dry && args.push("--dry-run")
 
     debug(`command: git push ${args.join(" ")}`)
-    const { exitCode, failed, shortMessage } = await execa("git", ["push", ...args])
+    const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["push", ...args])
+    debug("git push stdout:", stdout, stderr)
     if (failed) {
         s.stop(color.red(shortMessage), exitCode)
         return false
@@ -163,7 +166,8 @@ export async function gitReset(options: GitResetOptions): Promise<boolean> {
 
     debug(`command: git reset ${args.join(" ")}`)
     if (!dry) {
-        const { exitCode, failed, shortMessage } = await execa("git", ["reset", ...args])
+        const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["reset", ...args])
+        debug("git reset stdout:", stdout, stderr)
         if (failed) {
             s.stop(color.red(shortMessage), exitCode)
             return false
@@ -200,14 +204,10 @@ export async function gitAdd(options: AddOptions = {}): Promise<boolean> {
     files.length > 0 && args.push("--", ...files)
 
     debug("command: git add", args.join(""))
-    try {
-        const { exitCode, failed, shortMessage } = await execa("git", ["add", ...args])
-        if (failed) {
-            s.stop(color.red(shortMessage), exitCode)
-            return false
-        }
-    } catch (error: any) {
-        s.stop(color.red(error.shortMessage), 1)
+    const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["add", ...args])
+    debug("git add stdout:", stdout, stderr)
+    if (failed) {
+        s.stop(color.red(shortMessage), exitCode)
         return false
     }
     s.stop("added files")

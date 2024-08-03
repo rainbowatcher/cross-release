@@ -74,10 +74,6 @@ export class App {
         }
     }
 
-    // toString(): string {
-    //     return this.currentVersion
-    // }
-
     async run(): Promise<void> {
         this.#start()
         await this.#getNextVersion()
