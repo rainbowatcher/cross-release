@@ -14,7 +14,7 @@ describe("findProjectFiles", () => {
     })
 
     it("should recursively search", async () => {
-        const projectFiles = await findProjectFiles(process.cwd(), ["node_modules", ".git"], true)
+        const projectFiles = await findProjectFiles(process.cwd(), ["node_modules", ".git", "dist", "coverage", ".github"], true)
         expect(projectFiles.length).gte(7)
     })
 
@@ -51,7 +51,16 @@ describe("findProjectFiles", () => {
         expect(projectFiles).toEqual(expected)
     })
 
-    it("should throw a error", async () => {
-        await expect(() => findProjectFiles("not/exists")).rejects.toThrowError("ENOENT")
+    it("should return never[]", async () => {
+        expect(await findProjectFiles("not/exists")).toEqual([])
+    })
+
+    it("should ignore files", async () => {
+        const projectFiles = await findProjectFiles("fixture", ["ignored", "**/pom.xml", "**/package.json"])
+        const expected = [{
+            category: "rust",
+            path: `${process.cwd()}/fixture/Cargo.toml`,
+        }]
+        expect(projectFiles).toEqual(expected)
     })
 })
