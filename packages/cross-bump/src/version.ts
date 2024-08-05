@@ -6,7 +6,6 @@ import detectIndent from "detect-indent"
 import semver from "semver"
 import type { PathLike } from "node:fs"
 import type { ProjectFile } from "./project"
-import type { UpgradeOptions } from "./types"
 
 const FALLBACK_VERSION = "undefined"
 type VersionNumbers = {
@@ -17,6 +16,10 @@ type VersionNumbers = {
     nextPreMinor: string
     nextPrePatch: string
     nextRelease: string
+}
+type UpgradeOptions = {
+    dry?: boolean
+    finalNewline?: boolean
 }
 
 /**
