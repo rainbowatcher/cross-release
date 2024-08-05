@@ -34,7 +34,7 @@ export async function loadUserConfig(overrides: Partial<ReleaseOptions>): Promis
 export async function parseOptions(): Promise<ReleaseOptions> {
     const cli = cac("cross-release")
     cli.version(version)
-        .usage("[flags] version")
+        .usage("[version] [options]")
         .option("-D, --dry", `Dry run (default: ${CONFIG_DEFAULT.dry})`)
         .option("-d, --dir [dir]", "Set working directory (default: project root)")
         .option("-e, --exclude [dir]", "Folders to exclude from search")

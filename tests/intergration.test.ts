@@ -7,20 +7,20 @@ const helpMessage = dedent`
     cross-release/${version}
 
     Usage:
-      $ cross-release [flags] version
+      $ cross-release [version] [options]
 
     Options:
       -v, --version        Display version number 
-      -r, --recursive      Run the command for each project in the workspace (default: false) 
-      -c, --commit         Commit current changes (default: false) 
-      -d, --dry            Dry run (default: false) 
+      -D, --dry            Dry run (default: false) 
+      -d, --dir [dir]      Set working directory (default: project root) 
       -e, --exclude [dir]  Folders to exclude from search 
       -m, --main           Base project language (e.g. java, rust, javascript default: javascript) 
-      -D, --dir [dir]      Set working directory (default: project root) 
-      -p, --push           Push the project to remote (default: false) 
-      -t, --tag            Create a tag for current version (default: false) 
+      -r, --recursive      Run the command for each project in the workspace (default: false) 
       -y, --yes            Answer yes to all prompts (default: false) 
-      -h, --help           Display this message
+      --no-commit          Skip committing changes (default: true)
+      --no-push            Skip pushing (default: true)
+      --no-tag             Skip tagging (default: true)
+      -h, --help           Display this message 
 `
 
 describe("show help message", () => {
