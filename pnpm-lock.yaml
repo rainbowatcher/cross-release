@@ -92,6 +92,12 @@ importers:
       detect-indent:
         specifier: ^7.0.1
         version: 7.0.1
+      fast-glob:
+        specifier: ^3.3.2
+        version: 3.3.2
+      parse-gitignore:
+        specifier: ^2.0.0
+        version: 2.0.0
       semver:
         specifier: ^7.6.3
         version: 7.6.3
@@ -117,9 +123,6 @@ importers:
         specifier: ^9.3.0
         version: 9.3.0
       is-unicode-supported:
-        specifier: ^2.0.0
-        version: 2.0.0
-      parse-gitignore:
         specifier: ^2.0.0
         version: 2.0.0
       picocolors:

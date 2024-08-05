@@ -33,7 +33,7 @@ export type Execution = {
     taskQueue: Task[]
 }
 
-export type ReleaseOptionsDefault = Omit<ReleaseOptions, "config">
+export type ReleaseOptionsDefault = Omit<ReleaseOptions, "config" | "excludes">
 
 export type DefineConfigOptions = Partial<Omit<ReleaseOptions, "config">>
 
@@ -53,7 +53,7 @@ export type ReleaseOptions = {
      * The directory path where the operation will be performed.
      * @default process.cwd()
      */
-    dir: string
+    cwd: string
 
     /**
      * Whether the operation is being run in a dry-run mode (simulated execution).
@@ -92,7 +92,7 @@ export type ReleaseOptions = {
      * Indicates whether to create a tag for a release.
      * @default false
      */
-    tag: boolean
+    tag: boolean | TagOptions
 
     /**
      * The version string associated with the command or operation.
@@ -127,7 +127,26 @@ export type CommitOptions = {
 
 export type PushOptions = {
     /**
+     * The branch name
+     */
+    branch?: string
+
+    /**
      * Whether to follow tags
      */
     followTags?: boolean
+
+    /**
+     * The remote name
+     */
+    remote?: string
+}
+
+export type TagOptions = {
+    /**
+     * The template for tag name, same as @type {CommitOptions.template}
+     * if the template contains any "%s" placeholders,
+     * then they are replaced with the version number;
+     */
+    template?: string
 }
