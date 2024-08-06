@@ -8,7 +8,7 @@ import {
 } from "cross-bump"
 import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
-import { parseOptions } from "./cmd"
+import { initCli, resolveOptions } from "./cmd"
 import { CONFIG_DEFAULT, ExitCode } from "./constants"
 import { gitCommit, gitPush, gitTag } from "./git"
 import { chooseVersion } from "./prompt"
@@ -40,7 +40,8 @@ function handleUserCancel<T = boolean>(result: symbol | T): T {
 
 class App {
     static async create(): Promise<App> {
-        const opts = await parseOptions()
+        const cli = initCli()
+        const opts = await resolveOptions(cli)
         return new App(opts)
     }
 
