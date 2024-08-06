@@ -72,9 +72,9 @@ class App {
 
     async run(): Promise<void> {
         this.#start()
-        await this.#getNextVersion()
-        await this.#getProjects()
-        await this.#confirmReleaseOptions()
+        await this.getNextVersion()
+        await this.resolveProjects()
+        await this.confirmReleaseOptions()
         debug("taskQueue:", this.taskQueue)
         for await (const task of this.taskQueue) {
             if (this.taskStatus === "failed") {
@@ -86,24 +86,7 @@ class App {
         this.#done()
     }
 
-    #addTask(task: Task): boolean {
-        const expect = this.taskQueue.length + 1
-        return this.taskQueue.push(task) === expect
-    }
-
-    #check(status: boolean) {
-        if (!status) this.taskStatus = "failed"
-    }
-
-    #checkDryRun() {
-        if (this.options.dry) {
-            log.message(color.bgBlue(" DRY RUN "))
-            process.env.DRY = "true"
-        }
-    }
-
-    // TODO: refactor this function
-    async #confirmReleaseOptions() {
+    async confirmReleaseOptions() {
         const { dry, yes } = this.options
 
         const confirmTask = async (
@@ -154,13 +137,7 @@ class App {
         }
     }
 
-    #done(): void {
-        outro("Done")
-        this.taskStatus = "finished"
-    }
-
-
-    async #getNextVersion(): Promise<void> {
+    async getNextVersion(): Promise<void> {
         const { cwd: dir, excludes, main, version } = this.options
 
         // read current project version
@@ -185,7 +162,7 @@ class App {
         }
     }
 
-    async #getProjects(): Promise<void> {
+    async resolveProjects(): Promise<void> {
         const { nextVersion, options: { cwd: dir, excludes, recursive } } = this
         const projectFiles = await findProjectFiles(dir, excludes, recursive)
         debug(`found ${projectFiles.length} project files`)
@@ -206,12 +183,33 @@ class App {
         })
     }
 
+    #addTask(task: Task): boolean {
+        const expect = this.taskQueue.length + 1
+        return this.taskQueue.push(task) === expect
+    }
+
+
+    #check(status: boolean) {
+        if (!status) this.taskStatus = "failed"
+    }
+
+    #checkDryRun() {
+        if (this.options.dry) {
+            log.message(color.bgBlue(" DRY RUN "))
+            process.env.DRY = "true"
+        }
+    }
+
+    #done(): void {
+        outro("Done")
+        this.taskStatus = "finished"
+    }
+
     #start(): void {
         intro("Cross release")
         this.#checkDryRun()
         this.taskStatus = "running"
     }
-
 }
 
 const app = await App.create()
