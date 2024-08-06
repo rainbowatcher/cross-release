@@ -33,7 +33,7 @@ export type Execution = {
     taskQueue: Task[]
 }
 
-export type ReleaseOptionsDefault = Omit<ReleaseOptions, "config" | "excludes">
+export type ReleaseOptionsDefault = Omit<ReleaseOptions, "config" | "excludes" | "version">
 
 export type DefineConfigOptions = Partial<Omit<ReleaseOptions, "config">>
 
