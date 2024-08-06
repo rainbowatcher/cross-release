@@ -2,7 +2,7 @@ import fg from "fast-glob"
 // @ts-expect-error missing types
 import gitignore from "parse-gitignore"
 
-export const IGNORE_DEFAULT = ["**/node_modules/**", "**/.git/**", "**/dist/**", "**/fixture(s)?/**", "**/target/**", "**/build/**"]
+export const IGNORE_DEFAULT = ["**/node_modules/**", "**/.git/**"]
 export const G_GITIGNORE = "**/.gitignore"
 
 export async function getGitignores(cwd: string): Promise<Set<string>> {
