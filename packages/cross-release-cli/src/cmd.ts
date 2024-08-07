@@ -13,7 +13,7 @@ const debug = createDebug("cmd")
 
 // TODO: should give more approches for config
 export async function loadUserConfig(overrides: Partial<ReleaseOptions>): Promise<ReleaseOptions> {
-    const { config: userConfig } = await loadConfig<Partial<ReleaseOptions>>({
+    const { config: userConfig, sources } = await loadConfig<Partial<ReleaseOptions>>({
         sources: [
             { files: "cross-release.config" },
             {
@@ -27,7 +27,8 @@ export async function loadUserConfig(overrides: Partial<ReleaseOptions>): Promis
         ],
     })
 
-    debug("load user config", userConfig)
+    debug("load user config", sources)
+    debug("user config:", userConfig)
     return defu<ReleaseOptions, any>(userConfig, overrides)
 }
 
