@@ -86,21 +86,22 @@ export async function gitCommit(options: GitCommitOptions): Promise<boolean> {
 
     args.push("--message", message)
 
+    !verify && args.push("--no-verify")
+
     if (!stageAll && modifiedFiles.length > 0) {
         args.push("--", ...modifiedFiles)
     } else {
         args.push("--all")
     }
 
-    dry && args.push("--dry-run")
-    !verify && args.push("--no-verify")
-
     debug(`command: git commit ${args.join(" ")}`)
-    const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["commit", ...args])
-    debug("git commit stdout:", stdout, stderr)
-    if (failed) {
-        s.stop(color.red(shortMessage), exitCode)
-        return false
+    if (!dry) {
+        const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["commit", ...args])
+        debug("git commit stdout:", stdout, stderr)
+        if (failed) {
+            s.stop(color.red(shortMessage), exitCode)
+            return false
+        }
     }
 
     s.stop(`commit message: ${color.green(message)}`)
@@ -127,16 +128,16 @@ export async function gitPush(options: GitPushOptions = {}): Promise<boolean> {
     }
 
     followTags && args.push("--follow-tags")
-    dry && args.push("--dry-run")
 
     debug(`command: git push ${args.join(" ")}`)
-    const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["push", ...args])
-    debug("git push stdout:", stdout, stderr)
-    if (failed) {
-        s.stop(color.red(shortMessage), exitCode)
-        return false
+    if (!dry) {
+        const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["push", ...args])
+        debug("git push stdout:", stdout, stderr)
+        if (failed) {
+            s.stop(color.red(shortMessage), exitCode)
+            return false
+        }
     }
-
     const originUrl = await gitOriginUrl()
     s.stop(`pushed to repo ${color.underline(originUrl)}`)
     return true
@@ -195,21 +196,19 @@ export async function gitAdd(options: AddOptions = {}): Promise<boolean> {
         dry = false,
         files = [],
     } = options
-    const s = spinner()
-    s.start("adding files...")
     const args = []
 
     all && args.push("-A")
-    dry && args.push("--dry-run")
     files.length > 0 && args.push("--", ...files)
 
-    debug("command: git add", args.join(""))
-    const { exitCode, failed, shortMessage, stderr, stdout } = await execa("git", ["add", ...args])
-    debug("git add stdout:", stdout, stderr)
-    if (failed) {
-        s.stop(color.red(shortMessage), exitCode)
-        return false
+    debug("command: git add", args.join(" "))
+    if (!dry) {
+        const { failed, stderr, stdout } = await execa("git", ["add", ...args])
+        debug("git add stdout:", stdout, stderr)
+        if (failed) {
+            return false
+        }
     }
-    s.stop("added files")
+    debug("add files:", files)
     return true
 }
