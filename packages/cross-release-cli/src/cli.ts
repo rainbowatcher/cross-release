@@ -11,7 +11,9 @@ import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
 import { initCli, parseCliCommand, resolveOptions } from "./cmd"
 import { CONFIG_DEFAULT, ExitCode } from "./constants"
-import { gitCommit, gitPush, gitTag } from "./git"
+import {
+    gitAdd, gitCommit, gitPush, gitTag,
+} from "./git"
 import { chooseVersion } from "./prompt"
 import { resolveAltOptions } from "./util/config"
 import createDebug from "./util/debug"
@@ -134,6 +136,14 @@ class App {
         let commitMessage: string | undefined
         if (this.options.commit) {
             const { stageAll, template, verify } = resolveAltOptions(this.options, "commit", CONFIG_DEFAULT.commit)
+            if (!stageAll) {
+                this.#addTask({
+                    exec: async () => {
+                        return await gitAdd({ dry, files: this.modifiedFiles })
+                    },
+                    name: "add",
+                })
+            }
             commitMessage = this.formatMessageString(template!, this.nextVersion)
             await confirmTask("commit", "should commit?", async () => {
                 return await gitCommit({
