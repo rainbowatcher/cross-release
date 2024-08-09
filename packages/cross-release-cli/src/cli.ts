@@ -6,9 +6,10 @@ import {
 import {
     findProjectFiles, getProjectVersion, isVersionValid, upgradeProjectVersion,
 } from "cross-bump"
+import { execa } from "execa"
 import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
-import { initCli, resolveOptions } from "./cmd"
+import { initCli, parseCliCommand, resolveOptions } from "./cmd"
 import { CONFIG_DEFAULT, ExitCode } from "./constants"
 import { gitCommit, gitPush, gitTag } from "./git"
 import { chooseVersion } from "./prompt"
@@ -19,7 +20,7 @@ import type {
 } from "./types"
 
 
-const debug = createDebug("app")
+const debug = createDebug("cli")
 
 
 function message(msg: string): void {
@@ -75,6 +76,7 @@ class App {
         await this.getNextVersion()
         await this.resolveProjects()
         await this.confirmReleaseOptions()
+        this.resolveExecutes()
         debug("taskQueue:", this.taskQueue)
         for await (const task of this.taskQueue) {
             if (this.taskStatus === "failed") {
@@ -84,6 +86,28 @@ class App {
             }
         }
         this.#done()
+    }
+
+    resolveExecutes() {
+        const { execute } = this.options
+        const index = this.taskQueue.findIndex(t => t.name === "push")
+        for (const command of execute) {
+            if (!command) continue
+            const [cmd, ...args] = parseCliCommand(command)
+            if (!cmd) continue
+            const exec = async () => {
+                const { failed, stdout } = await execa(cmd, args, { reject: false })
+                debug("stdout:", stdout)
+                if (failed) {
+                    log.error(`exec: ${command}`)
+                    return false
+                } else {
+                    log.success(`exec: ${command}`)
+                    return true
+                }
+            }
+            this.#addTask({ exec, name: "anonymous" }, index)
+        }
     }
 
     async confirmReleaseOptions() {
@@ -105,6 +129,7 @@ class App {
                 this.#addTask({ exec, name })
             }
         }
+
 
         let commitMessage: string | undefined
         if (this.options.commit) {

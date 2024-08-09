@@ -67,6 +67,11 @@ export type ReleaseOptions = {
     excludes: string[]
 
     /**
+     * The command to execute before pushing.
+     */
+    execute: string[]
+
+    /**
      * Specifies the main project category.
      */
     main: ProjectCategory

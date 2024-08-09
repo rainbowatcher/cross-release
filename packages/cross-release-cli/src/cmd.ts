@@ -81,3 +81,11 @@ export async function resolveOptions(cli: CAC): Promise<ReleaseOptions> {
     }
     return parsedArgs
 }
+
+export function parseCliCommand(commandString: string) {
+    const regex = /[^\s"'`]+|(["'`])(?:(?!\1)[^\\]|\\.)*\1/g
+    return commandString.match(regex)?.map((arg) => {
+        const unquoted = arg.replace(/^(["'`])(.*)\1$/, "$2")
+        return unquoted.replaceAll(/\\(["'`])/g, "$1")
+    }) ?? []
+}

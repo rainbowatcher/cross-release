@@ -21,6 +21,7 @@ export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     },
     cwd: process.cwd(),
     dry: false,
+    execute: [],
     main: "javascript",
     push: {
         followTags: false,
