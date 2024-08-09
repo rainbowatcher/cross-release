@@ -80,7 +80,7 @@ class App {
             if (this.taskStatus === "failed") {
                 break
             } else {
-                await task.exec()
+                this.#check(await task.exec())
             }
         }
         this.#done()
@@ -92,7 +92,7 @@ class App {
         const confirmTask = async (
             name: ExtractBooleanKeys<ReleaseOptions>,
             message: string,
-            exec: () => Promise<void> | void,
+            exec: Task["exec"],
         ) => {
             if (yes) {
                 this.options[name] = true
@@ -111,13 +111,13 @@ class App {
             const { stageAll, template, verify } = resolveAltOptions(this.options, "commit", CONFIG_DEFAULT.commit)
             commitMessage = this.formatMessageString(template!, this.nextVersion)
             await confirmTask("commit", "should commit?", async () => {
-                this.#check(await gitCommit({
+                return await gitCommit({
                     dry,
                     message: commitMessage!,
                     modifiedFiles: this.modifiedFiles,
                     stageAll,
                     verify,
-                }))
+                })
             })
         }
 
@@ -125,14 +125,14 @@ class App {
             const { template } = resolveAltOptions(this.options, "tag", CONFIG_DEFAULT.tag)
             await confirmTask("tag", "should create tag?", async () => {
                 const tagName = this.formatMessageString(template!, this.nextVersion)
-                this.#check(await gitTag({ dry, message: commitMessage, tagName }))
+                return await gitTag({ dry, message: commitMessage, tagName })
             })
         }
 
         if (this.options.push) {
             const { followTags } = resolveAltOptions(this.options, "push", CONFIG_DEFAULT.push)
             await confirmTask("push", "should push to remote?", async () => {
-                this.#check(await gitPush({ dry, followTags }))
+                return await gitPush({ dry, followTags })
             })
         }
     }
@@ -168,29 +168,41 @@ class App {
         debug(`found ${projectFiles.length} project files`)
         this.#addTask({
             exec: async () => {
-                await Promise.all(projectFiles.map(async (projectFile) => {
+                return await Promise.all(projectFiles.map(async (projectFile) => {
                     try {
                         await upgradeProjectVersion(nextVersion, projectFile)
                         this.modifiedFiles.push(projectFile.path)
                         message(`upgrade to ${color.blue(nextVersion)} for ${color.gray(path.relative(dir, projectFile.path))}`)
                     } catch (error) {
-                        this.taskStatus = "failed"
                         log.error(String(error))
+                        return false
                     }
+                    return true
                 }))
             },
             name: "upgradeVersion",
         })
     }
 
-    #addTask(task: Task): boolean {
+    #addTask(task: Task, idx?: number): boolean {
         const expect = this.taskQueue.length + 1
-        return this.taskQueue.push(task) === expect
+        if (idx) {
+            this.taskQueue.splice(idx, 0, task)
+        } else {
+            this.taskQueue.push(task)
+        }
+        return this.taskQueue.length === expect
     }
 
 
-    #check(status: boolean) {
-        if (!status) this.taskStatus = "failed"
+    #check(status: boolean | boolean[]) {
+        if (Array.isArray(status)) {
+            if (status.some(s => !s)) {
+                this.taskStatus = "failed"
+            }
+        } else if (!status) {
+            this.taskStatus = "failed"
+        }
     }
 
     #checkDryRun() {
