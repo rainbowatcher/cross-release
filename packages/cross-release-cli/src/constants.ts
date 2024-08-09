@@ -15,7 +15,7 @@ export enum ExitCode {
 
 export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     commit: {
-        stageAll: true,
+        stageAll: false,
         template: "chore: release v%s",
         verify: true,
     },
