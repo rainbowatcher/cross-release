@@ -7,6 +7,7 @@ const options: ReleaseOptions = {
     commit: true,
     config: "",
     cwd: "",
+    debug: false,
     dry: false,
     excludes: [],
     execute: [],

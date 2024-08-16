@@ -20,6 +20,7 @@ export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
         verify: true,
     },
     cwd: process.cwd(),
+    debug: false,
     dry: false,
     execute: [],
     main: "javascript",

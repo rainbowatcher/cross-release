@@ -56,6 +56,11 @@ export type ReleaseOptions = {
     cwd: string
 
     /**
+     * Enable debug log
+     */
+    debug: boolean
+
+    /**
      * Whether the operation is being run in a dry-run mode (simulated execution).
      */
     dry: boolean

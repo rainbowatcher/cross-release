@@ -5,7 +5,7 @@ import { defu } from "defu"
 import { loadConfig } from "unconfig"
 import { version } from "../package.json"
 import { CONFIG_DEFAULT } from "./constants"
-import createDebug from "./util/debug"
+import createDebug, { isDebugEnable } from "./util/debug"
 import type { CAC } from "cac"
 import type { ReleaseOptions } from "./types"
 
@@ -37,12 +37,13 @@ export function initCli(argv = process.argv) {
     cli.version(version)
         .usage("[version] [options]")
         .option("-D, --dry", `Dry run (default: ${CONFIG_DEFAULT.dry})`)
-        .option("-d, --dir [dir]", "Set working directory (default: project root)")
+        .option("-d, --debug", `Enable debug mode (default: ${CONFIG_DEFAULT.debug})`)
         .option("-e, --exclude [dir]", "Folders to exclude from search")
         .option("-m, --main", `Base project language (e.g. java, rust, javascript default: ${CONFIG_DEFAULT.main})`)
         .option("-r, --recursive", `Run the command for each project in the workspace (default: ${CONFIG_DEFAULT.recursive})`)
         .option("-x, --execute.* [command]", `Execute the command (default: ${JSON.stringify(CONFIG_DEFAULT.execute)})`)
         .option("-y, --yes", `Answer yes to all prompts (default: ${CONFIG_DEFAULT.yes})`)
+        .option("--cwd [dir]", "Set working directory (default: project root)")
         .option("--no-commit", "Skip committing changes")
         .option("--no-push", "Skip pushing")
         .option("--no-tag", "Skip tagging")
@@ -56,7 +57,8 @@ export async function resolveOptions(cli: CAC): Promise<ReleaseOptions> {
     const parsedArgs: ReleaseOptions = await loadUserConfig({
         ...options,
         commit: options.commit ?? CONFIG_DEFAULT.commit,
-        cwd: options.dir ?? CONFIG_DEFAULT.cwd,
+        cwd: options.cwd ?? CONFIG_DEFAULT.cwd,
+        debug: options.debug ?? CONFIG_DEFAULT.debug,
         dry: options.dry ?? CONFIG_DEFAULT.dry,
         execute: options.execute ?? CONFIG_DEFAULT.execute,
         main: options.main ?? CONFIG_DEFAULT.main,
@@ -68,6 +70,7 @@ export async function resolveOptions(cli: CAC): Promise<ReleaseOptions> {
         yes: options.yes ?? CONFIG_DEFAULT.yes,
     })
 
+    isDebugEnable(parsedArgs)
     const set = await getGitignores(parsedArgs.cwd)
     for (const p of parsedArgs?.excludes ?? []) {
         set.add(p)
