@@ -92,7 +92,8 @@ class App {
 
     resolveExecutes() {
         const { execute } = this.options
-        const index = this.taskQueue.findIndex(t => t.name === "push")
+        const indexBeforePush = this.taskQueue.findIndex(t => t.name === "push")
+        const index = indexBeforePush === -1 ? this.taskQueue.length : indexBeforePush
         for (const command of execute) {
             if (!command) continue
             const [cmd, ...args] = parseCliCommand(command)

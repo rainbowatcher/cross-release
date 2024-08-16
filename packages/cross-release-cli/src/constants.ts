@@ -31,6 +31,5 @@ export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     tag: {
         template: "v%s",
     },
-    version: "",
     yes: false,
 }

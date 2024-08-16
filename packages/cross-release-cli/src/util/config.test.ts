@@ -9,6 +9,7 @@ const options: ReleaseOptions = {
     cwd: "",
     dry: false,
     excludes: [],
+    execute: [],
     main: "javascript",
     push: false,
     recursive: false,

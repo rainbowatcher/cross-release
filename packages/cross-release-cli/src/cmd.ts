@@ -32,7 +32,7 @@ export async function loadUserConfig(overrides: Partial<ReleaseOptions>): Promis
     return defu<ReleaseOptions, any>(userConfig, overrides)
 }
 
-export function initCli() {
+export function initCli(argv = process.argv) {
     const cli = cac("cross-release")
     cli.version(version)
         .usage("[version] [options]")
@@ -47,7 +47,7 @@ export function initCli() {
         .option("--no-push", "Skip pushing")
         .option("--no-tag", "Skip tagging")
         .help()
-        .parse()
+        .parse(argv)
     return cli
 }
 
@@ -73,6 +73,9 @@ export async function resolveOptions(cli: CAC): Promise<ReleaseOptions> {
         set.add(p)
     }
     parsedArgs.excludes = [...set]
+    if (typeof parsedArgs.execute === "string") {
+        parsedArgs.execute = [parsedArgs.execute]
+    }
 
     debug("parsedArgs:", parsedArgs)
     if (cli.options.help) {
@@ -83,7 +86,7 @@ export async function resolveOptions(cli: CAC): Promise<ReleaseOptions> {
 }
 
 export function parseCliCommand(commandString: string) {
-    const regex = /[^\s"'`]+|(["'`])(?:(?!\1)[^\\]|\\.)*\1/g
+    const regex = /[^\s"']+|(["'])(?:(?!\1)[^\\]|\\.)*\1/g
     return commandString.match(regex)?.map((arg) => {
         const unquoted = arg.replace(/^(["'`])(.*)\1$/, "$2")
         return unquoted.replaceAll(/\\(["'`])/g, "$1")
