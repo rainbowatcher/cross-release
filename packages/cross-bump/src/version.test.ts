@@ -28,7 +28,7 @@ describe("Javascript project version related operation", async () => {
 
     it("should return the project version", async () => {
         const version = await getJSProjectVersion(projectFile!.path)
-        expect(semver.valid(version)).toMatchInlineSnapshot('"1.1.1"')
+        expect(semver.valid(version)).toBe(defaultVersion)
     })
 
     it("should upgrade Javascript project version", async () => {
@@ -45,13 +45,13 @@ describe("Java project version related operation", async () => {
 
     it("should return the project version", async () => {
         const version = await getJavaProjectVersion(projectFile!.path)
-        expect(semver.valid(version)).toMatchInlineSnapshot('"1.1.1"')
+        expect(semver.valid(version)).toBe(defaultVersion)
     })
 
     it("should upgrade Java project version", async () => {
         await upgradePomVersion(projectFile!.path, "1.2.3")
         const version = await getJavaProjectVersion(projectFile!.path)
-        expect(semver.valid(version)).toEqual("1.2.3")
+        expect(semver.valid(version)).toBe("1.2.3")
     })
 })
 
@@ -62,13 +62,13 @@ describe("Rust project version related operation", async () => {
 
     it("should return the project version", async () => {
         const version = await getRustProjectVersion(projectFile!.path)
-        expect(version).toMatchInlineSnapshot('"1.1.1"')
+        expect(version).toBe(defaultVersion)
     })
 
     it("should upgrade Rust project version", async () => {
         await upgradeCargoVersion(projectFile!.path, "1.2.3")
         const version = await getRustProjectVersion(projectFile!.path)
-        expect(version).toEqual("1.2.3")
+        expect(version).toBe("1.2.3")
     })
 })
 
