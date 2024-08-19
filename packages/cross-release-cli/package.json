@@ -33,9 +33,9 @@
         "@clack/prompts": "^0.7.0",
         "cac": "^6.7.14",
         "cross-bump": "workspace:*",
-        "debug": "^4.3.5",
+        "debug": "^4.3.6",
         "defu": "^6.1.4",
-        "execa": "^9.3.0",
+        "execa": "^9.3.1",
         "is-unicode-supported": "^2.0.0",
         "picocolors": "^1.0.1",
         "unconfig": "^0.5.5"

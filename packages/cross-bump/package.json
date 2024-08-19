@@ -38,8 +38,8 @@
         "build": "tsup-node"
     },
     "dependencies": {
-        "@rainbowatcher/toml-edit-js": "^0.1.1",
-        "cheerio": "1.0.0-rc.12",
+        "@rainbowatcher/toml-edit-js": "^0.2.0",
+        "cheerio": "1.0.0",
         "detect-indent": "^7.0.1",
         "fast-glob": "^3.3.2",
         "parse-gitignore": "^2.0.0",
