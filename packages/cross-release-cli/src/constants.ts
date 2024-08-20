@@ -28,7 +28,6 @@ export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
         followTags: false,
     },
     recursive: false,
-    showVersion: false,
     tag: {
         template: "v%s",
     },

@@ -14,7 +14,6 @@ const options: ReleaseOptions = {
     main: "javascript",
     push: false,
     recursive: false,
-    showVersion: false,
     tag: true,
     version: "",
     yes: false,

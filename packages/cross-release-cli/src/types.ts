@@ -1,5 +1,7 @@
 import type { ProjectCategory } from "cross-bump"
 
+export type KeysOf<T, KeyType = string> = keyof { [K in keyof T as T[K] extends KeyType ? K : never]: T[K] }
+
 export type Status = "failed" | "finished" | "pending" | "running"
 
 export type ExtractBooleanKeys<T> = keyof Pick<T, { [K in keyof T]: T[K] extends boolean | Record<string, unknown> ? K : never }[keyof T]>
@@ -92,11 +94,6 @@ export type ReleaseOptions = {
      * @default false
      */
     recursive: boolean
-
-    /**
-     * Whether the command should display the version information.
-     */
-    showVersion: boolean
 
     /**
      * Indicates whether to create a tag for a release.

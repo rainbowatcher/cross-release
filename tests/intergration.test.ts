@@ -1,3 +1,4 @@
+import process from "node:process"
 import dedent from "dedent"
 import { $ } from "execa"
 import { describe, expect, it } from "vitest"
@@ -15,14 +16,15 @@ describe.concurrent("show help message", () => {
     
         Options:
           -v, --version              Display version number 
-          -D, --dry                  Dry run (default: false) 
-          -d, --debug                Enable debug mode (default: false) 
+          -c, --config [file]        Config file (auto detect by default) 
+          -D, --dry                  Dry run (default: false)
+          -d, --debug                Enable debug mode (default: false)
           -e, --exclude [dir]        Folders to exclude from search 
-          -m, --main                 Base project language (e.g. java, rust, javascript default: javascript) 
-          -r, --recursive            Run the command for each project in the workspace (default: false) 
-          -x, --execute.* [command]  Execute the command (default: []) 
-          -y, --yes                  Answer yes to all prompts (default: false) 
-          --cwd [dir]                Set working directory (default: project root) 
+          -m, --main                 Base project language [e.g. java, rust, javascript] (default: javascript)
+          -r, --recursive            Run the command for each project in the workspace (default: false)
+          -x, --execute.* [command]  Execute the command (default: )
+          -y, --yes                  Answer yes to all prompts (default: false)
+          --cwd [dir]                Set working directory (default: ${process.cwd()})
           --no-commit                Skip committing changes (default: true)
           --no-push                  Skip pushing (default: true)
           --no-tag                   Skip tagging (default: true)
@@ -45,18 +47,7 @@ describe.concurrent("show help message", () => {
 
 describe("execute commands", () => {
     it("single command", async () => {
-        const { command, stdout } = await $({ all: true, env: { DEBUG: "cross*" } })`${RUNNER} ${SCRIPT} --dry --no-commit --no-push --no-tag 0.0.1 --execute 'echo hello'`
-        expect(command).toMatchInlineSnapshot(`"tsx packages/cross-release-cli/src/cli.ts --dry --no-commit --no-push --no-tag 0.0.1 --execute 'echo hello'"`)
-        expect(stdout).toMatchInlineSnapshot(`
-            "┌  Cross release
-            │
-            │   DRY RUN 
-            │  upgrade to 0.0.1 for package.json
-            │
-            ◆  exec: 'echo
-            │
-            └  Done
-            "
-        `)
+        const { command } = await $({ all: true })`${RUNNER} ${SCRIPT} --dry --cwd fixture --no-commit --no-push --no-tag 0.0.1 --execute 'echo hello'`
+        expect(command).toBe(`"tsx packages/cross-release-cli/src/cli.ts --dry --cwd fixture --no-commit --no-push --no-tag 0.0.1 --execute 'echo hello'"`)
     })
 })

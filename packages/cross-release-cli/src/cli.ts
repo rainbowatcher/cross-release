@@ -42,12 +42,6 @@ function handleUserCancel<T = boolean>(result: symbol | T): T {
 }
 
 class App {
-    static async create(): Promise<App> {
-        const cli = initCli()
-        const opts = await resolveOptions(cli)
-        return new App(opts)
-    }
-
     private currentVersion = ""
 
     private modifiedFiles: string[] = []
@@ -64,54 +58,55 @@ class App {
         this.options = opts
     }
 
-    /**
-     * Accepts a message string template (e.g. "release %s" or "This is the %s release").
-     * If the template contains any "%s" placeholders, then they are replaced with the version number;
-     * otherwise, the version number is appended to the string.
-     */
-    formatMessageString(template: string, nextVersion: string): string {
-        return template?.includes("%s") ? template.replaceAll("%s", nextVersion) : template + nextVersion
+
+    static async create(): Promise<App> {
+        const cli = initCli()
+        const opts = await resolveOptions(cli)
+        return new App(opts)
     }
 
-    async run(): Promise<void> {
-        this.#start()
-        await this.getNextVersion()
-        await this.resolveProjects()
-        await this.confirmReleaseOptions()
-        this.resolveExecutes()
-        debug("taskQueue:", this.taskQueue)
-        for await (const task of this.taskQueue) {
-            if (this.taskStatus === "failed") {
-                break
-            } else {
-                this.#check(await task.exec())
-            }
+
+    #addTask(task: Task, idx?: number): boolean {
+        const expect = this.taskQueue.length + 1
+        if (idx) {
+            this.taskQueue.splice(idx, 0, task)
+        } else {
+            this.taskQueue.push(task)
         }
-        this.#done()
+        return this.taskQueue.length === expect
     }
 
-    resolveExecutes() {
-        const { execute } = this.options
-        const indexBeforePush = this.taskQueue.findIndex(t => t.name === "push")
-        const index = indexBeforePush === -1 ? this.taskQueue.length : indexBeforePush
-        for (const command of execute) {
-            if (!command) continue
-            const [cmd, ...args] = parseCliCommand(command)
-            if (!cmd) continue
-            const exec = async () => {
-                const { failed, stdout } = await execa(cmd, args, { reject: false })
-                debug("stdout:", stdout)
-                if (failed) {
-                    log.error(`exec: ${command}`)
-                    return false
-                } else {
-                    log.success(`exec: ${command}`)
-                    return true
-                }
+    #check(status: boolean | boolean[]) {
+        if (Array.isArray(status)) {
+            if (status.some(s => !s)) {
+                this.taskStatus = "failed"
             }
-            this.#addTask({ exec, name: "anonymous" }, index)
+        } else if (!status) {
+            this.taskStatus = "failed"
         }
     }
+
+
+    #checkDryRun() {
+        if (this.options.dry) {
+            log.message(color.bgBlue(" DRY RUN "))
+            process.env.DRY = "true"
+        }
+    }
+
+
+    #done(): void {
+        outro("Done")
+        this.taskStatus = "finished"
+    }
+
+
+    #start(): void {
+        intro("Cross release")
+        this.#checkDryRun()
+        this.taskStatus = "running"
+    }
+
 
     async confirmReleaseOptions() {
         const { dry, yes } = this.options
@@ -173,6 +168,16 @@ class App {
         }
     }
 
+
+    /**
+     * Accepts a message string template (e.g. "release %s" or "This is the %s release").
+     * If the template contains any "%s" placeholders, then they are replaced with the version number;
+     * otherwise, the version number is appended to the string.
+     */
+    formatMessageString(template: string, nextVersion: string): string {
+        return template?.includes("%s") ? template.replaceAll("%s", nextVersion) : template + nextVersion
+    }
+
     async getNextVersion(): Promise<void> {
         const { cwd: dir, excludes, main, version } = this.options
 
@@ -198,6 +203,29 @@ class App {
         }
     }
 
+    resolveExecutes() {
+        const { execute } = this.options
+        const indexBeforePush = this.taskQueue.findIndex(t => t.name === "push")
+        const index = indexBeforePush === -1 ? this.taskQueue.length : indexBeforePush
+        for (const command of execute) {
+            if (!command) continue
+            const [cmd, ...args] = parseCliCommand(command)
+            if (!cmd) continue
+            const exec = async () => {
+                const { failed, stdout } = await execa(cmd, args, { reject: false })
+                debug("stdout:", stdout)
+                if (failed) {
+                    log.error(`exec: ${command}`)
+                    return false
+                } else {
+                    log.success(`exec: ${command}`)
+                    return true
+                }
+            }
+            this.#addTask({ exec, name: "anonymous" }, index)
+        }
+    }
+
     async resolveProjects(): Promise<void> {
         const { nextVersion, options: { cwd: dir, excludes, recursive } } = this
         const projectFiles = await findProjectFiles(dir, excludes, recursive)
@@ -220,43 +248,21 @@ class App {
         })
     }
 
-    #addTask(task: Task, idx?: number): boolean {
-        const expect = this.taskQueue.length + 1
-        if (idx) {
-            this.taskQueue.splice(idx, 0, task)
-        } else {
-            this.taskQueue.push(task)
-        }
-        return this.taskQueue.length === expect
-    }
-
-
-    #check(status: boolean | boolean[]) {
-        if (Array.isArray(status)) {
-            if (status.some(s => !s)) {
-                this.taskStatus = "failed"
+    async run(): Promise<void> {
+        this.#start()
+        await this.getNextVersion()
+        await this.resolveProjects()
+        await this.confirmReleaseOptions()
+        this.resolveExecutes()
+        debug("taskQueue:", this.taskQueue)
+        for await (const task of this.taskQueue) {
+            if (this.taskStatus === "failed") {
+                break
+            } else {
+                this.#check(await task.exec())
             }
-        } else if (!status) {
-            this.taskStatus = "failed"
         }
-    }
-
-    #checkDryRun() {
-        if (this.options.dry) {
-            log.message(color.bgBlue(" DRY RUN "))
-            process.env.DRY = "true"
-        }
-    }
-
-    #done(): void {
-        outro("Done")
-        this.taskStatus = "finished"
-    }
-
-    #start(): void {
-        intro("Cross release")
-        this.#checkDryRun()
-        this.taskStatus = "running"
+        this.#done()
     }
 }
 
