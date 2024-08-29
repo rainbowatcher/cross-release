@@ -26,7 +26,7 @@
         "coverage": "vitest --coverage",
         "dev": "tsx packages/cross-release-cli/src/cli.ts -rD",
         "lint": "eslint .",
-        "prepare": "husky",
+        "prepare": "simple-git-hooks",
         "release": "node packages/cross-release-cli/dist/cli.js",
         "publish": "pnpm release -ry && pnpm build && pnpm -r publish",
         "test": "vitest",
@@ -51,14 +51,18 @@
         "dedent": "^1.5.3",
         "eslint": "^9.9.0",
         "execa": "^9.3.1",
-        "husky": "^9.1.4",
         "lint-staged": "^15.2.9",
         "rimraf": "^6.0.1",
+        "simple-git-hooks": "^2.11.1",
         "taze": "^0.16.6",
         "tsup": "^8.2.4",
         "tsx": "^4.17.0",
         "typescript": "^5.5.4",
         "vitest": "^2.0.5"
+    },
+    "simple-git-hooks": {
+        "pre-commit": "pnpm exec lint-staged",
+        "commit-msg": "pnpm exec commitlint --edit $1"
     },
     "lint-staged": {
         "*.{js,ts,vue,json,jsonc,md,toml}": "eslint"
