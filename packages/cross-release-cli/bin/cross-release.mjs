@@ -2,4 +2,4 @@
 
 "use strict"
 
-import("../dist/cli.js")
+import("../dist/app.js")

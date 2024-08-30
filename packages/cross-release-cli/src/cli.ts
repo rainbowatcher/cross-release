@@ -1,271 +1,101 @@
 import path from "node:path"
 import process from "node:process"
-import {
-    cancel, confirm, intro, isCancel, log, outro,
-} from "@clack/prompts"
-import {
-    findProjectFiles, getProjectVersion, isVersionValid, upgradeProjectVersion,
-} from "cross-bump"
-import { execa } from "execa"
-import isUnicodeSupported from "is-unicode-supported"
-import color from "picocolors"
-import { initCli, parseCliCommand, resolveOptions } from "./cmd"
-import { CONFIG_DEFAULT, ExitCode } from "./constants"
-import {
-    gitAdd, gitCommit, gitPush, gitTag,
-} from "./git"
-import { chooseVersion } from "./prompt"
-import { resolveAltOptions } from "./util/config"
-import createDebug from "./util/debug"
-import type {
-    ExtractBooleanKeys, ReleaseOptions, Status, Task,
-} from "./types"
-
+import { Command } from "commander"
+import { getGitignores } from "cross-bump"
+import { defu } from "defu"
+import { version } from "../package.json"
+import { CONFIG_DEFAULT } from "./constants"
+import { loadUserConfig, loadUserSpecifiedConfigFile } from "./util/config"
+import createDebug, { isDebugEnable } from "./util/debug"
+import type { KeysOf, ReleaseOptions } from "./types"
 
 const debug = createDebug("cli")
 
+export function createCliProgram() {
+    const cli = new Command("cross-release")
 
-function message(msg: string): void {
-    const bar = isUnicodeSupported() ? "│" : "|"
-    console.log(`${color.gray(bar)}  ${msg}`)
+    cli.configureHelp({
+        subcommandTerm: cmd => `${cmd.name()} ${cmd.usage()}`,
+    })
+
+    cli.name("cross-release")
+        .version(version)
+        .description("A release tool that support multi programming language")
+        .usage("[version] [options]")
+        .option("-c, --config [file]", "Config file (auto detect by default)")
+        .option("-D, --dry", "Dry run", CONFIG_DEFAULT.dry)
+        .option("-d, --debug", "Enable debug mode", CONFIG_DEFAULT.debug)
+        .option("-e, --exclude [dir]", "Folders to exclude from search")
+        .option("-m, --main", "Base project language [e.g. java, rust, javascript]", CONFIG_DEFAULT.main)
+        .option("-r, --recursive", "Run the command for each project in the workspace", CONFIG_DEFAULT.recursive)
+        .option("-x, --execute [command...]", "Execute the command", CONFIG_DEFAULT.execute)
+        .option("-y, --yes", "Answer yes to all prompts", CONFIG_DEFAULT.yes)
+        .option("--cwd [dir]", "Set working directory", CONFIG_DEFAULT.cwd)
+        .option("--no-commit", "Skip committing changes")
+        .option("--no-push", "Skip pushing")
+        .option("--no-tag", "Skip tagging")
+        .option("-h, --help", "Display this message")
+
+    return cli
 }
 
-/**
- * Return the original result if it is not a cancellation symbol. exit process when detect cancel signal
- */
-function handleUserCancel<T = boolean>(result: symbol | T): T {
-    if (isCancel(result)) {
-        cancel("User cancel")
-        process.exit(ExitCode.Canceled)
+export function toReleaseOptions(cli: Command): ReleaseOptions {
+    const { args } = cli
+    const options = cli.opts<{ help: boolean } & ReleaseOptions>()
+    if (options.help) {
+        cli.help()
     }
-    return result
-}
-
-class App {
-    private currentVersion = ""
-
-    private modifiedFiles: string[] = []
-
-    private nextVersion = ""
-
-    private options: ReleaseOptions
-
-    private taskQueue: Task[] = []
-
-    private taskStatus: Status = "pending"
-
-    constructor(opts: ReleaseOptions) {
-        this.options = opts
-    }
-
-
-    static async create(): Promise<App> {
-        const cli = initCli()
-        const opts = await resolveOptions(cli)
-        return new App(opts)
-    }
-
-
-    #addTask(task: Task, idx?: number): boolean {
-        const expect = this.taskQueue.length + 1
-        if (idx) {
-            this.taskQueue.splice(idx, 0, task)
-        } else {
-            this.taskQueue.push(task)
-        }
-        return this.taskQueue.length === expect
-    }
-
-    #check(status: boolean | boolean[]) {
-        if (Array.isArray(status)) {
-            if (status.some(s => !s)) {
-                this.taskStatus = "failed"
-            }
-        } else if (!status) {
-            this.taskStatus = "failed"
-        }
-    }
-
-
-    #checkDryRun() {
-        if (this.options.dry) {
-            log.message(color.bgBlue(" DRY RUN "))
-            process.env.DRY = "true"
-        }
-    }
-
-
-    #done(): void {
-        outro("Done")
-        this.taskStatus = "finished"
-    }
-
-
-    #start(): void {
-        intro("Cross release")
-        this.#checkDryRun()
-        this.taskStatus = "running"
-    }
-
-
-    async confirmReleaseOptions() {
-        const { dry, yes } = this.options
-
-        const confirmTask = async (
-            name: ExtractBooleanKeys<ReleaseOptions>,
-            message: string,
-            exec: Task["exec"],
-        ) => {
-            if (yes) {
-                this.options[name] = true
-            } else if (this.options[name]) {
-                const confirmation = await confirm({ message })
-                this.options[name] = handleUserCancel<boolean>(confirmation)
-            }
-
-            if (this.options[name]) {
-                this.#addTask({ exec, name })
-            }
-        }
-
-
-        let commitMessage: string | undefined
-        if (this.options.commit) {
-            const { stageAll, template, verify } = resolveAltOptions(this.options, "commit", CONFIG_DEFAULT.commit)
-            if (!stageAll) {
-                this.#addTask({
-                    exec: async () => {
-                        return await gitAdd({ dry, files: this.modifiedFiles })
-                    },
-                    name: "add",
-                })
-            }
-            commitMessage = this.formatMessageString(template!, this.nextVersion)
-            await confirmTask("commit", "should commit?", async () => {
-                return await gitCommit({
-                    dry,
-                    message: commitMessage!,
-                    modifiedFiles: this.modifiedFiles,
-                    stageAll,
-                    verify,
-                })
-            })
-        }
-
-        if (this.options.tag && commitMessage !== undefined) {
-            const { template } = resolveAltOptions(this.options, "tag", CONFIG_DEFAULT.tag)
-            await confirmTask("tag", "should create tag?", async () => {
-                const tagName = this.formatMessageString(template!, this.nextVersion)
-                return await gitTag({ dry, message: commitMessage, tagName })
-            })
-        }
-
-        if (this.options.push) {
-            const { followTags } = resolveAltOptions(this.options, "push", CONFIG_DEFAULT.push)
-            await confirmTask("push", "should push to remote?", async () => {
-                return await gitPush({ dry, followTags })
-            })
-        }
-    }
-
-
-    /**
-     * Accepts a message string template (e.g. "release %s" or "This is the %s release").
-     * If the template contains any "%s" placeholders, then they are replaced with the version number;
-     * otherwise, the version number is appended to the string.
-     */
-    formatMessageString(template: string, nextVersion: string): string {
-        return template?.includes("%s") ? template.replaceAll("%s", nextVersion) : template + nextVersion
-    }
-
-    async getNextVersion(): Promise<void> {
-        const { cwd: dir, excludes, main, version } = this.options
-
-        // read current project version
-        // project file is in alphabetical order
-        const projectFiles = await findProjectFiles(dir, excludes)
-        if (projectFiles.length === 0) {
-            throw new Error("can't found any project file in the project root")
-        }
-        const mainProjectFile = projectFiles.find(file => file.category === main)
-        if (!mainProjectFile) {
-            throw new Error(`can't found ${main} project file in the project root`)
-        }
-        const projectVersion = await getProjectVersion(mainProjectFile)
-        this.currentVersion = projectVersion ?? ""
-
-        // whether there are a version number is given
-        if (isVersionValid(version)) {
-            this.nextVersion = version
-        } else {
-            const nextVersion = await chooseVersion(this.currentVersion)
-            this.nextVersion = handleUserCancel(nextVersion)
-        }
-    }
-
-    resolveExecutes() {
-        const { execute } = this.options
-        const indexBeforePush = this.taskQueue.findIndex(t => t.name === "push")
-        const index = indexBeforePush === -1 ? this.taskQueue.length : indexBeforePush
-        for (const command of execute) {
-            if (!command) continue
-            const [cmd, ...args] = parseCliCommand(command)
-            if (!cmd) continue
-            const exec = async () => {
-                const { failed, stdout } = await execa(cmd, args, { reject: false })
-                debug("stdout:", stdout)
-                if (failed) {
-                    log.error(`exec: ${command}`)
-                    return false
-                } else {
-                    log.success(`exec: ${command}`)
-                    return true
-                }
-            }
-            this.#addTask({ exec, name: "anonymous" }, index)
-        }
-    }
-
-    async resolveProjects(): Promise<void> {
-        const { nextVersion, options: { cwd: dir, excludes, recursive } } = this
-        const projectFiles = await findProjectFiles(dir, excludes, recursive)
-        debug(`found ${projectFiles.length} project files`)
-        this.#addTask({
-            exec: async () => {
-                return await Promise.all(projectFiles.map(async (projectFile) => {
-                    try {
-                        await upgradeProjectVersion(nextVersion, projectFile)
-                        this.modifiedFiles.push(projectFile.path)
-                        message(`upgrade to ${color.blue(nextVersion)} for ${color.gray(path.relative(dir, projectFile.path))}`)
-                    } catch (error) {
-                        log.error(String(error))
-                        return false
-                    }
-                    return true
-                }))
-            },
-            name: "upgradeVersion",
-        })
-    }
-
-    async run(): Promise<void> {
-        this.#start()
-        await this.getNextVersion()
-        await this.resolveProjects()
-        await this.confirmReleaseOptions()
-        this.resolveExecutes()
-        debug("taskQueue:", this.taskQueue)
-        for await (const task of this.taskQueue) {
-            if (this.taskStatus === "failed") {
-                break
-            } else {
-                this.#check(await task.exec())
-            }
-        }
-        this.#done()
+    return {
+        ...options,
+        ...args.length > 0 ? { version: args[0] } : {},
     }
 }
 
-const app = await App.create()
+export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
+    const cliOptions = toReleaseOptions(cli)
+    let userConfig: Partial<ReleaseOptions>
+    if (cliOptions.config) {
+        userConfig = await loadUserSpecifiedConfigFile(cliOptions.config, cliOptions)
+    } else {
+        userConfig = await loadUserConfig()
+    }
+    const parsedArgs = defu(cliOptions, userConfig)
 
-await app.run()
+    isDebugEnable(parsedArgs)
+
+    // add gitignores
+    const set = await getGitignores(parsedArgs.cwd)
+    for (const i of parsedArgs.excludes) set.add(i)
+    parsedArgs.excludes = [...set]
+
+    // correct execute type to string array
+    if (typeof parsedArgs.execute === "string") {
+        parsedArgs.execute = [parsedArgs.execute]
+    }
+
+    // convert to absolute path
+    const shouldBeAbsolute: Array<KeysOf<ReleaseOptions>> = ["cwd", "config"]
+    for (const key of shouldBeAbsolute) {
+        if (!parsedArgs[key]) continue
+        if (key === "cwd") {
+            const { cwd } = parsedArgs
+            parsedArgs.cwd = path.isAbsolute(cwd) ? cwd : path.join(process.cwd(), cwd)
+        }
+        // @ts-expect-error type missmatch
+        parsedArgs[key] = path.resolve(parsedArgs.cwd, parsedArgs[key])
+    }
+
+    debug("parsedArgs:", parsedArgs)
+    // if (cli.options.help) {
+    //     process.exit(0)
+    // }
+    return parsedArgs
+}
+
+export function parseCliCommand(commandString: string) {
+    const regex = /[^\s"']+|(["'])(?:(?!\1)[^\\]|\\.)*\1/g
+    return commandString.match(regex)?.map((arg) => {
+        const unquoted = arg.replace(/^(["'`])(.*)\1$/, "$2")
+        return unquoted.replaceAll(/\\(["'`])/g, "$1")
+    }) ?? []
+}
