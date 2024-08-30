@@ -51,7 +51,6 @@
         "dedent": "^1.5.3",
         "eslint": "^9.9.1",
         "execa": "^9.3.1",
-        "lint-staged": "^15.2.9",
         "rimraf": "^6.0.1",
         "simple-git-hooks": "^2.11.1",
         "taze": "^0.16.7",
@@ -61,11 +60,7 @@
         "vitest": "^2.0.5"
     },
     "simple-git-hooks": {
-        "pre-commit": "pnpm exec lint-staged",
         "commit-msg": "pnpm exec commitlint --edit $1"
-    },
-    "lint-staged": {
-        "*.{js,ts,vue,json,jsonc,md,toml}": "eslint"
     },
     "commitlint": {
         "extends": ["@commitlint/config-conventional"],
