@@ -11,6 +11,9 @@ export default defineConfig({
             exclude: ["packages/{cross-release-cli,cross-bump}/src/index.ts", "**/types.ts"],
             include: ["packages/**/src/**/*.{ts,tsx}"],
         },
+        // deps: {
+        //     moduleDirectories: ["node_modules", "tests"],
+        // },
         name: "cross-release",
     },
 })

@@ -24,7 +24,7 @@
         "build": "pnpm -r build",
         "clean": "pnpm -r clean",
         "coverage": "vitest --coverage",
-        "dev": "tsx packages/cross-release-cli/src/cli.ts -rD",
+        "dev": "tsx packages/cross-release-cli/src/app.ts -rD",
         "lint": "eslint .",
         "prepare": "simple-git-hooks",
         "release": "node packages/cross-release-cli/dist/cli.js",
@@ -51,6 +51,7 @@
         "dedent": "^1.5.3",
         "eslint": "^9.9.1",
         "execa": "^9.3.1",
+        "memfs": "^4.11.1",
         "rimraf": "^6.0.1",
         "simple-git-hooks": "^2.11.1",
         "taze": "^0.16.7",
@@ -63,9 +64,17 @@
         "commit-msg": "pnpm exec commitlint --edit $1"
     },
     "commitlint": {
-        "extends": ["@commitlint/config-conventional"],
+        "extends": [
+            "@commitlint/config-conventional"
+        ],
         "scope-enum": [
-            2, "always", ["cross-release-cli", "cross-bump", "deps"]
+            2,
+            "always",
+            [
+                "cross-release-cli",
+                "cross-bump",
+                "deps"
+            ]
         ]
     },
     "cross-release": {

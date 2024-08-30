@@ -1,4 +1,4 @@
-import * as fs from "node:fs/promises"
+import * as fs from "node:fs"
 import process from "node:process"
 import initTomlEdit, { edit, parse } from "@rainbowatcher/toml-edit-js"
 import * as cheerio from "cheerio"
@@ -71,13 +71,13 @@ export function getNextVersions(version?: semver.SemVer | string, coerce = false
  * @param dry - Whether to perform a dry run or not. @default process.env.DRY
  * @return A promise that resolves when the version upgrade is complete.
  */
-export async function upgradePomVersion(filePath: PathLike, version: string, opts: UpgradeOptions = {}): Promise<void> {
+export function upgradePomVersion(filePath: PathLike, version: string, opts: UpgradeOptions = {}): void {
     const {
         dry = process.env.DRY,
         finalNewline = true,
     } = opts
 
-    const content = await fs.readFile(filePath, "utf8")
+    const content = fs.readFileSync(filePath, "utf8")
     const $ = cheerio.load(content, {
         xml: { decodeEntities: false },
     })
@@ -92,7 +92,7 @@ export async function upgradePomVersion(filePath: PathLike, version: string, opt
     }
 
     if (!dry) {
-        await fs.writeFile(filePath, newXml)
+        fs.writeFileSync(filePath, newXml)
     }
 }
 
@@ -101,8 +101,8 @@ export async function upgradePomVersion(filePath: PathLike, version: string, opt
  *
  * @return The version of the Java project.
  */
-export async function getJavaProjectVersion(filePath: PathLike): Promise<string | undefined> {
-    const pom = await fs.readFile(filePath, "utf8")
+export function getJavaProjectVersion(filePath: PathLike): string | undefined {
+    const pom = fs.readFileSync(filePath, "utf8")
     const $ = cheerio.load(pom)
     const currVersion = $("project>version").text()
     return currVersion
@@ -116,12 +116,12 @@ export async function getJavaProjectVersion(filePath: PathLike): Promise<string 
  * @param dry - Whether to perform a dry run. @default process.env.DRY
  * @return A promise that resolves when the version is upgraded.
  */
-export async function upgradePackageVersion(filePath: PathLike, version: string, opts: UpgradeOptions = {}): Promise<void> {
+export function upgradePackageVersion(filePath: PathLike, version: string, opts: UpgradeOptions = {}): void {
     const {
         dry = process.env.DRY,
         finalNewline = true,
     } = opts
-    const file = await fs.readFile(filePath, "utf8")
+    const file = fs.readFileSync(filePath, "utf8")
     const { amount } = detectIndent(file)
     const packageJson = JSON.parse(file)
     const indent = amount ?? 2
@@ -131,7 +131,7 @@ export async function upgradePackageVersion(filePath: PathLike, version: string,
         newPkgJson += "\n"
     }
     if (!dry) {
-        await fs.writeFile(filePath, newPkgJson)
+        fs.writeFileSync(filePath, newPkgJson)
     }
 }
 
@@ -141,8 +141,8 @@ export async function upgradePackageVersion(filePath: PathLike, version: string,
  * @param filePath - The path to the package.json file.
  * @return The version number as a string, or undefined if the file cannot be read or parsed.
  */
-export async function getJSProjectVersion(filePath: PathLike): Promise<string | undefined> {
-    const packageJson = await fs.readFile(filePath, "utf8")
+export function getJSProjectVersion(filePath: PathLike): string | undefined {
+    const packageJson = fs.readFileSync(filePath, "utf8")
     const { version } = JSON.parse(packageJson)
     return version as string
 }
@@ -154,7 +154,7 @@ export async function getJSProjectVersion(filePath: PathLike): Promise<string | 
  * @return The version of the Rust project, or undefined if the version is not available.
  */
 export async function getRustProjectVersion(filePath: PathLike): Promise<string | undefined> {
-    const file = await fs.readFile(filePath, "utf8")
+    const file = fs.readFileSync(filePath, "utf8")
     await initTomlEdit()
     const { package: cargoPackage } = parse(file)
     if (cargoPackage?.version) {
@@ -176,7 +176,7 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, o
     } = opts
 
     await initTomlEdit()
-    const cargoFile = await fs.readFile(filePath, "utf8")
+    const cargoFile = fs.readFileSync(filePath, "utf8")
     const cargoToml = parse(cargoFile)
     let newCargoFile = cargoFile
     const { package: cargoPackage, workspace } = cargoToml
@@ -188,18 +188,18 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, o
         if (workspace?.package?.version && typeof workspace.package.version === "string") {
             newCargoFile = edit(newCargoFile, "workspace.package.version", version)
         }
-        await fs.writeFile(filePath, newCargoFile)
+        fs.writeFileSync(filePath, newCargoFile)
     }
 }
 
 export async function upgradeProjectVersion(nextVersion: string, projectFile?: ProjectFile, opts: UpgradeOptions = {}): Promise<void> {
     switch (projectFile?.category) {
         case "java": {
-            await upgradePomVersion(projectFile.path, nextVersion, opts)
+            upgradePomVersion(projectFile.path, nextVersion, opts)
             break
         }
         case "javascript": {
-            await upgradePackageVersion(projectFile.path, nextVersion, opts)
+            upgradePackageVersion(projectFile.path, nextVersion, opts)
             break
         }
         case "rust": {
@@ -213,11 +213,11 @@ export async function getProjectVersion(projectFile: ProjectFile) {
     let projectVersion
     switch (projectFile?.category) {
         case "java": {
-            projectVersion = await getJavaProjectVersion(projectFile.path)
+            projectVersion = getJavaProjectVersion(projectFile.path)
             break
         }
         case "javascript": {
-            projectVersion = await getJSProjectVersion(projectFile.path)
+            projectVersion = getJSProjectVersion(projectFile.path)
             break
         }
         case "rust": {

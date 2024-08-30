@@ -1,10 +1,11 @@
+import fs from "node:fs"
 import path from "node:path"
 import fg from "fast-glob"
 import { isBlankPath } from "./util"
 
-const supportedProjectCategory = ["java", "javascript", "rust"/* , "go" */] as const
-const supportedProjectFiles = ["package.json", "pom.xml", "Cargo.toml"] as const
-const supportedProjectGlobs = supportedProjectFiles.map(f => `**/${f}`)
+export const supportedProjectCategory = ["java", "javascript", "rust"/* , "go" */] as const
+export const supportedProjectFiles = ["package.json", "pom.xml", "Cargo.toml"] as const
+export const supportedProjectGlobs = supportedProjectFiles.map(f => `**/${f}`)
 export type ProjectCategory = typeof supportedProjectCategory[number]
 export type ProjectFileName = typeof supportedProjectFiles[number]
 
@@ -35,16 +36,17 @@ export type ProjectFile = {
  * @param recursive - Whether to recursively search. @default false
  * @return An array of file paths that match the search criteria.
  */
-export async function findProjectFiles(cwd?: string, ignore: string[] = [], recursive = false): Promise<ProjectFile[]> {
+export function findProjectFiles(cwd?: string, ignore: string[] = [], recursive = false): ProjectFile[] {
     const files: ProjectFile[] = []
     if (isBlankPath(cwd)) {
         return files
     }
 
-    const projectFiles = await fg.async(supportedProjectGlobs, {
+    const projectFiles = fg.sync(supportedProjectGlobs, {
         absolute: true,
         cwd,
         deep: recursive ? Infinity : 1,
+        fs,
         ignore,
     })
 

@@ -23,16 +23,16 @@ describe("resolveAltOptions", () => {
     it("should return the default value if value is undefined", () => {
         // @ts-expect-error param type incompatible
         const result = resolveAltOptions(options, "key")
-        expect(result).toEqual({})
+        expect(result).toStrictEqual({})
     })
 
     it("should return default if value is true", () => {
         const result = resolveAltOptions(options, "commit", CONFIG_DEFAULT.commit)
-        expect(result).toEqual(CONFIG_DEFAULT.commit)
+        expect(result).toStrictEqual(CONFIG_DEFAULT.commit)
     })
 
     it("should return {} if value is false", () => {
         const result = resolveAltOptions(options, "push", CONFIG_DEFAULT.push)
-        expect(result).toEqual({})
+        expect(result).toStrictEqual({})
     })
 })

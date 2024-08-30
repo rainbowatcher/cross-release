@@ -31,7 +31,9 @@
     },
     "dependencies": {
         "@clack/prompts": "^0.7.0",
-        "cac": "^6.7.14",
+        "@rainbowatcher/fs-extra": "^0.2.3",
+        "@rainbowatcher/path-extra": "^0.2.3",
+        "commander": "^12.1.0",
         "cross-bump": "workspace:*",
         "debug": "^4.3.6",
         "defu": "^6.1.4",

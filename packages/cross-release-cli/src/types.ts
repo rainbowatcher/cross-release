@@ -1,6 +1,12 @@
 import type { ProjectCategory } from "cross-bump"
 
+export type Arrayable<T> = T | T[]
+
 export type KeysOf<T, KeyType = string> = keyof { [K in keyof T as T[K] extends KeyType ? K : never]: T[K] }
+
+export type ResolvedOptions<T> = T extends boolean
+    ? never
+    : NonNullable<T>
 
 export type Status = "failed" | "finished" | "pending" | "running"
 

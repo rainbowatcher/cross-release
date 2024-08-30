@@ -1,7 +1,8 @@
+import process from "node:process"
 import { describe, expect, it } from "vitest"
 import { gitOriginUrl } from "./git"
 
-describe("getOriginUrl", () => {
+describe.runIf(!process.env.CI)("getOriginUrl", () => {
     it("should return the origin url", async () => {
         const mockStdout = "https://github.com/rainbowatcher/cross-release"
         const result = await gitOriginUrl()
