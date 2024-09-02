@@ -9,7 +9,7 @@ import {
 import { execa, parseCommandString } from "execa"
 import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
-import { createCliProgram, parseCliCommand, resolveOptions } from "./cli"
+import { createCliProgram, resolveOptions } from "./cli"
 import { CONFIG_DEFAULT, ExitCode } from "./constants"
 import {
     gitAdd, gitCommit, gitPush, gitTag,
@@ -18,6 +18,7 @@ import { chooseVersion } from "./prompt"
 import { resolveAltOptions } from "./util/config"
 import createDebug from "./util/debug"
 import { formatMessageString } from "./util/str"
+import type { ProjectFile } from "cross-bump"
 import type {
     ExtractBooleanKeys, ReleaseOptions, Status, Task,
 } from "./types"
@@ -43,50 +44,53 @@ function handleUserCancel<T = boolean>(result: symbol | T): T {
 }
 
 class App {
-    private currentVersion = ""
+    private _currentVersion = ""
 
-    private modifiedFiles: string[] = []
+    private _modifiedFiles: string[] = []
 
-    private nextVersion = ""
+    private _nextVersion = ""
 
-    private options: ReleaseOptions
+    private _options: ReleaseOptions
 
-    private taskQueue: Task[] = []
+    private _projectFiles: ProjectFile[] = []
 
-    private taskStatus: Status = "pending"
+    private _taskQueue: Task[] = []
+
+    private _taskStatus: Status = "pending"
 
     private constructor(opts: ReleaseOptions) {
-        this.options = opts
+        this._options = opts
     }
 
-    static async create(): Promise<App> {
-        const cli = createCliProgram().parse(process.argv)
+
+    static async create(argv = process.argv): Promise<App> {
+        const cli = createCliProgram().parse(argv)
         const opts = await resolveOptions(cli)
         return new App(opts)
     }
 
     #addTask(task: Task, idx?: number): boolean {
-        const expect = this.taskQueue.length + 1
+        const expect = this._taskQueue.length + 1
         if (idx) {
-            this.taskQueue.splice(idx, 0, task)
+            this._taskQueue.splice(idx, 0, task)
         } else {
-            this.taskQueue.push(task)
+            this._taskQueue.push(task)
         }
-        return this.taskQueue.length === expect
+        return this._taskQueue.length === expect
     }
 
     #check(status: boolean | boolean[]) {
         if (Array.isArray(status)) {
             if (status.some(s => !s)) {
-                this.taskStatus = "failed"
+                this._taskStatus = "failed"
             }
         } else if (!status) {
-            this.taskStatus = "failed"
+            this._taskStatus = "failed"
         }
     }
 
     #checkDryRun() {
-        if (this.options.dry) {
+        if (this._options.dry) {
             log.message(color.bgBlue(" DRY RUN "))
             process.env.DRY = "true"
         }
@@ -94,19 +98,19 @@ class App {
 
     #done(): void {
         outro("Done")
-        this.taskStatus = "finished"
+        this._taskStatus = "finished"
     }
 
 
     #start(): void {
         intro("Cross release")
         this.#checkDryRun()
-        this.taskStatus = "running"
+        this._taskStatus = "running"
     }
 
 
     async confirmReleaseOptions() {
-        const { dry, yes } = this.options
+        const { dry, yes } = this._options
 
         const confirmTask = async (
             name: ExtractBooleanKeys<ReleaseOptions>,
@@ -114,51 +118,51 @@ class App {
             exec: Task["exec"],
         ) => {
             if (yes) {
-                this.options[name] = true
-            } else if (this.options[name]) {
+                this._options[name] = true
+            } else if (this._options[name]) {
                 const confirmation = await confirm({ message })
-                this.options[name] = handleUserCancel<boolean>(confirmation)
+                this._options[name] = handleUserCancel<boolean>(confirmation)
             }
 
-            if (this.options[name]) {
+            if (this._options[name]) {
                 this.#addTask({ exec, name })
             }
         }
 
 
         let commitMessage: string | undefined
-        if (this.options.commit) {
-            const { stageAll, template, verify } = resolveAltOptions(this.options, "commit", CONFIG_DEFAULT.commit)
+        if (this._options.commit) {
+            const { stageAll, template, verify } = resolveAltOptions(this._options, "commit", CONFIG_DEFAULT.commit)
             if (!stageAll) {
                 this.#addTask({
                     exec: async () => {
-                        return await gitAdd({ dry, files: this.modifiedFiles })
+                        return await gitAdd({ dry, files: this._modifiedFiles })
                     },
                     name: "add",
                 })
             }
-            commitMessage = formatMessageString(template!, this.nextVersion)
+            commitMessage = formatMessageString(template!, this._nextVersion)
             await confirmTask("commit", "should commit?", async () => {
                 return await gitCommit({
                     dry,
                     message: commitMessage!,
-                    modifiedFiles: this.modifiedFiles,
+                    modifiedFiles: this._modifiedFiles,
                     stageAll,
                     verify,
                 })
             })
         }
 
-        if (this.options.tag && commitMessage !== undefined) {
-            const { template } = resolveAltOptions(this.options, "tag", CONFIG_DEFAULT.tag)
+        if (this._options.tag && commitMessage !== undefined) {
+            const { template } = resolveAltOptions(this._options, "tag", CONFIG_DEFAULT.tag)
             await confirmTask("tag", "should create tag?", async () => {
-                const tagName = formatMessageString(template!, this.nextVersion)
+                const tagName = formatMessageString(template!, this._nextVersion)
                 return await gitTag({ dry, message: commitMessage, tagName })
             })
         }
 
-        if (this.options.push) {
-            const { followTags } = resolveAltOptions(this.options, "push", CONFIG_DEFAULT.push)
+        if (this._options.push) {
+            const { followTags } = resolveAltOptions(this._options, "push", CONFIG_DEFAULT.push)
             await confirmTask("push", "should push to remote?", async () => {
                 return await gitPush({ dry, followTags })
             })
@@ -166,9 +170,9 @@ class App {
     }
 
     async executeTasks() {
-        debug("taskQueue:", this.taskQueue)
-        for await (const task of this.taskQueue) {
-            if (this.taskStatus === "failed") {
+        debug("taskQueue:", this._taskQueue)
+        for await (const task of this._taskQueue) {
+            if (this._taskStatus === "failed") {
                 break
             } else {
                 this.#check(await task.exec())
@@ -176,38 +180,13 @@ class App {
         }
     }
 
-    async getNextVersion(): Promise<void> {
-        const { cwd: dir, excludes, main, version } = this.options
-
-        // read current project version
-        // project file is in alphabetical order
-        const projectFiles = await findProjectFiles(dir, excludes)
-        if (projectFiles.length === 0) {
-            throw new Error("can't found any project file in the project root")
-        }
-        const mainProjectFile = projectFiles.find(file => file.category === main)
-        if (!mainProjectFile) {
-            throw new Error(`can't found ${main} project file in the project root`)
-        }
-        const projectVersion = await getProjectVersion(mainProjectFile)
-        this.currentVersion = projectVersion ?? ""
-
-        // whether there are a version number is given
-        if (isVersionValid(version)) {
-            this.nextVersion = version
-        } else {
-            const nextVersion = await chooseVersion(this.currentVersion)
-            this.nextVersion = handleUserCancel(nextVersion)
-        }
-    }
-
     resolveExecutes() {
-        const { execute } = this.options
-        const indexBeforePush = this.taskQueue.findIndex(t => t.name === "push")
-        const index = indexBeforePush === -1 ? this.taskQueue.length : indexBeforePush
+        const { execute } = this._options
+        const indexBeforePush = this._taskQueue.findIndex(t => t.name === "push")
+        const index = indexBeforePush === -1 ? this._taskQueue.length : indexBeforePush
         for (const command of execute) {
             if (!command) continue
-            const [cmd, ...args] = parseCliCommand(command)
+            const [cmd, ...args] = parseCommandString(command)
             if (!cmd) continue
             const exec = async () => {
                 const { failed, stdout } = await execa(cmd, args, { reject: false })
@@ -224,17 +203,46 @@ class App {
         }
     }
 
-    async resolveProjects(): Promise<void> {
-        const { nextVersion, options: { cwd: dir, excludes, recursive } } = this
-        const projectFiles = await findProjectFiles(dir, excludes, recursive)
+    async resolveNextVersion(): Promise<void> {
+        const { main, version } = this._options
+
+        const mainProjectFile = this._projectFiles.find(file => file.category === main)
+        if (!mainProjectFile) {
+            throw new Error(`can't found ${main} project file in the project root`)
+        }
+        const projectVersion = await getProjectVersion(mainProjectFile)
+        this._currentVersion = projectVersion ?? ""
+
+        // whether there are a version number is given
+        if (isVersionValid(version)) {
+            this._nextVersion = version
+            log.info(`current version: ${this._currentVersion}, next version: ${color.blue(this._nextVersion)}`)
+        } else {
+            const nextVersion = await chooseVersion(this._currentVersion)
+            this._nextVersion = handleUserCancel(nextVersion)
+        }
+    }
+
+    resolveProjectFiles(): void {
+        const { cwd, excludes, recursive } = this._options
+        const projectFiles = findProjectFiles(cwd, excludes, recursive)
+        if (projectFiles.length === 0) {
+            console.error("can't found any project file in the project root")
+            process.exit(1)
+        }
         debug(`found ${projectFiles.length} project files`)
+        this._projectFiles = projectFiles
+    }
+
+    resolveProjects(): void {
+        const { _nextVersion, _options: { cwd }, _projectFiles } = this
         this.#addTask({
             exec: async () => {
-                return await Promise.all(projectFiles.map(async (projectFile) => {
+                return await Promise.all(_projectFiles.map(async (projectFile) => {
                     try {
-                        await upgradeProjectVersion(nextVersion, projectFile)
-                        this.modifiedFiles.push(projectFile.path)
-                        message(`upgrade to ${color.blue(nextVersion)} for ${color.gray(path.relative(dir, projectFile.path))}`)
+                        await upgradeProjectVersion(_nextVersion, projectFile)
+                        this._modifiedFiles.push(projectFile.path)
+                        message(`upgrade to ${color.blue(_nextVersion)} for ${color.gray(path.relative(cwd, projectFile.path))}`)
                     } catch (error) {
                         log.error(String(error))
                         return false
@@ -248,15 +256,30 @@ class App {
 
     async run(): Promise<void> {
         this.#start()
-        await this.getNextVersion()
-        await this.resolveProjects()
+        this.resolveProjectFiles()
+        await this.resolveNextVersion()
+        this.resolveProjects()
         await this.confirmReleaseOptions()
         this.resolveExecutes()
         await this.executeTasks()
         this.#done()
     }
+
+    public get currentVersion(): string {
+        return this._currentVersion
+    }
+
+    public get nextVersion(): string {
+        return this._nextVersion
+    }
+
+    public get options(): ReleaseOptions {
+        return this._options
+    }
+
+    public get projectFiles(): ProjectFile[] {
+        return this._projectFiles
+    }
 }
 
-const app = await App.create()
-
-await app.run()
+export default App

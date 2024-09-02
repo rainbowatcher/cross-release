@@ -2,4 +2,6 @@
 
 "use strict"
 
-import("../dist/app.js")
+const App = await import("../dist/app.js")
+const app = await App.default.create()
+void app.run()
