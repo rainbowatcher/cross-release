@@ -135,15 +135,15 @@ class App {
             const { stageAll, template, verify } = resolveAltOptions(this._options, "commit", CONFIG_DEFAULT.commit)
             if (!stageAll) {
                 this.#addTask({
-                    exec: async () => {
-                        return await gitAdd({ dry, files: this._modifiedFiles })
+                    exec: () => {
+                        return gitAdd({ dry, files: this._modifiedFiles })
                     },
                     name: "add",
                 })
             }
             commitMessage = formatMessageString(template!, this._nextVersion)
-            await confirmTask("commit", "should commit?", async () => {
-                return await gitCommit({
+            await confirmTask("commit", "should commit?", () => {
+                return gitCommit({
                     dry,
                     message: commitMessage!,
                     modifiedFiles: this._modifiedFiles,
@@ -155,16 +155,16 @@ class App {
 
         if (this._options.tag && commitMessage !== undefined) {
             const { template } = resolveAltOptions(this._options, "tag", CONFIG_DEFAULT.tag)
-            await confirmTask("tag", "should create tag?", async () => {
+            await confirmTask("tag", "should create tag?", () => {
                 const tagName = formatMessageString(template!, this._nextVersion)
-                return await gitTag({ dry, message: commitMessage, tagName })
+                return gitTag({ dry, message: commitMessage, tagName })
             })
         }
 
         if (this._options.push) {
             const { followTags } = resolveAltOptions(this._options, "push", CONFIG_DEFAULT.push)
-            await confirmTask("push", "should push to remote?", async () => {
-                return await gitPush({ dry, followTags })
+            await confirmTask("push", "should push to remote?", () => {
+                return gitPush({ dry, followTags })
             })
         }
     }

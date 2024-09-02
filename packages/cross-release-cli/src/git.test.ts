@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest"
 import { gitOriginUrl } from "./git"
 
 describe.runIf(!process.env.CI)("getOriginUrl", () => {
-    it("should return the origin url", async () => {
+    it("should return the origin url", () => {
         const mockStdout = "https://github.com/rainbowatcher/cross-release"
-        const result = await gitOriginUrl()
+        const result = gitOriginUrl()
         expect(result).toContain(mockStdout)
     })
 })
