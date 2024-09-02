@@ -1,15 +1,6 @@
-import { vol } from "memfs"
-import {
-    describe, expect, it, vi,
-} from "vitest"
+import { describe, expect, it } from "vitest"
 import { createCliProgram, toReleaseOptions } from "./cli"
 import { CONFIG_DEFAULT } from "./constants"
-
-vi.mock("node:fs")
-vi.mock("node:fs/promises")
-
-
-vol.fromNestedJSON({})
 
 
 describe.concurrent("arg parse", () => {

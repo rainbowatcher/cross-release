@@ -1,15 +1,8 @@
-import { vol } from "memfs"
-import {
-    describe, expect, it, vi,
-} from "vitest"
-import { fsJson } from "../../../tests/utils/mock_fs"
+import path from "node:path"
+import { describe, expect, it } from "vitest"
 import { findProjectFiles } from "./project"
 
-vi.mock("node:fs")
-vi.mock("node:fs/promises")
-
-vol.fromNestedJSON(fsJson)
-const cwd = "/repo"
+const cwd = path.join(process.cwd(), "fixture")
 
 describe("findProjectFiles", () => {
     it("should return an empty array when dir is empty", () => {
