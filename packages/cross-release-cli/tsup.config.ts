@@ -5,5 +5,4 @@ export default defineConfig({
     dts: true,
     entry: ["src/index.ts", "src/app.ts"],
     format: ["esm"],
-    minify: true,
 })

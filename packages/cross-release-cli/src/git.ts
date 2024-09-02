@@ -139,7 +139,7 @@ export async function gitPush(options: GitPushOptions = {}): Promise<boolean> {
         }
     }
     const originUrl = await gitOriginUrl()
-    s.stop(`pushed to repo ${color.underline(originUrl)}`)
+    s.stop(`pushed to repo: ${color.underline(originUrl)}`)
     return true
 }
 

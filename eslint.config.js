@@ -8,4 +8,8 @@ export default defineConfig({
     toml: true,
     typescript: true,
     yaml: true,
+}, {
+    rules: {
+        "unicorn/no-process-exit": "off",
+    },
 })

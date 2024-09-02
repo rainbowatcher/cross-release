@@ -64,7 +64,7 @@ export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
     isDebugEnable(parsedArgs)
 
     // add gitignores
-    const set = await getGitignores(parsedArgs.cwd)
+    const set = getGitignores(parsedArgs.cwd)
     for (const i of parsedArgs.excludes) set.add(i)
     parsedArgs.excludes = [...set]
 
@@ -86,8 +86,5 @@ export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
     }
 
     debug("parsedArgs:", parsedArgs)
-    // if (cli.options.help) {
-    //     process.exit(0)
-    // }
     return parsedArgs
 }
