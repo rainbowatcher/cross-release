@@ -6,7 +6,7 @@ import {
 import {
     findProjectFiles, getProjectVersion, isVersionValid, upgradeProjectVersion,
 } from "cross-bump"
-import { execa } from "execa"
+import { execa, parseCommandString } from "execa"
 import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
 import { createCliProgram, parseCliCommand, resolveOptions } from "./cli"
