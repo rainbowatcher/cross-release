@@ -7,7 +7,7 @@ import { version } from "../package.json"
 import { CONFIG_DEFAULT } from "./constants"
 import { loadUserConfig, loadUserSpecifiedConfigFile } from "./util/config"
 import createDebug, { isDebugEnable } from "./util/debug"
-import type { KeysOf, ReleaseOptions } from "./types"
+import type { CliReleaseOptions, KeysOf, ReleaseOptions } from "./types"
 
 const debug = createDebug("cli")
 
@@ -39,9 +39,9 @@ export function createCliProgram() {
     return cli
 }
 
-export function toReleaseOptions(cli: Command): ReleaseOptions {
+export function toCliReleaseOptions(cli: Command): CliReleaseOptions {
     const { args } = cli
-    const options = cli.opts<{ help: boolean } & ReleaseOptions>()
+    const options = cli.opts<{ help: boolean } & CliReleaseOptions>()
     if (options.help) {
         cli.help()
     }
@@ -52,7 +52,7 @@ export function toReleaseOptions(cli: Command): ReleaseOptions {
 }
 
 export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
-    const cliOptions = toReleaseOptions(cli)
+    const cliOptions = toCliReleaseOptions(cli)
     let userConfig: Partial<ReleaseOptions>
     if (cliOptions.config) {
         userConfig = await loadUserSpecifiedConfigFile(cliOptions.config, cliOptions)
@@ -67,11 +67,6 @@ export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
     const set = getGitignores(parsedArgs.cwd)
     for (const i of parsedArgs.excludes) set.add(i)
     parsedArgs.excludes = [...set]
-
-    // correct execute type to string array
-    if (typeof parsedArgs.execute === "string") {
-        parsedArgs.execute = [parsedArgs.execute]
-    }
 
     // convert to absolute path
     const shouldBeAbsolute: Array<KeysOf<ReleaseOptions>> = ["cwd", "config"]

@@ -2,6 +2,12 @@ import type { ProjectCategory } from "cross-bump"
 
 export type Arrayable<T> = T | T[]
 
+export type CliPrimitive = boolean | string | string[]
+
+export type ExcludeType<T, U> = {
+    [K in keyof T]: T[K] extends U ? T[K] : Exclude<T[K], U>
+}
+
 export type KeysOf<T, KeyType = string> = keyof { [K in keyof T as T[K] extends KeyType ? K : never]: T[K] }
 
 export type ResolvedOptions<T> = T extends boolean
@@ -17,33 +23,11 @@ export type Task = {
     name: string
 }
 
-export type ExecutionStatus = {
-    commit: Task
-    publish: Task
-    push: Task
-    tag: { tagName: string } & Task
-    upgrade: { modifiedFiles: string[] } & Task
-}
-
-export type ReleaseContext = {
-    currentVersion: string
-    // TODO: record the task execution status to rollback when execution fails
-    execution: Execution
-    modifiedFiles: string[]
-    nextVersion: string
-    options: ReleaseOptions
-}
-
-
-export type Execution = {
-    execIndex: number
-    failIndex: number
-    taskQueue: Task[]
-}
-
-export type ReleaseOptionsDefault = Omit<ReleaseOptions, "config" | "excludes" | "version">
+export type ReleaseOptionsDefault = Omit<ExcludeType<ReleaseOptions, CliPrimitive>, "config" | "excludes" | "version">
 
 export type DefineConfigOptions = Partial<Omit<ReleaseOptions, "config">>
+
+export type CliReleaseOptions = ExcludeType<ReleaseOptions, Record<string, unknown>>
 
 export type ReleaseOptions = {
     /**
