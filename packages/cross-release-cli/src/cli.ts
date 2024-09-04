@@ -1,5 +1,4 @@
 import path from "node:path"
-import process from "node:process"
 import { toAbsolute } from "@rainbowatcher/path-extra"
 import { Command } from "commander"
 import { getGitignores } from "cross-bump"

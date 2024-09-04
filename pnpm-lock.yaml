@@ -13,13 +13,13 @@ importers:
         version: 19.4.1
       '@rainbowatcher/eslint-config':
         specifier: ^0.14.3
-        version: 0.14.3(@rainbowatcher/eslint-config-ignore@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-js@0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.1)))(@rainbowatcher/eslint-config-json@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-md@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-prettier@0.14.3(@types/eslint@9.6.1)(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-toml@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-ts@0.14.3(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))
+        version: 0.14.3(@rainbowatcher/eslint-config-ignore@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-js@0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.3)))(@rainbowatcher/eslint-config-json@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-md@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-prettier@0.14.3(@types/eslint@9.6.1)(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-toml@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-ts@0.14.3(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))
       '@rainbowatcher/eslint-config-ignore':
         specifier: ^0.14.3
         version: 0.14.3(eslint@9.9.1(jiti@1.21.6))
       '@rainbowatcher/eslint-config-js':
         specifier: ^0.14.3
-        version: 0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.1))
+        version: 0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.3))
       '@rainbowatcher/eslint-config-json':
         specifier: ^0.14.3
         version: 0.14.3(eslint@9.9.1(jiti@1.21.6))
@@ -39,17 +39,17 @@ importers:
         specifier: ^4.1.12
         version: 4.1.12
       '@types/node':
-        specifier: ^22.5.1
-        version: 22.5.1
+        specifier: ^22.5.3
+        version: 22.5.3
       '@types/semver':
         specifier: ^7.5.8
         version: 7.5.8
       '@vitest/coverage-v8':
         specifier: ^2.0.5
-        version: 2.0.5(vitest@2.0.5(@types/node@22.5.1))
+        version: 2.0.5(vitest@2.0.5(@types/node@22.5.3))
       commitlint:
         specifier: ^19.4.1
-        version: 19.4.1(@types/node@22.5.1)(typescript@5.5.4)
+        version: 19.4.1(@types/node@22.5.3)(typescript@5.5.4)
       dedent:
         specifier: ^1.5.3
         version: 1.5.3
@@ -82,7 +82,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^2.0.5
-        version: 2.0.5(@types/node@22.5.1)
+        version: 2.0.5(@types/node@22.5.3)
 
   packages/cross-bump:
     dependencies:
@@ -135,8 +135,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       picocolors:
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.1.0
+        version: 1.1.0
       unconfig:
         specifier: ^0.5.5
         version: 0.5.5
@@ -949,8 +949,8 @@ packages:
   '@types/ms@0.7.31':
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
 
-  '@types/node@22.5.1':
-    resolution: {integrity: sha512-KkHsxej0j9IW1KKOOAA/XBA0z08UFSrRQHErzEfA3Vgq57eXIMYboIlHJuYIfd+lwCQjtKqUu3UnmKbtUc9yRw==}
+  '@types/node@22.5.3':
+    resolution: {integrity: sha512-njripolh85IA9SQGTAqbmnNZTdxv7X/4OYGPz8tgy5JDr8MP+uDBa921GpYEoDDnwm0Hmn5ZPeJgiiSTPoOzkQ==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -2416,8 +2416,8 @@ packages:
     resolution: {integrity: sha512-vE7JKRyES09KiunauX7nd2Q9/L7lhok4smP9RZTDeD4MVs72Dp2qNFVz39Nz5a0FVEW0BJR6C0DYrq6unoziZA==}
     engines: {node: '>= 14.16'}
 
-  picocolors@1.0.1:
-    resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
+  picocolors@1.1.0:
+    resolution: {integrity: sha512-TQ92mBOW0l3LeMeyLV6mzy/kWr8lkd/hp3mTg7wYK7zJhuBStmGMBG0BdeDZS/dZx1IukaX6Bk11zcln25o1Aw==}
 
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
@@ -3108,20 +3108,20 @@ snapshots:
 
   '@clack/core@0.3.3':
     dependencies:
-      picocolors: 1.0.1
+      picocolors: 1.1.0
       sisteransi: 1.0.5
 
   '@clack/prompts@0.7.0':
     dependencies:
       '@clack/core': 0.3.3
-      picocolors: 1.0.1
+      picocolors: 1.1.0
       sisteransi: 1.0.5
 
-  '@commitlint/cli@19.4.1(@types/node@22.5.1)(typescript@5.5.4)':
+  '@commitlint/cli@19.4.1(@types/node@22.5.3)(typescript@5.5.4)':
     dependencies:
       '@commitlint/format': 19.3.0
       '@commitlint/lint': 19.4.1
-      '@commitlint/load': 19.4.0(@types/node@22.5.1)(typescript@5.5.4)
+      '@commitlint/load': 19.4.0(@types/node@22.5.3)(typescript@5.5.4)
       '@commitlint/read': 19.4.0
       '@commitlint/types': 19.0.3
       execa: 8.0.1
@@ -3168,7 +3168,7 @@ snapshots:
       '@commitlint/rules': 19.4.1
       '@commitlint/types': 19.0.3
 
-  '@commitlint/load@19.4.0(@types/node@22.5.1)(typescript@5.5.4)':
+  '@commitlint/load@19.4.0(@types/node@22.5.3)(typescript@5.5.4)':
     dependencies:
       '@commitlint/config-validator': 19.0.3
       '@commitlint/execute-rule': 19.0.0
@@ -3176,7 +3176,7 @@ snapshots:
       '@commitlint/types': 19.0.3
       chalk: 5.3.0
       cosmiconfig: 9.0.0(typescript@5.5.4)
-      cosmiconfig-typescript-loader: 5.0.0(@types/node@22.5.1)(cosmiconfig@9.0.0(typescript@5.5.4))(typescript@5.5.4)
+      cosmiconfig-typescript-loader: 5.0.0(@types/node@22.5.3)(cosmiconfig@9.0.0(typescript@5.5.4))(typescript@5.5.4)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -3476,14 +3476,14 @@ snapshots:
     transitivePeerDependencies:
       - eslint
 
-  '@rainbowatcher/eslint-config-js@0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.1))':
+  '@rainbowatcher/eslint-config-js@0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.3))':
     dependencies:
       '@eslint/js': 9.9.1
       '@rainbowatcher/eslint-config-shared': 0.14.3
       '@stylistic/eslint-plugin-js': 2.7.1(eslint@9.9.1(jiti@1.21.6))
       '@stylistic/eslint-plugin-jsx': 2.7.1(eslint@9.9.1(jiti@1.21.6))
       '@stylistic/eslint-plugin-plus': 2.7.1(eslint@9.9.1(jiti@1.21.6))
-      '@vitest/eslint-plugin': 1.1.0(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.1))
+      '@vitest/eslint-plugin': 1.1.0(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.3))
       eslint: 9.9.1(jiti@1.21.6)
       eslint-plugin-antfu: 2.3.6(eslint@9.9.1(jiti@1.21.6))
       eslint-plugin-import-x: 4.1.1(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)
@@ -3558,7 +3558,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@rainbowatcher/eslint-config@0.14.3(@rainbowatcher/eslint-config-ignore@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-js@0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.1)))(@rainbowatcher/eslint-config-json@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-md@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-prettier@0.14.3(@types/eslint@9.6.1)(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-toml@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-ts@0.14.3(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))':
+  '@rainbowatcher/eslint-config@0.14.3(@rainbowatcher/eslint-config-ignore@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-js@0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.3)))(@rainbowatcher/eslint-config-json@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-md@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-prettier@0.14.3(@types/eslint@9.6.1)(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-toml@0.14.3(eslint@9.9.1(jiti@1.21.6)))(@rainbowatcher/eslint-config-ts@0.14.3(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))':
     dependencies:
       '@antfu/install-pkg': 0.4.1
       '@clack/prompts': 0.7.0
@@ -3568,10 +3568,10 @@ snapshots:
       eslint-flat-config-utils: 0.3.1
       local-pkg: 0.5.0
       magicast: 0.3.5
-      picocolors: 1.0.1
+      picocolors: 1.1.0
     optionalDependencies:
       '@rainbowatcher/eslint-config-ignore': 0.14.3(eslint@9.9.1(jiti@1.21.6))
-      '@rainbowatcher/eslint-config-js': 0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.1))
+      '@rainbowatcher/eslint-config-js': 0.14.3(@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.3))
       '@rainbowatcher/eslint-config-json': 0.14.3(eslint@9.9.1(jiti@1.21.6))
       '@rainbowatcher/eslint-config-md': 0.14.3(eslint@9.9.1(jiti@1.21.6))
       '@rainbowatcher/eslint-config-prettier': 0.14.3(@types/eslint@9.6.1)(eslint@9.9.1(jiti@1.21.6))
@@ -3718,7 +3718,7 @@ snapshots:
 
   '@types/conventional-commits-parser@5.0.0':
     dependencies:
-      '@types/node': 22.5.1
+      '@types/node': 22.5.3
 
   '@types/debug@4.1.12':
     dependencies:
@@ -3744,7 +3744,7 @@ snapshots:
 
   '@types/ms@0.7.31': {}
 
-  '@types/node@22.5.1':
+  '@types/node@22.5.3':
     dependencies:
       undici-types: 6.19.6
 
@@ -3835,7 +3835,7 @@ snapshots:
       '@typescript-eslint/types': 8.3.0
       eslint-visitor-keys: 3.4.3
 
-  '@vitest/coverage-v8@2.0.5(vitest@2.0.5(@types/node@22.5.1))':
+  '@vitest/coverage-v8@2.0.5(vitest@2.0.5(@types/node@22.5.3))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -3849,17 +3849,17 @@ snapshots:
       std-env: 3.7.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.0.5(@types/node@22.5.1)
+      vitest: 2.0.5(@types/node@22.5.3)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/eslint-plugin@1.1.0(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.1))':
+  '@vitest/eslint-plugin@1.1.0(@typescript-eslint/utils@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4))(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)(vitest@2.0.5(@types/node@22.5.3))':
     dependencies:
       eslint: 9.9.1(jiti@1.21.6)
     optionalDependencies:
       '@typescript-eslint/utils': 8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.5.4)
       typescript: 5.5.4
-      vitest: 2.0.5(@types/node@22.5.1)
+      vitest: 2.0.5(@types/node@22.5.3)
 
   '@vitest/expect@2.0.5':
     dependencies:
@@ -4115,9 +4115,9 @@ snapshots:
 
   comment-parser@1.4.1: {}
 
-  commitlint@19.4.1(@types/node@22.5.1)(typescript@5.5.4):
+  commitlint@19.4.1(@types/node@22.5.3)(typescript@5.5.4):
     dependencies:
-      '@commitlint/cli': 19.4.1(@types/node@22.5.1)(typescript@5.5.4)
+      '@commitlint/cli': 19.4.1(@types/node@22.5.3)(typescript@5.5.4)
       '@commitlint/types': 19.0.3
     transitivePeerDependencies:
       - '@types/node'
@@ -4153,9 +4153,9 @@ snapshots:
     dependencies:
       browserslist: 4.23.2
 
-  cosmiconfig-typescript-loader@5.0.0(@types/node@22.5.1)(cosmiconfig@9.0.0(typescript@5.5.4))(typescript@5.5.4):
+  cosmiconfig-typescript-loader@5.0.0(@types/node@22.5.3)(cosmiconfig@9.0.0(typescript@5.5.4))(typescript@5.5.4):
     dependencies:
-      '@types/node': 22.5.1
+      '@types/node': 22.5.3
       cosmiconfig: 9.0.0(typescript@5.5.4)
       jiti: 1.21.6
       typescript: 5.5.4
@@ -5371,7 +5371,7 @@ snapshots:
 
   pathval@2.0.0: {}
 
-  picocolors@1.0.1: {}
+  picocolors@1.1.0: {}
 
   picomatch@2.3.1: {}
 
@@ -5401,7 +5401,7 @@ snapshots:
   postcss@8.4.38:
     dependencies:
       nanoid: 3.3.7
-      picocolors: 1.0.1
+      picocolors: 1.1.0
       source-map-js: 1.2.0
 
   prelude-ls@1.2.1: {}
@@ -5786,7 +5786,7 @@ snapshots:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
-      picocolors: 1.0.1
+      picocolors: 1.1.0
       postcss-load-config: 6.0.1(jiti@1.21.6)(postcss@8.4.38)(tsx@4.19.0)(yaml@2.5.0)
       resolve-from: 5.0.0
       rollup: 4.19.2
@@ -5851,7 +5851,7 @@ snapshots:
     dependencies:
       browserslist: 4.23.2
       escalade: 3.1.2
-      picocolors: 1.0.1
+      picocolors: 1.1.0
 
   uri-js@4.4.1:
     dependencies:
@@ -5866,13 +5866,13 @@ snapshots:
 
   validate-npm-package-name@5.0.1: {}
 
-  vite-node@2.0.5(@types/node@22.5.1):
+  vite-node@2.0.5(@types/node@22.5.3):
     dependencies:
       cac: 6.7.14
       debug: 4.3.6
       pathe: 1.1.2
       tinyrainbow: 1.2.0
-      vite: 5.2.10(@types/node@22.5.1)
+      vite: 5.2.10(@types/node@22.5.3)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -5883,16 +5883,16 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.2.10(@types/node@22.5.1):
+  vite@5.2.10(@types/node@22.5.3):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
       rollup: 4.18.1
     optionalDependencies:
-      '@types/node': 22.5.1
+      '@types/node': 22.5.3
       fsevents: 2.3.3
 
-  vitest@2.0.5(@types/node@22.5.1):
+  vitest@2.0.5(@types/node@22.5.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@vitest/expect': 2.0.5
@@ -5910,11 +5910,11 @@ snapshots:
       tinybench: 2.8.0
       tinypool: 1.0.0
       tinyrainbow: 1.2.0
-      vite: 5.2.10(@types/node@22.5.1)
-      vite-node: 2.0.5(@types/node@22.5.1)
+      vite: 5.2.10(@types/node@22.5.3)
+      vite-node: 2.0.5(@types/node@22.5.3)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.5.1
+      '@types/node': 22.5.3
     transitivePeerDependencies:
       - less
       - lightningcss

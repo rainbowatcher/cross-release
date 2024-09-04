@@ -7,7 +7,6 @@ import {
     afterEach, beforeEach, describe, expect, it,
 } from "vitest"
 import { findProjectFiles, getJSProjectVersion, upgradeProjectVersion } from "../../packages/cross-bump/src"
-import { getStagedFiles } from "../../packages/cross-release-cli/src/git"
 
 const script = "packages/cross-release-cli/bin/cross-release.mjs"
 const fixture = path.join(process.cwd(), "fixture")
@@ -44,7 +43,8 @@ describe.sequential("exec", () => {
 
     it("should run", () => {
         const { all } = run("--cwd", "fixture")
-        expect(all).toContain("Pick a project version")
+        // eslint-disable-next-line test/valid-expect
+        expect(all, all).toContain("Pick a project version")
     })
 
     it("should run with dry", () => {
