@@ -23,13 +23,18 @@ export type Task = {
     name: string
 }
 
-export type ReleaseOptionsDefault = Omit<ExcludeType<ReleaseOptions, CliPrimitive>, "config" | "excludes" | "version">
+export type ReleaseOptionsDefault = Omit<ExcludeType<ReleaseOptions, CliPrimitive>, "config" | "version">
 
 export type DefineConfigOptions = Partial<Omit<ReleaseOptions, "config">>
 
 export type CliReleaseOptions = ExcludeType<ReleaseOptions, Record<string, unknown>>
 
 export type ReleaseOptions = {
+    /**
+     * Wethere add all changed files to staged, shorthand for @type {CommitOptions.stageAll}
+     */
+    all: boolean
+
     /**
      * Indicates whether to commit the changes.
      * @default false
@@ -61,7 +66,7 @@ export type ReleaseOptions = {
      * The list of directories to exclude from the search.
      * @default ["node_modules", ".git"]
      */
-    excludes: string[]
+    exclude: string[]
 
     /**
      * The command to execute before pushing.

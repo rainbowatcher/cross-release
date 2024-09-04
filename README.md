@@ -1,3 +1,7 @@
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/rainbowatcher/cross-release/ci.yml)](https://github.com/rainbowatcher/cross-release/actions)
+![GitHub License](https://img.shields.io/github/license/rainbowatcher/cross-release)
+[![NPM Version](https://img.shields.io/npm/v/cross-release-cli)](https://www.npmjs.com/package/cross-release-cli)
+
 # Cross Release
 
 > a release tool that support multi programming language

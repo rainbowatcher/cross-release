@@ -1,13 +1,18 @@
+import process from "node:process"
 import { log, spinner } from "@clack/prompts"
 import { execaSync as createExeca } from "execa"
 import color from "picocolors"
 import createDebug from "./util/debug"
 
 const debug = createDebug("git")
-const execa = createExeca({ reject: false })
+const execa = createExeca({ all: true, reject: false })
 
 type DryAble = {
     dry?: boolean
+}
+
+type CwdOption = {
+    cwd?: string
 }
 
 type GitTagOptions = {
@@ -15,10 +20,11 @@ type GitTagOptions = {
     force?: boolean
     message?: string
     tagName: string
-} & DryAble
+} & CwdOption & DryAble
 
 export function gitTag(options: GitTagOptions): boolean {
     const {
+        cwd = process.cwd(),
         del = false,
         dry = false,
         force = false,
@@ -53,7 +59,7 @@ export function gitTag(options: GitTagOptions): boolean {
 
     debug(`command: git tag ${args.join(" ")}`)
     if (!dry) {
-        const { exitCode, failed, shortMessage, stderr, stdout } = execa("git", ["tag", ...args])
+        const { exitCode, failed, shortMessage, stderr, stdout } = execa("git", ["tag", ...args], { cwd })
         debug("git tag stdout:", stdout, stderr)
         if (failed) {
             s.stop(color.red(shortMessage), exitCode)
@@ -70,10 +76,11 @@ type GitCommitOptions = {
     modifiedFiles?: string[]
     stageAll?: boolean
     verify?: boolean
-} & DryAble
+} & CwdOption & DryAble
 
 export function gitCommit(options: GitCommitOptions): boolean {
     const {
+        cwd = process.cwd(),
         dry = false,
         message,
         modifiedFiles = [],
@@ -96,7 +103,7 @@ export function gitCommit(options: GitCommitOptions): boolean {
 
     debug(`command: git commit ${args.join(" ")}`)
     if (!dry) {
-        const { exitCode, failed, shortMessage, stderr, stdout } = execa("git", ["commit", ...args])
+        const { exitCode, failed, shortMessage, stderr, stdout } = execa("git", ["commit", ...args], { cwd })
         debug("git commit stdout:", stdout, stderr)
         if (failed) {
             s.stop(color.red(shortMessage), exitCode)
@@ -112,10 +119,16 @@ type GitPushOptions = {
     branch?: string
     followTags?: boolean
     remote?: string
-} & DryAble
+} & CwdOption & DryAble
 
 export function gitPush(options: GitPushOptions = {}): boolean {
-    const { branch, dry, followTags = true, remote } = options
+    const {
+        branch,
+        cwd = process.cwd(),
+        dry,
+        followTags = true,
+        remote,
+    } = options
     const s = spinner()
     s.start("pushing...")
     const args = []
@@ -131,7 +144,7 @@ export function gitPush(options: GitPushOptions = {}): boolean {
 
     debug(`command: git push ${args.join(" ")}`)
     if (!dry) {
-        const { exitCode, failed, shortMessage, stderr, stdout } = execa("git", ["push", ...args])
+        const { exitCode, failed, shortMessage, stderr, stdout } = execa("git", ["push", ...args], { cwd })
         debug("git push stdout:", stdout, stderr)
         if (failed) {
             s.stop(color.red(shortMessage), exitCode)
@@ -154,7 +167,7 @@ type GitResetOptions = {
     mode?: "hard" | "keep" | "merge" | "mixed" | "soft"
 } & DryAble
 
-export function gitReset(options: GitResetOptions): boolean {
+export function gitReset(options: GitResetOptions = {}): boolean {
     const { commit = "HEAD", dry, files = [], mode = "mixed" } = options ?? {}
     const s = spinner()
     s.start("resetting...")
@@ -188,22 +201,26 @@ export function gitHash(): string {
 type AddOptions = {
     all?: boolean
     files?: string[]
-} & DryAble
+} & CwdOption & DryAble
 
 export function gitAdd(options: AddOptions = {}): boolean {
     const {
         all = false,
+        cwd = process.cwd(),
         dry = false,
         files = [],
     } = options
     const args = []
 
-    all && args.push("-A")
-    files.length > 0 && args.push("--", ...files)
+    if (all) {
+        args.push("-A")
+    } else if (files.length > 0) {
+        args.push("--", ...files)
+    }
 
     debug("command: git add", args.join(" "))
     if (!dry) {
-        const { failed, stderr, stdout } = execa("git", ["add", ...args])
+        const { failed, stderr, stdout } = execa("git", ["add", ...args], { cwd })
         debug("git add stdout:", stdout, stderr)
         if (failed) {
             return false
@@ -211,4 +228,44 @@ export function gitAdd(options: AddOptions = {}): boolean {
     }
     debug("add files:", files)
     return true
+}
+
+type IsGitCleanOptions = CwdOption
+
+export function isGitClean(options: IsGitCleanOptions = {}): boolean {
+    const { cwd = process.cwd() } = options
+    const args = ["diff-index", "--quiet", "HEAD", "--"]
+    const { failed, message } = execa("git", args, { cwd })
+    if (message?.includes("bad revision")) {
+        return true
+    }
+    return !failed
+}
+
+type StageFilesOptions = CwdOption
+
+/**
+ * `-z`: use NUL termination instead of newline
+ * @see https://git-scm.com/docs/diff
+ */
+export function getStagedFiles(opts: StageFilesOptions = {}) {
+    const { cwd } = opts
+    let stagedArr: string[] = []
+    const args = ["--name-only", "--staged", "-z", "--diff-filter=ACMR"]
+
+    debug("command: git diff", args.join(" "))
+    const { all, failed } = execa("git", ["diff", ...args], { cwd })
+
+    if (!failed) {
+        stagedArr = all.replace(/\0$/, "").split("\0")
+    }
+
+    return stagedArr
+}
+
+export function getGitVersion(opts: CwdOption = {}) {
+    const { cwd } = opts
+    const args = ["--build-options"]
+    const { all } = execa("git", ["version", ...args], { cwd })
+    return all
 }

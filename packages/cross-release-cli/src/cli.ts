@@ -1,5 +1,6 @@
 import path from "node:path"
 import process from "node:process"
+import { toAbsolute } from "@rainbowatcher/path-extra"
 import { Command } from "commander"
 import { getGitignores } from "cross-bump"
 import { defu } from "defu"
@@ -22,10 +23,11 @@ export function createCliProgram() {
         .version(version)
         .description("A release tool that support multi programming language")
         .usage("[version] [options]")
+        .option("-a, --all", "Add all changed files to staged", CONFIG_DEFAULT.commit.stageAll)
         .option("-c, --config [file]", "Config file (auto detect by default)")
         .option("-D, --dry", "Dry run", CONFIG_DEFAULT.dry)
         .option("-d, --debug", "Enable debug mode", CONFIG_DEFAULT.debug)
-        .option("-e, --exclude [dir]", "Folders to exclude from search")
+        .option("-e, --exclude [dir]", "Folders to exclude from search", CONFIG_DEFAULT.exclude)
         .option("-m, --main", "Base project language [e.g. java, rust, javascript]", CONFIG_DEFAULT.main)
         .option("-r, --recursive", "Run the command for each project in the workspace", CONFIG_DEFAULT.recursive)
         .option("-x, --execute [command...]", "Execute the command", CONFIG_DEFAULT.execute)
@@ -65,8 +67,8 @@ export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
 
     // add gitignores
     const set = getGitignores(parsedArgs.cwd)
-    for (const i of parsedArgs.excludes) set.add(i)
-    parsedArgs.excludes = [...set]
+    for (const i of parsedArgs.exclude) set.add(i)
+    parsedArgs.exclude = [...set]
 
     // convert to absolute path
     const shouldBeAbsolute: Array<KeysOf<ReleaseOptions>> = ["cwd", "config"]
@@ -74,7 +76,7 @@ export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
         if (!parsedArgs[key]) continue
         if (key === "cwd") {
             const { cwd } = parsedArgs
-            parsedArgs.cwd = path.isAbsolute(cwd) ? cwd : path.join(process.cwd(), cwd)
+            parsedArgs.cwd = toAbsolute(cwd)
         }
         // @ts-expect-error type missmatch
         parsedArgs[key] = path.resolve(parsedArgs.cwd, parsedArgs[key])

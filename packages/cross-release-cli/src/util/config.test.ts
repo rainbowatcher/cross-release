@@ -4,12 +4,13 @@ import { resolveAltOptions } from "./config"
 import type { ReleaseOptions } from "../types"
 
 const options: ReleaseOptions = {
+    all: false,
     commit: true,
     config: "",
     cwd: "",
     debug: false,
     dry: false,
-    excludes: [],
+    exclude: [],
     execute: [],
     main: "javascript",
     push: false,
