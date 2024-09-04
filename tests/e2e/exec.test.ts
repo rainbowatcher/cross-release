@@ -4,7 +4,7 @@ import process from "node:process"
 import { execaSync } from "execa"
 import git from "isomorphic-git"
 import {
-    afterEach, beforeEach, describe, expect, it,
+    afterEach, beforeAll, beforeEach, describe, expect, it,
 } from "vitest"
 import { findProjectFiles, getJSProjectVersion, upgradeProjectVersion } from "../../packages/cross-bump/src"
 
@@ -28,6 +28,10 @@ async function restoreFixture() {
 }
 
 describe.sequential("exec", () => {
+    beforeAll(async () => {
+        await restoreFixture()
+    })
+
     beforeEach(async () => {
         await git.init({ dir: fixture, fs })
         await git.add({ dir: fixture, filepath: ".", fs })
