@@ -27,7 +27,7 @@
     ],
     "scripts": {
         "clean": "rimraf dist/*",
-        "build": "tsup-node"
+        "build": "tsup"
     },
     "dependencies": {
         "@clack/prompts": "^0.7.0",
