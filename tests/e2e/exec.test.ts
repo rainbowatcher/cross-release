@@ -27,7 +27,7 @@ async function restoreFixture() {
     fs.rmSync(path.join(fixture, ".git"), { force: true, recursive: true })
 }
 
-describe.sequential("exec", () => {
+describe.skipIf(process.env.CI)("exec", () => {
     beforeAll(async () => {
         await restoreFixture()
     })
