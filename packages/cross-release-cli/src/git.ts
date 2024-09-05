@@ -226,7 +226,7 @@ export function gitAdd(options: AddOptions = {}): boolean {
             return false
         }
     }
-    debug("add files:", files)
+
     return true
 }
 
