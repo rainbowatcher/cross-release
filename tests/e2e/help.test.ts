@@ -3,7 +3,7 @@ import { $ } from "execa"
 import { describe, expect, it } from "vitest"
 
 const RUNNER = "node"
-const SCRIPT = "packages/cross-release-cli/bin/cross-release.mjs"
+const SCRIPT = "packages/cross-release-cli/bin/cross-release.js"
 
 describe.concurrent("help", () => {
     const helpMessage = dedent`

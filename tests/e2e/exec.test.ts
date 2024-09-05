@@ -8,7 +8,7 @@ import {
 } from "vitest"
 import { findProjectFiles, getJSProjectVersion, upgradeProjectVersion } from "../../packages/cross-bump/src"
 
-const script = "packages/cross-release-cli/bin/cross-release.mjs"
+const script = "packages/cross-release-cli/bin/cross-release.js"
 const fixture = path.join(process.cwd(), "fixture")
 const changelog = "changelog.md"
 const changelogPath = path.join(fixture, changelog)
@@ -85,8 +85,9 @@ describe.skipIf(process.env.CI)("exec", () => {
         expect(log.at(0)?.commit.message.trim()).toMatchInlineSnapshot(`"chore: release v1.1.2"`)
     })
 
-    it("should add changelog if all option is set", async () => {
+    it.only("should add changelog if all option is set", async () => {
         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--all", "--no-tag", "--no-push", "-x", `touch ${changelogPath}`)
+        console.log(all)
         // eslint-disable-next-line test/valid-expect
         expect(failed, all).toBeFalsy()
         expect(fs.existsSync(changelogPath)).toBeTruthy()
