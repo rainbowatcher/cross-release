@@ -29,7 +29,7 @@
         "lint": "eslint .",
         "prepare": "simple-git-hooks",
         "start": "node packages/cross-release-cli/bin/cross-release.mjs",
-        "release": "pnpm build && pnpm release -ry && pnpm -r publish",
+        "release": "pnpm build && pnpm start -ry && pnpm -r publish",
         "test": "vitest",
         "typecheck": "tsc --noEmit",
         "up": "taze -rI"
