@@ -158,11 +158,11 @@ class App {
                 stageAll: all,
             })
 
-
+            const _all = stageAll ?? all
             this.#addTask({
                 exec: () => {
                     return gitAdd({
-                        all: stageAll === false ? all : stageAll, cwd, dry, files: this._modifiedFiles,
+                        all: _all, cwd, dry, files: this._modifiedFiles,
                     })
                 },
                 name: "add",
@@ -175,8 +175,8 @@ class App {
                     cwd,
                     dry,
                     message: commitMessage!,
-                    modifiedFiles: this._modifiedFiles,
-                    // stageAll,
+                    modifiedFiles: _all ? undefined : this._modifiedFiles,
+                    stageAll: _all,
                     verify,
                 })
             })

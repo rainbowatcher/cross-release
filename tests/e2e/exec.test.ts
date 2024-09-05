@@ -85,14 +85,13 @@ describe.skipIf(process.env.CI)("exec", () => {
         expect(log.at(0)?.commit.message.trim()).toMatchInlineSnapshot(`"chore: release v1.1.2"`)
     })
 
-    it.only("should add changelog if all option is set", async () => {
+    it("should add changelog if all option is set", async () => {
         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--all", "--no-tag", "--no-push", "-x", `touch ${changelogPath}`)
-        console.log(all)
         // eslint-disable-next-line test/valid-expect
         expect(failed, all).toBeFalsy()
         expect(fs.existsSync(changelogPath)).toBeTruthy()
         const status = await git.status({ dir: fixture, filepath: changelog, fs })
-        expect(status).toBe("added")
+        expect(status).toBe("unmodified")
     })
 
     it("should not add changelog if all option is not set", async () => {
