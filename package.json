@@ -79,7 +79,7 @@
         ]
     },
     "cross-release": {
-        "excludes": [
+        "exclude": [
             "fixture"
         ]
     }
