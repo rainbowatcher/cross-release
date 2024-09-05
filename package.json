@@ -28,7 +28,7 @@
         "dev": "tsx packages/cross-release-cli/src/app.ts -rD",
         "lint": "eslint .",
         "prepare": "simple-git-hooks",
-        "start": "node packages/cross-release-cli/bin/cross-release.mjs",
+        "start": "node packages/cross-release-cli/bin/cross-release.js",
         "release": "pnpm build && pnpm start -ry && pnpm -r publish",
         "test": "vitest",
         "typecheck": "tsc --noEmit",
