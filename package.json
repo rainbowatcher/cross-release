@@ -1,7 +1,7 @@
 {
     "name": "cross-release-project",
     "type": "module",
-    "version": "0.1.0-alpha.3",
+    "version": "0.1.0-alpha.4",
     "private": true,
     "packageManager": "pnpm@9.9.0",
     "description": "the cross release project",

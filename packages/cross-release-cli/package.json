@@ -1,7 +1,7 @@
 {
     "name": "cross-release-cli",
     "type": "module",
-    "version": "0.1.0-alpha.3",
+    "version": "0.1.0-alpha.4",
     "description": "command line app for cross language bump utility",
     "author": {
         "name": "rainbowatcher",
