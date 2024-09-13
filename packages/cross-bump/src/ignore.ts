@@ -2,17 +2,17 @@ import fg from "fast-glob"
 // @ts-expect-error missing types
 import gitignore from "parse-gitignore"
 
-export const IGNORE_DEFAULT = ["node_modules", ".git", "target", "build", "dist"]
+export const DEFAULT_IGNORED_GLOBS = ["**/node_modules/**", "**/.git/**", "**/target/**", "**/build/**", "**/dist/**"]
 export const G_GITIGNORE = "**/.gitignore"
 
-export function getGitignores(cwd: string, ignore = IGNORE_DEFAULT): Set<string> {
+export function getGitignores(cwd: string, ignoreGlobs = DEFAULT_IGNORED_GLOBS): Set<string> {
     const gitignores = fg.sync(G_GITIGNORE, {
         absolute: true,
         cwd,
-        ignore,
+        ignore: ignoreGlobs,
         onlyFiles: true,
     })
-    const set = new Set<string>(IGNORE_DEFAULT)
+    const set = new Set<string>()
     for (const gi of gitignores) {
         const result = gitignore(gi)
         if (!result?.globs()?.length) continue
