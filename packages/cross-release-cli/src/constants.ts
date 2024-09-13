@@ -1,4 +1,5 @@
 import process from "node:process"
+import { DEFAULT_IGNORED_GLOBS } from "cross-bump"
 import type { ReleaseOptionsDefault } from "./types"
 
 /**
@@ -24,7 +25,7 @@ export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     cwd: process.cwd(),
     debug: false,
     dry: false,
-    exclude: ["node_modules", ".git", "target", "build", "dist"],
+    exclude: DEFAULT_IGNORED_GLOBS,
     execute: [],
     main: "javascript",
     push: {

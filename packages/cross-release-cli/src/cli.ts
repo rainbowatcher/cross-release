@@ -1,7 +1,7 @@
 import path from "node:path"
 import { toAbsolute } from "@rainbowatcher/path-extra"
 import { Command } from "commander"
-import { getGitignores } from "cross-bump"
+import { DEFAULT_IGNORED_GLOBS, getGitignores } from "cross-bump"
 import { defu } from "defu"
 import { version } from "../package.json"
 import { CONFIG_DEFAULT } from "./constants"
@@ -26,7 +26,7 @@ export function createCliProgram() {
         .option("-c, --config [file]", "Config file (auto detect by default)")
         .option("-D, --dry", "Dry run", CONFIG_DEFAULT.dry)
         .option("-d, --debug", "Enable debug mode", CONFIG_DEFAULT.debug)
-        .option("-e, --exclude [dir]", "Folders to exclude from search", CONFIG_DEFAULT.exclude)
+        .option("-e, --exclude [dir...]", "Folders to exclude from search", CONFIG_DEFAULT.exclude)
         .option("-m, --main", "Base project language [e.g. java, rust, javascript]", CONFIG_DEFAULT.main)
         .option("-r, --recursive", "Run the command for each project in the workspace", CONFIG_DEFAULT.recursive)
         .option("-x, --execute [command...]", "Execute the command", CONFIG_DEFAULT.execute)
@@ -48,6 +48,8 @@ export function toCliReleaseOptions(cli: Command): CliReleaseOptions {
     }
     return {
         ...options,
+        // combine user cli exclude option with default
+        exclude: options.exclude?.length ? [...DEFAULT_IGNORED_GLOBS, ...options.exclude] : DEFAULT_IGNORED_GLOBS,
         ...args.length > 0 ? { version: args[0] } : {},
     }
 }
