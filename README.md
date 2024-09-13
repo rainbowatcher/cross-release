@@ -4,7 +4,7 @@
 
 # Cross Release
 
-> a release tool that support multi programming language
+> a release tool that support multi programming language project
 
 ## Feature
 
@@ -26,6 +26,7 @@
 - [x] bump
 - [x] git (tag/push)
 - [x] user config
+- [ ] support `jsr.json` / `jsr.jsonc` / `deno.json` / `deno.jsonc`
 - [ ] tauri support
 - [ ] changelog
 - [ ] release github action
