@@ -1,3 +1,5 @@
 {
-    "push": false
+    "push": false,
+    "tag": false,
+    "execute": ["echo 'fixtureConfigLoaded'"]
 }
