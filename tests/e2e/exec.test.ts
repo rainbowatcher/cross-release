@@ -8,13 +8,13 @@ import {
 } from "vitest"
 import { findProjectFiles, getJSProjectVersion, upgradeProjectVersion } from "../../packages/cross-bump/src"
 
-const script = "packages/cross-release-cli/bin/cross-release.js"
+const script = "packages/cross-release-cli/src/run.ts"
 const fixture = path.join(process.cwd(), "fixture")
 const changelog = "changelog.md"
 const changelogPath = path.join(fixture, changelog)
 
 function run(...args: string[]) {
-    return execaSync({ all: true, node: true, reject: false })(script, args)
+    return execaSync({ all: true, reject: false })`tsx ${script} ${args}`
 }
 
 async function restoreFixture() {
@@ -102,5 +102,28 @@ describe.skipIf(process.env.CI)("exec", () => {
         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-y", "--no-tag", "--no-push")
         expect(failed, all).toBeFalsy()
         expect(all).toContain("fixtureConfigLoaded")
+    })
+
+    describe("exclude", () => {
+        it("default exclude", () => {
+            const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push")
+            expect(failed, all).toBeFalsy()
+            expect(all).toContain("**/node_modules/**")
+            expect(all).toContain("**/.git/**")
+            expect(all).toContain("**/target/**")
+            expect(all).toContain("**/build/**")
+            expect(all).toContain("**/dist/**")
+        })
+
+        it("should combine cli exclude into default exclude list", () => {
+            const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push", "-e", "testExclude")
+            expect(failed, all).toBeFalsy()
+            expect(all).toContain("**/node_modules/**")
+            expect(all).toContain("**/.git/**")
+            expect(all).toContain("**/target/**")
+            expect(all).toContain("**/build/**")
+            expect(all).toContain("**/dist/**")
+            expect(all).toContain("testExclude")
+        })
     })
 })
