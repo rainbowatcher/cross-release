@@ -155,7 +155,7 @@ export function getJSProjectVersion(filePath: PathLike): string | undefined {
  */
 export async function getRustProjectVersion(filePath: PathLike): Promise<string | undefined> {
     const file = fs.readFileSync(filePath, "utf8")
-    await initTomlEdit()
+    await initTomlEdit({})
     const { package: cargoPackage } = parse(file)
     if (cargoPackage?.version) {
         return cargoPackage.version as string
@@ -175,7 +175,7 @@ export async function upgradeCargoVersion(filePath: PathLike, version: string, o
         dry = process.env.DRY,
     } = opts
 
-    await initTomlEdit()
+    await initTomlEdit({})
     const cargoFile = fs.readFileSync(filePath, "utf8")
     const cargoToml = parse(cargoFile)
     let newCargoFile = cargoFile

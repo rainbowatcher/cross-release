@@ -38,7 +38,7 @@
         "build": "tsup"
     },
     "dependencies": {
-        "@rainbowatcher/toml-edit-js": "^0.2.0",
+        "@rainbowatcher/toml-edit-js": "^0.2.1",
         "cheerio": "1.0.0",
         "detect-indent": "^7.0.1",
         "fast-glob": "^3.3.2",
