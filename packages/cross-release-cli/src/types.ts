@@ -64,7 +64,7 @@ export type ReleaseOptions = {
 
     /**
      * The list of directories to exclude from the search.
-     * @default ["node_modules", ".git"]
+     * @default ["node_modules", ".git", "target", "build", "dist"]
      */
     exclude: string[]
 

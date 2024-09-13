@@ -24,7 +24,7 @@ export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     cwd: process.cwd(),
     debug: false,
     dry: false,
-    exclude: ["node_modules", ".git"],
+    exclude: ["node_modules", ".git", "target", "build", "dist"],
     execute: [],
     main: "javascript",
     push: {
