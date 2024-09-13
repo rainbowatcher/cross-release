@@ -47,7 +47,6 @@ describe.skipIf(process.env.CI)("exec", () => {
 
     it("should run", () => {
         const { all } = run("--cwd", "fixture")
-        // eslint-disable-next-line test/valid-expect
         expect(all, all).toContain("Pick a project version")
     })
 
@@ -70,7 +69,6 @@ describe.skipIf(process.env.CI)("exec", () => {
         expect(status).toBe("added")
 
         const { all, failed, message } = run("--cwd", "fixture")
-        // eslint-disable-next-line test/valid-expect
         expect(failed, all).toBeTruthy()
 
         expect(message).toContain("git is not clean")
@@ -78,7 +76,6 @@ describe.skipIf(process.env.CI)("exec", () => {
 
     it("should update version and commit", async () => {
         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-y", "--no-tag", "--no-push")
-        // eslint-disable-next-line test/valid-expect
         expect(failed, all).toBeFalsy()
         expect(getJSProjectVersion(path.join(fixture, "package.json"))).toBe("1.1.2")
         const log = await git.log({ dir: fixture, fs })
@@ -87,7 +84,6 @@ describe.skipIf(process.env.CI)("exec", () => {
 
     it("should add changelog if all option is set", async () => {
         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--all", "--no-tag", "--no-push", "-x", `touch ${changelogPath}`)
-        // eslint-disable-next-line test/valid-expect
         expect(failed, all).toBeFalsy()
         expect(fs.existsSync(changelogPath)).toBeTruthy()
         const status = await git.status({ dir: fixture, filepath: changelog, fs })
@@ -96,10 +92,15 @@ describe.skipIf(process.env.CI)("exec", () => {
 
     it("should not add changelog if all option is not set", async () => {
         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push", "-x", `touch ${changelogPath}`)
-        // eslint-disable-next-line test/valid-expect
         expect(failed, all).toBeFalsy()
         const status = await git.status({ dir: fixture, filepath: changelog, fs })
         expect(fs.existsSync(changelogPath)).toBeTruthy()
         expect(status).toBe("*added")
+    })
+
+    it("should load config based on user specified cwd option", () => {
+        const { all, failed } = run("--cwd", "fixture", "1.1.2", "-y", "--no-tag", "--no-push")
+        expect(failed, all).toBeFalsy()
+        expect(all).toContain("fixtureConfigLoaded")
     })
 })
