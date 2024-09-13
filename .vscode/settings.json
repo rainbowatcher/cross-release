@@ -11,12 +11,15 @@
         "outro",
         "unconfig",
     ],
+    "git.ignoredRepositories": [
+        "fixture",
+    ],
     "eslint.validate": [
         "javascript",
+        "typescript",
         "json",
         "markdown",
         "toml",
         "yaml",
-        "typescript",
     ],
 }
