@@ -58,7 +58,7 @@ export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
     if (cliOptions.config) {
         userConfig = await loadUserSpecifiedConfigFile(cliOptions.config, cliOptions)
     } else {
-        userConfig = await loadUserConfig()
+        userConfig = await loadUserConfig(cliOptions.cwd)
     }
     const parsedArgs = defu(cliOptions, userConfig)
 
