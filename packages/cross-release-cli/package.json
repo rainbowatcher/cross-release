@@ -35,10 +35,10 @@
         "@rainbowatcher/path-extra": "^0.2.3",
         "commander": "^12.1.0",
         "cross-bump": "workspace:*",
-        "debug": "^4.3.6",
+        "debug": "^4.3.7",
         "defu": "^6.1.4",
         "execa": "^9.3.1",
-        "is-unicode-supported": "^2.0.0",
+        "is-unicode-supported": "^2.1.0",
         "picocolors": "^1.1.0",
         "unconfig": "^0.5.5"
     }
