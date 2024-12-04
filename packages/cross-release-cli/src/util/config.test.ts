@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { CONFIG_DEFAULT } from "../constants"
 import { resolveAltOptions } from "./config"
+import { CONFIG_DEFAULT } from "../constants"
 import type { ReleaseOptions } from "../types"
 
 const options: ReleaseOptions = {

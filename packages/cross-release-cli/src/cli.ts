@@ -3,10 +3,10 @@ import { toAbsolute } from "@rainbowatcher/path-extra"
 import { Command } from "commander"
 import { DEFAULT_IGNORED_GLOBS, getGitignores } from "cross-bump"
 import { defu } from "defu"
-import { version } from "../package.json"
 import { CONFIG_DEFAULT } from "./constants"
 import { loadUserConfig, loadUserSpecifiedConfigFile } from "./util/config"
 import createDebug, { isDebugEnable } from "./util/debug"
+import { version } from "../package.json"
 import type { CliReleaseOptions, KeysOf, ReleaseOptions } from "./types"
 
 const debug = createDebug("cli")

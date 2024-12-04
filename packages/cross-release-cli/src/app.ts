@@ -202,8 +202,9 @@ class App {
 
     async executeTasks() {
         debug("taskQueue:", this._taskQueue)
-        for await (const task of this._taskQueue) {
+        for (const task of this._taskQueue) {
             if (this._taskStatus === "failed") break
+            // eslint-disable-next-line no-await-in-loop
             this.#check(await task.exec())
         }
     }

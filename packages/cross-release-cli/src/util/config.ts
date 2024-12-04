@@ -16,7 +16,6 @@ export function resolveAltOptions<K extends keyof ReleaseOptions>(
 ): ResolvedOptions<ReleaseOptions[K]> {
     const value = opts[key]
     const _defaultValue = defaultValue ?? {}
-    // eslint-disable-next-line ts/no-unsafe-return
     return typeof value === "boolean"
         ? (value ? _defaultValue : {})
         : { ..._defaultValue, ...value as any }
@@ -52,7 +51,6 @@ export async function loadUserConfig(cwd = process.cwd()): Promise<Partial<Relea
                 extensions: ["json"],
                 files: "package",
                 rewrite(config: any) {
-                    // eslint-disable-next-line ts/no-unsafe-return
                     return config["cross-release"]
                 },
             },
