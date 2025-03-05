@@ -41,8 +41,8 @@
         "@rainbowatcher/toml-edit-js": "^0.2.1",
         "cheerio": "1.0.0",
         "detect-indent": "^7.0.1",
-        "fast-glob": "^3.3.2",
+        "fast-glob": "^3.3.3",
         "parse-gitignore": "^2.0.0",
-        "semver": "^7.6.3"
+        "semver": "^7.7.1"
     }
 }

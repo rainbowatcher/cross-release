@@ -30,16 +30,16 @@
         "build": "tsup"
     },
     "dependencies": {
-        "@clack/prompts": "^0.8.2",
-        "@rainbowatcher/fs-extra": "^0.2.3",
-        "@rainbowatcher/path-extra": "^0.2.3",
-        "commander": "^12.1.0",
+        "@clack/prompts": "^0.10.0",
+        "@rainbowatcher/fs-extra": "^0.3.0",
+        "@rainbowatcher/path-extra": "^0.3.0",
+        "commander": "^13.1.0",
         "cross-bump": "workspace:*",
-        "debug": "^4.3.7",
+        "debug": "^4.4.0",
         "defu": "^6.1.4",
-        "execa": "^9.5.1",
+        "execa": "^9.5.2",
         "is-unicode-supported": "^2.1.0",
         "picocolors": "^1.1.1",
-        "unconfig": "^0.6.0"
+        "unconfig": "^7.3.0"
     }
 }
