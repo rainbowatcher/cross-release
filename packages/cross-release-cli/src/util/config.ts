@@ -17,7 +17,7 @@ export function resolveAltOptions<K extends keyof ReleaseOptions>(
     const value = opts[key]
     const _defaultValue = defaultValue ?? {}
     return typeof value === "boolean"
-        ? (value ? _defaultValue : {})
+        ? (value ? _defaultValue : {}) as ResolvedOptions<ReleaseOptions[K]>
         : { ..._defaultValue, ...value as any }
 }
 
