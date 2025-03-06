@@ -1,6 +1,6 @@
 import path from "node:path"
 import { toAbsolute } from "@rainbowatcher/path-extra"
-import { Command } from "commander"
+import { Argument, Command } from "commander"
 import { DEFAULT_IGNORED_GLOBS, getGitignores } from "cross-bump"
 import { defu } from "defu"
 import { CONFIG_DEFAULT } from "./constants"
@@ -22,6 +22,7 @@ export function createCliProgram() {
         .version(version)
         .description("A release tool that support multi programming language")
         .usage("[version] [options]")
+        .addArgument(new Argument("version", "Version to bump").argOptional())
         .option("-a, --all", "Add all changed files to staged", CONFIG_DEFAULT.commit.stageAll)
         .option("-c, --config [file]", "Config file (auto detect by default)")
         .option("-D, --dry", "Dry run", CONFIG_DEFAULT.dry)
