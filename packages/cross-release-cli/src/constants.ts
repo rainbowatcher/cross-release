@@ -29,7 +29,7 @@ export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     execute: [],
     main: "javascript",
     push: {
-        followTags: false,
+        followTags: true,
     },
     recursive: false,
     tag: {
