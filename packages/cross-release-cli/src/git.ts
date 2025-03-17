@@ -74,6 +74,7 @@ export function gitTag(options: GitTagOptions): boolean {
 type GitCommitOptions = {
     message: string
     modifiedFiles?: string[]
+    signoff?: boolean
     stageAll?: boolean
     verify?: boolean
 } & CwdOption & DryAble
@@ -84,6 +85,7 @@ export function gitCommit(options: GitCommitOptions): boolean {
         dry = false,
         message,
         modifiedFiles = [],
+        signoff,
         stageAll,
         verify,
     } = options ?? {}
@@ -99,6 +101,10 @@ export function gitCommit(options: GitCommitOptions): boolean {
         args.push("--", ...modifiedFiles)
     } else {
         args.push("--all")
+    }
+
+    if (signoff) {
+        args.push("--signoff")
     }
 
     debug(`command: git commit ${args.join(" ")}`)

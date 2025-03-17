@@ -110,6 +110,12 @@ export type ReleaseOptions = {
 
 export type CommitOptions = {
     /**
+     * Whether to sign the commit.
+     * @default true
+     */
+    signoff?: true
+
+    /**
      * Whether to stage all files or only modified files.
      */
     stageAll?: boolean
