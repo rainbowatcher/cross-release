@@ -31,15 +31,19 @@
     },
     "dependencies": {
         "@clack/prompts": "^0.10.0",
-        "@rainbowatcher/fs-extra": "^0.3.0",
-        "@rainbowatcher/path-extra": "^0.3.0",
-        "commander": "^13.1.0",
+        "@rainbowatcher/common": "^0.6.0",
+        "@rainbowatcher/fs-extra": "^0.6.0",
+        "@rainbowatcher/path-extra": "^0.6.0",
+        "cac": "^6.7.14",
         "cross-bump": "workspace:*",
         "debug": "^4.4.0",
         "defu": "^6.1.4",
         "execa": "^9.5.2",
         "is-unicode-supported": "^2.1.0",
         "picocolors": "^1.1.1",
-        "unconfig": "^7.3.0"
+        "unconfig": "^7.3.1"
+    },
+    "devDependencies": {
+        "@rainbowatcher/maybe": "^0.6.0"
     }
 }
