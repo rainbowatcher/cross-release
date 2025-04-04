@@ -4,6 +4,7 @@
         "source.fixAll.eslint": "explicit",
         "source.organizeImports": "never",
     },
+    "git.alwaysSignOff": true,
     "cSpell.words": [
         "defu",
         "iarna",
