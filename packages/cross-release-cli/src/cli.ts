@@ -4,7 +4,7 @@ import { toAbsolute } from "@rainbowatcher/path-extra"
 import cac from "cac"
 import { getGitignores } from "cross-bump"
 import { loadUserConfig } from "./config"
-import { CONFIG_DEFAULT } from "./constants"
+import { CONFIG_DEFAULT, ExitCode } from "./constants"
 import { toArray } from "./util/array"
 import createDebug, { setupDebug } from "./util/debug"
 import { merge } from "./util/merge"
@@ -95,7 +95,7 @@ function validateOptions(cli: ReleaseOptions) {
             errorMsg = `${(val as any)._errors[0]} for key \`${key}\``
         }
         console.error(errorMsg)
-        process.exit(1)
+        process.exit(ExitCode.FatalError)
     }
 }
 

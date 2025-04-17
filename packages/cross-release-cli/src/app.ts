@@ -251,7 +251,7 @@ class App {
         const projectFiles = findProjectFiles(cwd, exclude, recursive)
         if (projectFiles.length === 0) {
             console.error("can't found any project file in the project root")
-            process.exit(1)
+            process.exit(ExitCode.FatalError)
         }
         debug(`found ${projectFiles.length} project files`)
         this._projectFiles = projectFiles
