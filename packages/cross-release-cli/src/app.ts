@@ -8,7 +8,8 @@ import {
 import { execaSync, parseCommandString } from "execa"
 import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
-import { createCliProgram, resolveOptions } from "./cli"
+import { createCliProgram, resolveAppOptions } from "./cli"
+import { resolveAltOptions } from "./config"
 import { CONFIG_DEFAULT, ExitCode } from "./constants"
 import {
     getStagedFiles,
@@ -16,12 +17,12 @@ import {
     isGitClean,
 } from "./git"
 import { chooseVersion } from "./prompt"
-import { resolveAltOptions } from "./util/config"
 import createDebug from "./util/debug"
 import { formatMessageString } from "./util/str"
 import type { ProjectFile } from "cross-bump"
 import type {
     ExtractBooleanKeys, ReleaseOptions, Status, Task,
+    TaskFn,
 } from "./types"
 
 
@@ -59,15 +60,10 @@ class App {
 
     private _taskStatus: Status = "pending"
 
-    private constructor(opts: ReleaseOptions) {
+    public constructor(argv = process.argv) {
+        const cli = createCliProgram(argv)
+        const opts = resolveAppOptions(cli)
         this._options = opts
-    }
-
-
-    static async create(argv = process.argv): Promise<App> {
-        const cli = createCliProgram().parse(argv)
-        const opts = await resolveOptions(cli)
-        return new App(opts)
     }
 
     #addTask(task: Task, idx?: number): boolean {
@@ -125,15 +121,14 @@ class App {
     }
 
     async confirmReleaseOptions() {
-        const { all, cwd, dry, yes } = this._options
+        const { cwd, dry, yes } = this._options
 
         const confirmTask = async (
             name: ExtractBooleanKeys<ReleaseOptions>,
             message: string,
-            exec: Task["exec"],
+            exec: TaskFn,
         ) => {
             if (yes) {
-                // since commit/tag/push is true by default, if it is false, it must be specified by the user.
                 if (!this._options[name]) return
                 this._options[name] = true
             } else if (this._options[name]) {
@@ -155,14 +150,12 @@ class App {
                 verify,
             } = resolveAltOptions(this._options, "commit", {
                 ...CONFIG_DEFAULT.commit,
-                stageAll: all,
             })
 
-            const _all = stageAll ?? all
             this.#addTask({
                 exec: () => {
                     return gitAdd({
-                        all: _all, cwd, dry, files: this._modifiedFiles,
+                        all: stageAll, cwd, dry, files: this._modifiedFiles,
                     })
                 },
                 name: "add",
@@ -175,15 +168,15 @@ class App {
                     cwd,
                     dry,
                     message: commitMessage!,
-                    modifiedFiles: _all ? undefined : this._modifiedFiles,
-                    stageAll: _all,
+                    modifiedFiles: stageAll ? undefined : this._modifiedFiles,
+                    stageAll,
                     verify,
                 })
             })
         }
 
         if (this._options.tag && commitMessage !== undefined) {
-            const { template: tagTpt } = resolveAltOptions(this._options, "tag", CONFIG_DEFAULT.tag)
+            const { template: tagTpt } = resolveAltOptions(this.options, "tag")
             await confirmTask("tag", "should create tag?", () => {
                 const tagName = formatMessageString(tagTpt!, this._nextVersion)
                 return gitTag({

@@ -16,8 +16,8 @@ export enum ExitCode {
 }
 
 export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
-    all: false,
     commit: {
+        signoff: true,
         stageAll: false,
         template: "chore: release v%s",
         verify: true,
@@ -29,7 +29,9 @@ export const CONFIG_DEFAULT: ReleaseOptionsDefault = {
     execute: [],
     main: "javascript",
     push: {
+        branch: undefined,
         followTags: true,
+        remote: undefined,
     },
     recursive: false,
     tag: {

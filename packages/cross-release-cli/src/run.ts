@@ -1,4 +1,4 @@
 import App from "./app"
 
-const app = await App.create()
+const app = new App()
 await app.run()

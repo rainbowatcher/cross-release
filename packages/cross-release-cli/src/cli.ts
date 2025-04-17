@@ -8,7 +8,7 @@ import { CONFIG_DEFAULT } from "./constants"
 import { toArray } from "./util/array"
 import createDebug, { setupDebug } from "./util/debug"
 import { merge } from "./util/merge"
-import { cliOptions } from "./zod"
+import { cliOptions as cliOptionsSchema } from "./zod"
 import { version } from "../package.json"
 import type { KeysOf, ParsedArgv, ReleaseOptions } from "./types"
 
@@ -86,10 +86,15 @@ function resolveGitIgnore(opts: ReleaseOptions) {
 }
 
 function validateOptions(cli: ReleaseOptions) {
-    const result = cliOptions.safeParse(cli)
+    const result = cliOptionsSchema.safeParse(cli)
     if (!result.success) {
-
-        console.log(result.error, cli)
+        const formatted = result.error.format()
+        let errorMsg = ""
+        for (const [key, val] of Object.entries(formatted)) {
+            if (key === "_errors") continue
+            errorMsg = `${(val as any)._errors[0]} for key \`${key}\``
+        }
+        console.error(errorMsg)
         process.exit(1)
     }
 }

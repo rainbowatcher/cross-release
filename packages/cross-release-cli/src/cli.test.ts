@@ -280,16 +280,6 @@ describe("resolveAppOptions", () => {
 
     it("should throw when passing --push.followTags and --push.followTags", () => {
         const cli = parseArg("--push.followTags", "--push.followTags")
-        const opts = resolveAppOptions(cli)
-        expect(opts).toStrictEqual({
-            ...CONFIG_DEFAULT,
-            config: undefined,
-            main: "javascript",
-            push: {
-                ...CONFIG_DEFAULT.push,
-                followTags: true,
-            },
-            version: undefined,
-        })
+        expect(() => resolveAppOptions(cli)).toThrowErrorMatchingInlineSnapshot(`[Error: process.exit unexpectedly called with "1"]`)
     })
 })

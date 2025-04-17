@@ -1,7 +1,6 @@
 import process from "node:process"
 import { isFileSync } from "@rainbowatcher/fs-extra"
 import { toAbsolute } from "@rainbowatcher/path-extra"
-import defu from "defu"
 import { loadConfig } from "unconfig"
 import createDebug from "./util/debug"
 import type { ReleaseOptions, ResolvedOptions } from "./types"
@@ -21,24 +20,24 @@ export function resolveAltOptions<K extends keyof ReleaseOptions>(
         : { ..._defaultValue, ...value as any }
 }
 
-export async function loadUserSpecifiedConfigFile(configPath: string, currentOpts: Partial<ReleaseOptions>): Promise<Partial<ReleaseOptions>> {
+export function loadUserSpecifiedConfigFile(configPath: string): Partial<ReleaseOptions> {
     const absConfigPath = toAbsolute(configPath)
     if (!isFileSync(absConfigPath)) {
         throw new Error(`${absConfigPath} is not a valid file.`)
     }
 
-    const { config, sources } = await loadConfig<Partial<ReleaseOptions>>({
+    const { config, sources } = loadConfig.sync<Partial<ReleaseOptions>>({
         sources: [{
             files: absConfigPath,
         }],
     })
 
     debug("load specified config file: %O", sources)
-    return defu({ config: toAbsolute(currentOpts.config ?? "") }, currentOpts, config)
+    return config
 }
 
-export async function loadDefaultConfigFile(cwd = process.cwd()): Promise<Partial<ReleaseOptions>> {
-    const { config: userConfig, sources } = await loadConfig<Partial<ReleaseOptions>>({
+export function loadDefaultConfigFile(cwd = process.cwd()): Partial<ReleaseOptions> {
+    const { config, sources } = loadConfig.sync<Partial<ReleaseOptions>>({
         cwd,
         sources: [
             { files: "cross-release.config" },
@@ -50,20 +49,20 @@ export async function loadDefaultConfigFile(cwd = process.cwd()): Promise<Partia
                 },
             },
         ],
-    })
+    }) ?? {}
 
     debug("load user config", sources)
-    debug("user config: %O", userConfig)
-    return userConfig
+    debug("user config: %O", config)
+    return config
 }
 
 
-export async function loadUserConfig(opts: ReleaseOptions) {
+export function loadUserConfig(opts: ReleaseOptions) {
     let userConfig: Partial<ReleaseOptions>
     if (opts.config) {
-        userConfig = await loadUserSpecifiedConfigFile(opts.config, opts)
+        userConfig = loadUserSpecifiedConfigFile(opts.config)
     } else {
-        userConfig = await loadDefaultConfigFile(opts.cwd)
+        userConfig = loadDefaultConfigFile(opts.cwd)
     }
     return userConfig
 }
