@@ -3,6 +3,8 @@ import { toAbsolute } from "@rainbowatcher/path-extra"
 import { getGitignores } from "cross-bump"
 import { loadConfig } from "unconfig"
 import {
+    afterEach,
+    beforeEach,
     describe, expect, it, vi,
 } from "vitest"
 import { argvToReleaseOptions, createCliProgram, resolveAppOptions } from "./cli"
@@ -12,6 +14,7 @@ import { CONFIG_DEFAULT } from "./constants"
 function parseArg(...args: string[]) {
     return createCliProgram(["", "", ...args])
 }
+
 
 describe("toReleaseOptions", () => {
     it("execute", () => {
@@ -69,7 +72,16 @@ describe("toReleaseOptions", () => {
 
 describe("resolveAppOptions", () => {
     vi.mock("cross-bump")
-    vi.mocked(getGitignores).mockReturnValue(new Set())
+    vi.mock("unconfig")
+    vi.mock("@rainbowatcher/fs-extra")
+
+    beforeEach(() => {
+        vi.mocked(getGitignores).mockReturnValue(new Set())
+    })
+
+    afterEach(() => {
+        vi.resetAllMocks()
+    })
 
     it("should props equal to config default when pass nothing", () => {
         const cli = parseArg()
@@ -154,7 +166,6 @@ describe("resolveAppOptions", () => {
         expect(opts).toStrictEqual({
             ...CONFIG_DEFAULT,
             config: undefined,
-            main: "javascript",
             version: undefined,
         })
     })
@@ -193,8 +204,6 @@ describe("resolveAppOptions", () => {
     })
 
     it("should works when passing --config", () => {
-        vi.mock("unconfig")
-        vi.mock("@rainbowatcher/fs-extra")
         const mockConfig = {
             config: { main: "java" },
             sources: ["cross-release.config.ts"],
@@ -207,7 +216,7 @@ describe("resolveAppOptions", () => {
         expect(opts).toStrictEqual({
             ...CONFIG_DEFAULT,
             config: toAbsolute("cross-release.config.ts"),
-            main: "javascript",
+            main: "java",
             version: undefined,
         })
     })
@@ -224,7 +233,6 @@ describe("resolveAppOptions", () => {
                 verify: true,
             },
             config: undefined,
-            main: "javascript",
             version: undefined,
         })
     })
@@ -241,7 +249,6 @@ describe("resolveAppOptions", () => {
                 verify: true,
             },
             config: undefined,
-            main: "javascript",
             version: undefined,
         })
     })
@@ -258,7 +265,6 @@ describe("resolveAppOptions", () => {
                 verify: true,
             },
             config: undefined,
-            main: "javascript",
             version: undefined,
         })
     })
@@ -269,7 +275,6 @@ describe("resolveAppOptions", () => {
         expect(opts).toStrictEqual({
             ...CONFIG_DEFAULT,
             config: undefined,
-            main: "javascript",
             push: {
                 ...CONFIG_DEFAULT.push,
                 followTags: true,

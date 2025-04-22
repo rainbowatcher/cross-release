@@ -17,6 +17,8 @@ function run(...args: string[]) {
     return execaSync({ all: true, reject: false })`tsx ${script} ${args}`
 }
 
+// https://isomorphic-git.org/docs/en/status
+
 async function restoreFixture() {
     const pFiles = findProjectFiles(fixture, [".git"], true)
     const restore = pFiles.map(async (pFile) => {
@@ -82,20 +84,20 @@ describe.skipIf(process.env.CI)("exec", () => {
         expect(log.at(0)?.commit.message.trim()).toMatchInlineSnapshot(`"chore: release v1.1.2"`)
     })
 
-    it("should add changelog if all option is set", async () => {
-        const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--all", "--no-tag", "--no-push", "-x", `touch ${changelogPath}`)
-        expect(failed, all).toBeFalsy()
-        expect(fs.existsSync(changelogPath)).toBeTruthy()
-        const status = await git.status({ dir: fixture, filepath: changelog, fs })
-        expect(status).toBe("unmodified")
-    })
-
-    it("should not add changelog if all option is not set", async () => {
+    it("should add changelog if stageAll option is not set", async () => {
         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push", "-x", `touch ${changelogPath}`)
         expect(failed, all).toBeFalsy()
+        expect(fs.existsSync(changelogPath)).toBeTruthy()
+        const status = await git.status({ dir: fixture, filepath: changelog, fs })
+        expect(status, all).toBe("*added")
+    })
+
+    it("should not add changelog if stageAll option is set", async () => {
+        const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push", "--commit.stageAll", "-x", `touch ${changelogPath}`)
+        expect(failed, all).toBeFalsy()
         const status = await git.status({ dir: fixture, filepath: changelog, fs })
         expect(fs.existsSync(changelogPath)).toBeTruthy()
-        expect(status).toBe("*added")
+        expect(status).toBe("unmodified")
     })
 
     it("should load config based on user specified cwd option", () => {
