@@ -35,7 +35,7 @@
     ],
     "scripts": {
         "clean": "rimraf dist/*",
-        "build": "tsup"
+        "build": "tsdown"
     },
     "dependencies": {
         "@rainbowatcher/toml-edit-js": "^0.2.1",

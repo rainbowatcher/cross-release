@@ -10,6 +10,7 @@
         "iarna",
         "memfs",
         "outro",
+        "tsdown",
         "unconfig",
     ],
     "git.ignoredRepositories": [

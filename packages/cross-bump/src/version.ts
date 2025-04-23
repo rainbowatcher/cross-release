@@ -209,7 +209,7 @@ export async function upgradeProjectVersion(nextVersion: string, projectFile?: P
     }
 }
 
-export async function getProjectVersion(projectFile: ProjectFile) {
+export async function getProjectVersion(projectFile: ProjectFile): Promise<string | undefined> {
     let projectVersion
     switch (projectFile?.category) {
         case "java": {
