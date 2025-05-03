@@ -1,10 +1,5 @@
-import { isFileSync } from "@rainbowatcher/fs-extra"
-import { toAbsolute } from "@rainbowatcher/path-extra"
-import { getGitignores } from "cross-bump"
-import { loadConfig } from "unconfig"
 import { describe, expect, it } from "vitest"
 import { argvToReleaseOptions, createCliProgram, resolveAppOptions } from "./cli"
-import { CONFIG_DEFAULT } from "./constants"
 
 
 function parseArg(...args: string[]) {

@@ -17,7 +17,7 @@ describe("getGitignores", () => {
         expect(set.has("pattern2")).toBeFalsy()
     })
 
-    it.only("should be defined", () => {
+    it("should be defined", () => {
         let set = getGitignores(process.cwd())
         expect(set).toBeDefined()
         set = getGitignores(`${process.cwd()}/packages`)
