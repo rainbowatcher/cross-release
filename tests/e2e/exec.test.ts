@@ -106,26 +106,24 @@ describe.skipIf(process.env.CI)("exec", () => {
         expect(all).toContain("fixtureConfigLoaded")
     })
 
-    // describe("exclude", () => {
-    //     it("default exclude", () => {
-    //         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push")
-    //         expect(failed, all).toBeFalsy()
-    //         expect(all).toContain("**/node_modules/**")
-    //         expect(all).toContain("**/.git/**")
-    //         expect(all).toContain("**/target/**")
-    //         expect(all).toContain("**/build/**")
-    //         expect(all).toContain("**/dist/**")
-    //     })
+    describe("exclude", () => {
+        it("default exclude", () => {
+            const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push")
+            expect(failed, all).toBeFalsy()
+            expect(all).toContain("**/node_modules/**")
+            expect(all).toContain("**/.git/**")
+            expect(all).toContain("**/target/**")
+            expect(all).toContain("**/build/**")
+            expect(all).toContain("**/dist/**")
+        })
 
-    //     it("should combine cli exclude into default exclude list", () => {
-    //         const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push", "-e", "testExclude")
-    //         expect(failed, all).toBeFalsy()
-    //         expect(all).toContain("**/node_modules/**")
-    //         expect(all).toContain("**/.git/**")
-    //         expect(all).toContain("**/target/**")
-    //         expect(all).toContain("**/build/**")
-    //         expect(all).toContain("**/dist/**")
-    //         expect(all).toContain("testExclude")
-    //     })
-    // })
+        it("should combine cli exclude into default exclude list", () => {
+            const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push", "-e", "testExclude")
+            expect(failed, all).toBeFalsy()
+            // TODO: should append exclude, not overwrite
+            expect(all).toContain("**/ignored")
+            expect(all).toContain("**/ignored/**")
+            expect(all).toContain("testExclude")
+        })
+    })
 })
