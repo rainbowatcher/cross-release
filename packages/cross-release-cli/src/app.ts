@@ -113,7 +113,9 @@ class App {
 
     checkGitClean(): void {
         const { cwd } = this._options
-        if (!isGitClean({ cwd })) {
+        const commit = resolveAltOptions(this._options, "commit")
+        const isClean = isGitClean({ cwd })
+        if (!isClean && !commit.stageAll) {
             log.warn("git is not clean, please commit or stash your changes before release")
             this.#done()
             process.exit(ExitCode.GitDirty)

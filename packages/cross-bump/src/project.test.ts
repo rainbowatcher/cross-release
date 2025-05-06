@@ -17,7 +17,17 @@ describe("findProjectFiles", () => {
 
     it("should recursively search", () => {
         const projectFiles = findProjectFiles(cwd, ["node_modules", ".git", "dist", "coverage", ".github"], true)
-        expect(projectFiles.length).gte(7)
+        expect(projectFiles.length).eq(7)
+    })
+
+    it("should respect ignore rule that end with slash", () => {
+        const projectFiles = findProjectFiles(cwd, ["node_modules", "ignored/", "**/ignored/**", ".git", "dist", "coverage", ".github"], true)
+        expect(projectFiles.length).eq(6)
+    })
+
+    it("should respect ignore rule that not end with slash", () => {
+        const projectFiles = findProjectFiles(cwd, ["node_modules", "ignored", ".git", "dist", "coverage", ".github"], true)
+        expect(projectFiles.length).eq(6)
     })
 
     it("should return java project", () => {
