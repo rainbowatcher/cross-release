@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest"
 const RUNNER = "node"
 const SCRIPT = "packages/cross-release-cli/bin/cross-release.js"
 
-describe.runIf(process.env.CI).concurrent("help", () => {
+describe.concurrent("help", () => {
     const helpMessage = dedent`
         Usage: cross-release [version] [options]
 
