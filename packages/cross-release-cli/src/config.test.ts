@@ -4,7 +4,6 @@ import { CONFIG_DEFAULT } from "./constants"
 import type { ReleaseOptions } from "./types"
 
 const options: ReleaseOptions = {
-    all: false,
     commit: true,
     config: "",
     cwd: "",
