@@ -8,13 +8,13 @@ import {
 } from "vitest"
 import { findProjectFiles, getJSProjectVersion, upgradeProjectVersion } from "../../packages/cross-bump/src"
 
-const script = "packages/cross-release-cli/src/run.ts"
+const SCRIPT = "packages/cross-release-cli/src/run.ts"
 const fixture = path.join(process.cwd(), "fixture")
 const changelog = "changelog.md"
 const changelogPath = path.join(fixture, changelog)
 
 function run(...args: string[]) {
-    return execaSync({ all: true, reject: false })`tsx ${script} ${args}`
+    return execaSync({ all: true, reject: false })`tsx ${SCRIPT} ${args}`
 }
 
 // https://isomorphic-git.org/docs/en/status

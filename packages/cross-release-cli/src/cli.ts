@@ -39,7 +39,6 @@ export function createCliProgram(argv: string[]): ParsedArgv {
         .option("--push.followTags", "pushing with follow tags")
         .option("--tag", "Tagging for release")
         .option("--tag.template <template>", "Template for tag message")
-        .option("-h, --help", "Display this message")
         .help()
 
     return cli.parse(argv)

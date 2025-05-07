@@ -62,6 +62,9 @@ class App {
 
     public constructor(argv: string[] = process.argv) {
         const cli = createCliProgram(argv)
+        if (cli.options.help) {
+            process.exit(ExitCode.Success)
+        }
         const opts = resolveAppOptions(cli)
         this._options = opts
     }
