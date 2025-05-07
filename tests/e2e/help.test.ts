@@ -1,6 +1,7 @@
 import dedent from "dedent"
 import { execaSync } from "execa"
 import { describe, it } from "vitest"
+import { version } from "../../package.json" with { type: "json" }
 
 const RUNNER = "tsx"
 const SCRIPT = "packages/cross-release-cli/src/run.ts"
@@ -14,7 +15,7 @@ describe("help", () => {
     it("bin script", ({ expect }) => {
         const { stdout } = run(`-Dh`)
         expect(stdout).toMatchInlineSnapshot(dedent`
-            "cross-release/0.2.0
+            "cross-release/${version}
 
             Usage:
               $ cross-release [version] [options]
