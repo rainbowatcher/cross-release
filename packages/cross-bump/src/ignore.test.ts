@@ -12,8 +12,19 @@ describe("getGitignores", () => {
     it("should update the set with patterns from existing .gitignore files", () => {
         const set = getGitignores(`${process.cwd()}/fixture`)
         expect(set.size).toBe(2)
-        expect(set.has("ignored")).toBeTruthy()
+        expect(set.has("**/ignored")).toBeTruthy()
         expect(set.has("**/ignored/**")).toBeTruthy()
         expect(set.has("pattern2")).toBeFalsy()
+    })
+
+    it("should be defined", () => {
+        let set = getGitignores(process.cwd())
+        expect(set).toBeDefined()
+        set = getGitignores(`${process.cwd()}/packages`)
+        expect(set).toBeDefined()
+        expect(set).toStrictEqual(new Set())
+
+        set = getGitignores(undefined)
+        expect(set).toBeDefined()
     })
 })

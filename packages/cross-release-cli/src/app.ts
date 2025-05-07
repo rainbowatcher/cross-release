@@ -8,7 +8,8 @@ import {
 import { execaSync, parseCommandString } from "execa"
 import isUnicodeSupported from "is-unicode-supported"
 import color from "picocolors"
-import { createCliProgram, resolveOptions } from "./cli"
+import { createCliProgram, resolveAppOptions } from "./cli"
+import { resolveAltOptions } from "./config"
 import { CONFIG_DEFAULT, ExitCode } from "./constants"
 import {
     getStagedFiles,
@@ -16,12 +17,12 @@ import {
     isGitClean,
 } from "./git"
 import { chooseVersion } from "./prompt"
-import { resolveAltOptions } from "./util/config"
 import createDebug from "./util/debug"
 import { formatMessageString } from "./util/str"
 import type { ProjectFile } from "cross-bump"
 import type {
     ExtractBooleanKeys, ReleaseOptions, Status, Task,
+    TaskFn,
 } from "./types"
 
 
@@ -59,15 +60,13 @@ class App {
 
     private _taskStatus: Status = "pending"
 
-    private constructor(opts: ReleaseOptions) {
+    public constructor(argv: string[] = process.argv) {
+        const cli = createCliProgram(argv)
+        if (cli.options.help) {
+            process.exit(ExitCode.Success)
+        }
+        const opts = resolveAppOptions(cli)
         this._options = opts
-    }
-
-
-    static async create(argv = process.argv): Promise<App> {
-        const cli = createCliProgram().parse(argv)
-        const opts = await resolveOptions(cli)
-        return new App(opts)
     }
 
     #addTask(task: Task, idx?: number): boolean {
@@ -115,25 +114,26 @@ class App {
     }
 
 
-    checkGitClean() {
+    checkGitClean(): void {
         const { cwd } = this._options
-        if (!isGitClean({ cwd })) {
+        const commit = resolveAltOptions(this._options, "commit")
+        const isClean = isGitClean({ cwd })
+        if (!isClean && !commit.stageAll) {
             log.warn("git is not clean, please commit or stash your changes before release")
             this.#done()
             process.exit(ExitCode.GitDirty)
         }
     }
 
-    async confirmReleaseOptions() {
-        const { all, cwd, dry, yes } = this._options
+    async confirmReleaseOptions(): Promise<void> {
+        const { cwd, dry, yes } = this._options
 
         const confirmTask = async (
             name: ExtractBooleanKeys<ReleaseOptions>,
             message: string,
-            exec: Task["exec"],
-        ) => {
+            exec: TaskFn,
+        ): Promise<void> => {
             if (yes) {
-                // since commit/tag/push is true by default, if it is false, it must be specified by the user.
                 if (!this._options[name]) return
                 this._options[name] = true
             } else if (this._options[name]) {
@@ -155,35 +155,33 @@ class App {
                 verify,
             } = resolveAltOptions(this._options, "commit", {
                 ...CONFIG_DEFAULT.commit,
-                stageAll: all,
             })
 
-            const _all = stageAll ?? all
             this.#addTask({
-                exec: () => {
+                exec: (): boolean => {
                     return gitAdd({
-                        all: _all, cwd, dry, files: this._modifiedFiles,
+                        all: stageAll, cwd, dry, files: this._modifiedFiles,
                     })
                 },
                 name: "add",
             })
 
             commitMessage = formatMessageString(template!, this._nextVersion)
-            await confirmTask("commit", "should commit?", () => {
+            await confirmTask("commit", "should commit?", (): boolean => {
                 debug("staged files: %O", getStagedFiles({ cwd }))
                 return gitCommit({
                     cwd,
                     dry,
                     message: commitMessage!,
-                    modifiedFiles: _all ? undefined : this._modifiedFiles,
-                    stageAll: _all,
+                    modifiedFiles: stageAll ? undefined : this._modifiedFiles,
+                    stageAll,
                     verify,
                 })
             })
         }
 
         if (this._options.tag && commitMessage !== undefined) {
-            const { template: tagTpt } = resolveAltOptions(this._options, "tag", CONFIG_DEFAULT.tag)
+            const { template: tagTpt } = resolveAltOptions(this.options, "tag")
             await confirmTask("tag", "should create tag?", () => {
                 const tagName = formatMessageString(tagTpt!, this._nextVersion)
                 return gitTag({
@@ -200,7 +198,7 @@ class App {
         }
     }
 
-    async executeTasks() {
+    async executeTasks(): Promise<void> {
         debug("taskQueue:", this._taskQueue)
         for (const task of this._taskQueue) {
             if (this._taskStatus === "failed") break
@@ -209,7 +207,7 @@ class App {
         }
     }
 
-    resolveExecutes() {
+    resolveExecutes(): void {
         const { cwd, execute } = this._options
         const indexBeforeCommit = this._taskQueue.findIndex(t => t.name === "commit") - 1
         const index = indexBeforeCommit === -1 ? this._taskQueue.length : indexBeforeCommit
@@ -258,7 +256,7 @@ class App {
         const projectFiles = findProjectFiles(cwd, exclude, recursive)
         if (projectFiles.length === 0) {
             console.error("can't found any project file in the project root")
-            process.exit(1)
+            process.exit(ExitCode.FatalError)
         }
         debug(`found ${projectFiles.length} project files`)
         this._projectFiles = projectFiles

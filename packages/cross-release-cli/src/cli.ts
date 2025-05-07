@@ -1,89 +1,111 @@
 import path from "node:path"
+import process from "node:process"
 import { toAbsolute } from "@rainbowatcher/path-extra"
-import { Argument, Command } from "commander"
-import { DEFAULT_IGNORED_GLOBS, getGitignores } from "cross-bump"
-import { defu } from "defu"
-import { CONFIG_DEFAULT } from "./constants"
-import { loadUserConfig, loadUserSpecifiedConfigFile } from "./util/config"
-import createDebug, { isDebugEnable } from "./util/debug"
+import cac from "cac"
+import { getGitignores } from "cross-bump"
+import { loadUserConfig } from "./config"
+import { CONFIG_DEFAULT, ExitCode } from "./constants"
+import { toArray } from "./util/array"
+import createDebug, { setupDebug } from "./util/debug"
+import { merge } from "./util/merge"
+import { cliOptions as cliOptionsSchema } from "./zod"
 import { version } from "../package.json"
-import type { CliReleaseOptions, KeysOf, ReleaseOptions } from "./types"
+import type { KeysOf, ParsedArgv, ReleaseOptions } from "./types"
 
 const debug = createDebug("cli")
 
-export function createCliProgram() {
-    const cli = new Command("cross-release")
-
-    cli.configureHelp({
-        subcommandTerm: cmd => `${cmd.name()} ${cmd.usage()}`,
-    })
-
-    cli.name("cross-release")
+export function createCliProgram(argv: string[]): ParsedArgv {
+    const cli = cac("cross-release")
+        .usage("A release tool that support multi programming language")
         .version(version)
-        .description("A release tool that support multi programming language")
         .usage("[version] [options]")
-        .addArgument(new Argument("version", "Version to bump").argOptional())
-        .option("-a, --all", "Add all changed files to staged", CONFIG_DEFAULT.commit.stageAll)
         .option("-c, --config [file]", "Config file (auto detect by default)")
-        .option("-D, --dry", "Dry run", CONFIG_DEFAULT.dry)
-        .option("-d, --debug", "Enable debug mode", CONFIG_DEFAULT.debug)
-        .option("-e, --exclude [dir...]", "Folders to exclude from search", CONFIG_DEFAULT.exclude)
-        .option("-m, --main", "Base project language [e.g. java, rust, javascript]", CONFIG_DEFAULT.main)
-        .option("-r, --recursive", "Run the command for each project in the workspace", CONFIG_DEFAULT.recursive)
-        .option("-x, --execute [command...]", "Execute the command", CONFIG_DEFAULT.execute)
-        .option("-y, --yes", "Answer yes to all prompts", CONFIG_DEFAULT.yes)
-        .option("--cwd [dir]", "Set working directory", CONFIG_DEFAULT.cwd)
-        .option("--no-commit", "Skip committing changes")
-        .option("--no-push", "Skip pushing")
-        .option("--no-tag", "Skip tagging")
-        .option("-h, --help", "Display this message")
+        .option("-D, --dry", "Dry run")
+        .option("-d, --debug", "Enable debug mode")
+        .option("-e, --exclude [dir...]", "Folders to exclude from search")
+        .option("-m, --main [lang]", "Base project language [e.g. java, rust, javascript]")
+        .option("-r, --recursive", "Run the command for each project in the workspace")
+        .option("-x, --execute [command...]", "Execute the command")
+        .option("-y, --yes", "Answer yes to all prompts")
+        .option("--cwd [dir]", "Set working directory")
+        .option("--commit", "Committing changes")
+        .option("--commit.signoff", "Pushing Commit with signoff")
+        .option("--commit.stageAll", "Stage all changes before pushing")
+        .option("--commit.template <template>", "Template for commit message")
+        .option("--commit.verify", "Verify commit message")
+        .option("--push", "Pushing Commit to remote")
+        .option("--push.followTags", "Pushing with follow tags")
+        .option("--push.branch <branch>", "Branch name to push")
+        .option("--push.followTags", "pushing with follow tags")
+        .option("--tag", "Tagging for release")
+        .option("--tag.template <template>", "Template for tag message")
+        .help()
 
-    return cli
+    return cli.parse(argv)
 }
 
-export function toCliReleaseOptions(cli: Command): CliReleaseOptions {
-    const { args } = cli
-    const options = cli.opts<{ help: boolean } & CliReleaseOptions>()
-    if (options.help) {
-        cli.help()
-    }
-    return {
-        ...options,
-        // combine user cli exclude option with default
-        exclude: options.exclude?.length ? [...DEFAULT_IGNORED_GLOBS, ...options.exclude] : DEFAULT_IGNORED_GLOBS,
+export function argvToReleaseOptions(cli: ParsedArgv): ReleaseOptions {
+    const { args, options } = cli
+    const opts = {
+        commit: options.commit,
+        config: options.config,
+        cwd: options.cwd,
+        debug: options.debug,
+        dry: options.dry,
+        exclude: toArray(options.exclude),
+        execute: toArray(options.execute),
+        main: options.main,
+        push: options.push,
+        recursive: options.recursive,
+        tag: options.tag,
+        version: options.version,
+        yes: options.yes,
         ...args.length > 0 ? { version: args[0] } : {},
-    }
+    } satisfies ReleaseOptions
+    debug("cli options: %O", opts)
+    return opts
 }
 
-export async function resolveOptions(cli: Command): Promise<ReleaseOptions> {
-    const cliOptions = toCliReleaseOptions(cli)
-    let userConfig: Partial<ReleaseOptions>
-    if (cliOptions.config) {
-        userConfig = await loadUserSpecifiedConfigFile(cliOptions.config, cliOptions)
-    } else {
-        userConfig = await loadUserConfig(cliOptions.cwd)
-    }
-    const parsedArgs = defu(cliOptions, userConfig)
-
-    isDebugEnable(parsedArgs)
-
-    // add gitignores
-    const set = getGitignores(parsedArgs.cwd)
-    for (const i of parsedArgs.exclude) set.add(i)
-    parsedArgs.exclude = [...set]
-
-    // convert to absolute path
+function pathToAbs(opts: ReleaseOptions) {
     const shouldBeAbsolute: Array<KeysOf<ReleaseOptions>> = ["cwd", "config"]
     for (const key of shouldBeAbsolute) {
-        if (!parsedArgs[key]) continue
+        if (!opts[key]) continue
         if (key === "cwd") {
-            const { cwd } = parsedArgs
-            parsedArgs.cwd = toAbsolute(cwd)
+            opts.cwd = toAbsolute(opts.cwd)
         }
         // @ts-expect-error type missmatch
-        parsedArgs[key] = path.resolve(parsedArgs.cwd, parsedArgs[key])
+        opts[key] = path.resolve(opts.cwd, opts[key])
     }
+}
 
-    debug("parsedArgs:", parsedArgs)
-    return parsedArgs
+function resolveGitIgnore(opts: ReleaseOptions) {
+    const ignoresSet = getGitignores(opts.cwd)
+    for (const i of opts.exclude) { ignoresSet.add(i) }
+    opts.exclude = [...ignoresSet]
+}
+
+function validateOptions(cli: ReleaseOptions) {
+    const result = cliOptionsSchema.safeParse(cli)
+    if (!result.success) {
+        const formatted = result.error.format()
+        let errorMsg = ""
+        for (const [key, val] of Object.entries(formatted)) {
+            if (key === "_errors") continue
+            errorMsg = `${(val as any)._errors[0]} for key \`${key}\``
+        }
+        console.error(errorMsg)
+        process.exit(ExitCode.FatalError)
+    }
+}
+
+export function resolveAppOptions(cli: ParsedArgv): ReleaseOptions {
+    const opts = argvToReleaseOptions(cli)
+    const userConfig = loadUserConfig(opts)
+    const crOptions = merge(CONFIG_DEFAULT, userConfig, opts) as ReleaseOptions
+    validateOptions(crOptions)
+    setupDebug(crOptions)
+    resolveGitIgnore(crOptions)
+    pathToAbs(crOptions)
+    debug("resolved app options: %O", crOptions)
+    return crOptions
 }

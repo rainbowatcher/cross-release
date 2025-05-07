@@ -1,7 +1,7 @@
 {
     "name": "cross-bump",
     "type": "module",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "cross language bump utility",
     "author": {
         "name": "rainbowatcher",
@@ -35,14 +35,14 @@
     ],
     "scripts": {
         "clean": "rimraf dist/*",
-        "build": "tsup"
+        "build": "tsdown"
     },
     "dependencies": {
         "@rainbowatcher/toml-edit-js": "^0.2.1",
         "cheerio": "1.0.0",
         "detect-indent": "^7.0.1",
         "fast-glob": "^3.3.3",
-        "parse-gitignore": "^2.0.0",
+        "is-glob": "^4.0.3",
         "semver": "^7.7.1"
     }
 }

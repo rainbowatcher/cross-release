@@ -1,10 +1,9 @@
 import process from "node:process"
 import { isFileSync } from "@rainbowatcher/fs-extra"
 import { toAbsolute } from "@rainbowatcher/path-extra"
-import defu from "defu"
 import { loadConfig } from "unconfig"
-import createDebug from "../util/debug"
-import type { Arrayable, ReleaseOptions, ResolvedOptions } from "../types"
+import createDebug from "./util/debug"
+import type { ReleaseOptions, ResolvedOptions } from "./types"
 
 const debug = createDebug("config")
 
@@ -21,29 +20,24 @@ export function resolveAltOptions<K extends keyof ReleaseOptions>(
         : { ..._defaultValue, ...value as any }
 }
 
-export function resolveArrayable<T = any>(maybeArr: Arrayable<T>): T[] {
-    if (!maybeArr) return []
-    return Array.isArray(maybeArr) ? maybeArr : [maybeArr]
-}
-
-export async function loadUserSpecifiedConfigFile(configPath: string, currentOpts: Partial<ReleaseOptions>): Promise<Partial<ReleaseOptions>> {
+export function loadUserSpecifiedConfigFile(configPath: string): Partial<ReleaseOptions> {
     const absConfigPath = toAbsolute(configPath)
     if (!isFileSync(absConfigPath)) {
         throw new Error(`${absConfigPath} is not a valid file.`)
     }
 
-    const { config, sources } = await loadConfig<Partial<ReleaseOptions>>({
+    const { config, sources } = loadConfig.sync<Partial<ReleaseOptions>>({
         sources: [{
             files: absConfigPath,
         }],
     })
 
-    debug("load specified config file:", sources)
-    return defu({ config: toAbsolute(currentOpts.config ?? "") }, currentOpts, config)
+    debug("load specified config file: %O", sources)
+    return config
 }
 
-export async function loadUserConfig(cwd = process.cwd()): Promise<Partial<ReleaseOptions>> {
-    const { config: userConfig, sources } = await loadConfig<Partial<ReleaseOptions>>({
+export function loadDefaultConfigFile(cwd = process.cwd()): Partial<ReleaseOptions> {
+    const { config, sources } = loadConfig.sync<Partial<ReleaseOptions>>({
         cwd,
         sources: [
             { files: "cross-release.config" },
@@ -55,9 +49,20 @@ export async function loadUserConfig(cwd = process.cwd()): Promise<Partial<Relea
                 },
             },
         ],
-    })
+    }) ?? {}
 
     debug("load user config", sources)
-    debug("user config:", userConfig)
+    debug("user config: %O", config)
+    return config
+}
+
+
+export function loadUserConfig(opts: ReleaseOptions) {
+    let userConfig: Partial<ReleaseOptions>
+    if (opts.config) {
+        userConfig = loadUserSpecifiedConfigFile(opts.config)
+    } else {
+        userConfig = loadDefaultConfigFile(opts.cwd)
+    }
     return userConfig
 }

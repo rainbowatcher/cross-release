@@ -1,6 +1,5 @@
+import type { CAC } from "cac"
 import type { ProjectCategory } from "cross-bump"
-
-export type Arrayable<T> = T | T[]
 
 export type CliPrimitive = boolean | string | string[]
 
@@ -18,26 +17,22 @@ export type Status = "failed" | "finished" | "pending" | "running"
 
 export type ExtractBooleanKeys<T> = keyof Pick<T, { [K in keyof T]: T[K] extends boolean | Record<string, unknown> ? K : never }[keyof T]>
 
+export type TaskFn = () => boolean | boolean[] | Promise<boolean | boolean[]>
+
 export type Task = {
-    exec: () => boolean | boolean[] | Promise<boolean | boolean[]>
+    exec: TaskFn
     name: string
 }
+
+export type ParsedArgv = ReturnType<CAC["parse"]>
 
 export type ReleaseOptionsDefault = Omit<ExcludeType<ReleaseOptions, CliPrimitive>, "config" | "version">
 
 export type DefineConfigOptions = Partial<Omit<ReleaseOptions, "config">>
 
-export type CliReleaseOptions = ExcludeType<ReleaseOptions, Record<string, unknown>>
-
 export type ReleaseOptions = {
     /**
-     * Wethere add all changed files to staged, shorthand for @type {CommitOptions.stageAll}
-     */
-    all: boolean
-
-    /**
      * Indicates whether to commit the changes.
-     * @default false
      */
     commit: boolean | CommitOptions
 
@@ -110,13 +105,21 @@ export type ReleaseOptions = {
 
 export type CommitOptions = {
     /**
+     * Whether to sign the commit.
+     * @default true
+     */
+    signoff?: true
+
+    /**
      * Whether to stage all files or only modified files.
+     * @default false
      */
     stageAll?: boolean
 
     /**
      * The template string for the commit message. if the template contains any "%s" placeholders,
      * then they are replaced with the version number;
+     * @default "chore: release v%s"
      */
     template?: string
 
@@ -129,17 +132,18 @@ export type CommitOptions = {
 
 export type PushOptions = {
     /**
-     * The branch name
+     * The branch name, Use the same branch name as the local if not specified.
      */
     branch?: string
 
     /**
      * Whether to follow tags
+     * @default true
      */
     followTags?: boolean
 
     /**
-     * The remote name
+     * The remote name, defaults to the upstream defined in the Git repository if not specified.
      */
     remote?: string
 }

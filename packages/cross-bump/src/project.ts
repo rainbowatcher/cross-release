@@ -3,7 +3,7 @@ import path from "node:path"
 import fg from "fast-glob"
 import { isBlankPath } from "./util"
 
-export const supportedProjectCategory = ["java", "javascript", "rust"/* , "go" */] as const
+export const supportedProjectCategory = ["java", "javascript", "rust"] as const
 export const supportedProjectFiles = ["package.json", "pom.xml", "Cargo.toml"] as const
 export const supportedProjectGlobs = supportedProjectFiles.map(f => `**/${f}`)
 export type ProjectCategory = typeof supportedProjectCategory[number]
