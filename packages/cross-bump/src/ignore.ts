@@ -1,22 +1,22 @@
-/* eslint-disable style-ts/brace-style */
 import { readFileSync } from "node:fs"
+import path from "node:path"
+import process from "node:process"
 import fg from "fast-glob"
-import isGlob from "is-glob"
 
 export const DEFAULT_IGNORED_GLOBS: string[] = ["**/node_modules/**", "**/.git/**", "**/target/**", "**/build/**", "**/dist/**"]
 export const G_GITIGNORE = "**/.gitignore"
 
 export function getGitignores(cwd?: string, ignoreGlobs = DEFAULT_IGNORED_GLOBS): Set<string> {
-    const gitignores = fg.sync(G_GITIGNORE, {
-        absolute: true,
+    const gitignoreFiles = fg.sync(G_GITIGNORE, {
+        absolute: true, // Returns absolute paths for .gitignore files
         cwd,
         ignore: ignoreGlobs,
         onlyFiles: true,
     })
     const set = new Set<string>()
-    for (const gi of gitignores) {
-        const rules = readFileSync(gi, { encoding: "utf8" })
-        const globs = parseGitingore(rules)
+    for (const gitignoreFilePath of gitignoreFiles) { // gitignoreFilePath is absolute
+        const rules = readFileSync(gitignoreFilePath, { encoding: "utf8" })
+        const globs = parseGitingore(rules, gitignoreFilePath, cwd = process.cwd())
         if (globs.length === 0) continue
         for (const item of globs) {
             set.add(item)
@@ -25,60 +25,124 @@ export function getGitignores(cwd?: string, ignoreGlobs = DEFAULT_IGNORED_GLOBS)
     return set
 }
 
+type ProcessResult = {
+    cleanedLine: string
+    isNegative?: boolean
+    shouldSkip?: boolean
+}
+
 /**
- * parse gitignore to globs
- * @param content gitignore file content
+ * Processes a raw line from .gitignore content.
+ * Handles empty lines, comments, trailing whitespace
  */
-export function parseGitingore(content: string): string[] {
-    const globs: string[] = []
+function processRawGitignoreLine(rawLine: string): ProcessResult {
+    let line = rawLine.trimStart()
+
+    // Rule: A blank line matches no files
+    // Rule: A line starting with # serves as a comment.
+    if (line.length === 0 || line.startsWith("#")) {
+        return { cleanedLine: "", shouldSkip: true }
+    }
+
+    line = normalizeIgnoreRule(line)
+    let isNegative = false
+
+    // Rule: Trailing spaces are ignored unless they are quoted with backslash ("\ ").
+    if (/\\\s*$/.test(line)) {
+        line = `${line.replace(/\\\s*$/, "")} `
+    } else {
+        line = line.trimEnd()
+    }
+
+    if (line.startsWith("!")) {
+        line = line.slice(1)
+        isNegative = true
+    }
+    return { cleanedLine: line, isNegative }
+}
+
+
+/**
+ * Converts the gitignore pattern to a glob pattern relative to the project root.
+ * @param result The processed gitignore line result
+ * @param gitignoreFileDirAbs Absolute path to the directory containing the .gitignore file.
+ * @param projectRoot Absolute path to the project root.
+ */
+function toRelativeGlob(
+    result: ProcessResult,
+    gitignoreFileDirAbs: string,
+    projectRoot: string,
+): string {
+    const { cleanedLine, isNegative } = result
+    const pattern = cleanedLine.replaceAll(/\\([# !])/g, "$1")
+    const relativeGitignoreDir = path.relative(projectRoot, gitignoreFileDirAbs)
+
+    let glob: string
+
+    if (pattern.includes("/")) {
+        const _pattern = pattern.startsWith("/")
+            ? pattern.slice(1)
+            : (pattern.startsWith("**/")
+                ? pattern
+                : `**/${(pattern.endsWith("/") ? pattern.slice(0, -1) : pattern)}`)
+
+        const targetPath = path.resolve(gitignoreFileDirAbs, _pattern)
+        glob = path.relative(projectRoot, targetPath) || "."
+    } else {
+        // simple pattern like '*.log ' | 'file.txt'
+        glob = path.join(relativeGitignoreDir, "**", pattern)
+    }
+
+    // pattern like '/' | '*' | '.'
+    if (glob === "*" || glob === ".") {
+        glob = path.join(relativeGitignoreDir, glob)
+    }
+
+    return isNegative ? `!${glob}` : glob
+}
+
+/**
+ * Normalizes the gitignore rule
+ * Converts path separators to `/`, removes leading `./`, and handles empty globs.
+ */
+function normalizeIgnoreRule(glob: string): string {
+    let normalized = glob.replaceAll("\\\\", "/")
+    if (normalized.startsWith("./")) {
+        normalized = normalized.slice(2)
+    }
+    if (normalized === "") {
+        normalized = "."
+    }
+    return normalized
+}
+
+/**
+ * Parses gitignore content into an array of glob patterns.
+ *
+ * rules ref: https://git-scm.com/docs/gitignore#_pattern_format
+ *
+ * @param content The content of the .gitignore file.
+ * @param gitignoreFilePath Absolute path to the .gitignore file.
+ * @param projectRoot Absolute path to the project root (cwd for fast-glob).
+ * @returns An array of glob patterns.
+ */
+export function parseGitingore(content: string, gitignoreFilePath: string, projectRoot: string): string[] {
+    const resultGlobs: string[] = []
     const lines = content.split(/\r\n?|\n/)
+    const gitignoreFileDirAbs = path.dirname(gitignoreFilePath)
 
     for (const rawLine of lines) {
-        const line = rawLine.trim()
-
-        if (line.startsWith("#") || line.length === 0) {
+        const result = processRawGitignoreLine(rawLine)
+        if (result.shouldSkip) {
             continue
         }
 
-        let isNegative = false
-        let pattern = line
+        const relativeGlob = toRelativeGlob(result, gitignoreFileDirAbs, projectRoot)
 
-        if (pattern.startsWith("!")) {
-            isNegative = true
-            pattern = pattern.slice(1)
-        }
-
-        // Handle patterns that are already globs
-        if (isGlob(pattern)) {
-            globs.push(isNegative ? `!${pattern}` : pattern)
-            continue
-        }
-
-        // Handle directory patterns (e.g., "node_modules/")
-        if (pattern.endsWith("/")) {
-            // Remove trailing slash for consistent processing
-            const dirPattern = pattern.slice(0, -1)
-            // Matches the directory and its contents
-            // For fast-glob, `**/dirname/**` is often redundant if `**/dirname` already implies matching contents for some interpretations,
-            // but `**/dirname/` (which fast-glob might treat as `**/dirname/**`) is what .gitignore implies.
-            // `**/${dirPattern}` might be enough if fast-glob treats it as matching dir and contents.
-            // To be safe and explicit for directories:
-            globs.push(isNegative ? `!**/${dirPattern}/**` : `**/${dirPattern}/**`)
-            // Also match the directory itself if specified without contents, e.g. if one wants to ignore `foo/` but not `foo/bar.txt` if `!foo/bar.txt` is later.
-            // However, `**/${dirPattern}` alone usually covers this.
-            // Let's stick to the common interpretation: `dir/` means `dir` and everything inside.
-        }
-        // Handle patterns starting with a slash (relative to root)
-        else if (pattern.startsWith("/")) {
-            const rootPattern = pattern.slice(1)
-            // Matches the specific file or directory at the root
-            globs.push(isNegative ? `!${rootPattern}` : rootPattern, isNegative ? `!${rootPattern}/**` : `${rootPattern}/**`)
-        }
-        // Handle other patterns (files, or patterns without leading/trailing slashes)
-        else {
-            // These patterns match in any directory
-            globs.push(isNegative ? `!**/${pattern}` : `**/${pattern}`, isNegative ? `!**/${pattern}/**` : `**/${pattern}/**`)
+        resultGlobs.push(relativeGlob)
+        if (!relativeGlob.endsWith("*") && relativeGlob !== ".") {
+            resultGlobs.push(`${relativeGlob}/**`)
         }
     }
-    return globs
+    return [...new Set(resultGlobs)] // Deduplicate
 }
