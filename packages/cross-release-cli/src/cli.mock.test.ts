@@ -240,4 +240,18 @@ describe("resolveAppOptions", () => {
         const cli = parseArg("--push.followTags", "--push.followTags")
         expect(() => resolveAppOptions(cli)).toThrowErrorMatchingInlineSnapshot(`[Error: process.exit unexpectedly called with "1"]`)
     })
+
+    it("should treat all as commit.stageAll", () => {
+        const cli = parseArg("--all")
+        const opts = resolveAppOptions(cli)
+        expect(opts).toStrictEqual({
+            ...CONFIG_DEFAULT,
+            commit: {
+                ...CONFIG_DEFAULT.commit,
+                stageAll: true,
+            },
+            config: undefined,
+            version: undefined,
+        })
+    })
 })

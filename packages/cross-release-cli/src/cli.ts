@@ -19,6 +19,7 @@ export function createCliProgram(argv: string[]): ParsedArgv {
         .usage("A release tool that support multi programming language")
         .version(version)
         .usage("[version] [options]")
+        .option("-a, --all", "shortcut for --commit.stageAll")
         .option("-c, --config [file]", "Config file (auto detect by default)")
         .option("-D, --dry", "Dry run")
         .option("-d, --debug", "Enable debug mode")
@@ -29,8 +30,8 @@ export function createCliProgram(argv: string[]): ParsedArgv {
         .option("-y, --yes", "Answer yes to all prompts")
         .option("--cwd [dir]", "Set working directory")
         .option("--commit", "Committing changes")
-        .option("--commit.signoff", "Pushing Commit with signoff")
-        .option("--commit.stageAll", "Stage all changes before pushing")
+        .option("--commit.signoff", "Commit with signoff")
+        .option("--commit.stageAll", "Stage all changes before commit")
         .option("--commit.template <template>", "Template for commit message")
         .option("--commit.verify", "Verify commit message")
         .option("--push", "Pushing Commit to remote")
@@ -47,7 +48,7 @@ export function createCliProgram(argv: string[]): ParsedArgv {
 export function argvToReleaseOptions(cli: ParsedArgv): ReleaseOptions {
     const { args, options } = cli
     const opts = {
-        commit: options.commit,
+        commit: merge({ stageAll: options.all }, options.commit),
         config: options.config,
         cwd: options.cwd,
         debug: options.debug,

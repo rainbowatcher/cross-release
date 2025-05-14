@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { argvToReleaseOptions, createCliProgram, resolveAppOptions } from "./cli"
+import { resolveAltOptions } from "./config"
 
 
 function parseArg(...args: string[]) {
@@ -57,6 +58,13 @@ describe("toReleaseOptions", () => {
         const cli = parseArg("-y")
         const ro = argvToReleaseOptions(cli)
         expect(ro.yes).toBeTruthy()
+    })
+
+    it("all", () => {
+        const cli = parseArg("--all")
+        const ro = argvToReleaseOptions(cli)
+        // @ts-expect-error type error
+        expect(ro.commit.stageAll).toBeTruthy()
     })
 })
 
