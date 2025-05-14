@@ -240,10 +240,10 @@ type IsGitCleanOptions = CwdOption
 
 export function isGitClean(options: IsGitCleanOptions = {}): boolean {
     const { cwd = process.cwd() } = options
-    const args = ["diff-index", "--quiet", "HEAD", "--"]
-    const { failed, message } = execa("git", args, { cwd })
-    if (message?.includes("bad revision")) {
-        return true
+    const args = ["status", "--porcelain"]
+    const { all, failed } = execa("git", args, { cwd })
+    if (all) {
+        return false
     }
     return !failed
 }
