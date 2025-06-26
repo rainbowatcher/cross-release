@@ -13,7 +13,8 @@ pnpm i -D cross-release
 ```json
 {
     "scripts": {
-        "release": "cross-release"
+        "release": "cross-release -ax 'pnpm changelog' && pnpm build && pnpm -r publish",
+        "changelog": "conventional-changelog -si CHANGELOG.md",
     }
 }
 ```
@@ -26,23 +27,34 @@ pnpm run release
 
 ## Command line
 
-| short | long                   | description                                         | default                                         |
-| ----- | ---------------------- | --------------------------------------------------- | ----------------------------------------------- |
-| -V    | --version              | output the version number                           | false                                           |
-| -a    | --all                  | Add all changed files to staged                     | false                                           |
-| -c    | --config [file]        | Config file                                         | auto detect                                     |
-| -D    | --dry                  | Dry run                                             | false                                           |
-| -d    | --debug                | Enable debug mode                                   | false                                           |
-| -e    | --exclude [dir]        | Folders to exclude from search                      | ["node_modules",".git","target","build","dist"] |
-| -m    | --main                 | Base project language [e.g. java, rust, javascript] | "javascript"                                    |
-| -r    | --recursive            | Run the command for each project in the workspace   | false                                           |
-| -x    | --execute [command...] | Execute the command                                 | []                                              |
-| -y    | --yes                  | Answer yes to all prompts                           | false                                           |
-|       | --cwd [dir]            | Set working directory                               | process.cwd()                                   |
-| -c    | --no-commit            | Skip committing changes                             | false                                           |
-| -p    | --no-push              | Skip pushing                                        | false                                           |
-| -t    | --no-tag               | Skip tagging                                        | false                                           |
-| -h    | --help                 | Display this message                                | false                                           |
+```
+Usage:
+  $ cross-release [version] [options]
+
+Options:
+  -v, --version                 Display version number
+  -a, --all                     shortcut for --commit.stageAll
+  -c, --config [file]           Config file (auto detect by default)
+  -D, --dry                     Dry run
+  -d, --debug                   Enable debug mode
+  -e, --exclude [dir...]        Folders to exclude from search
+  -m, --main [lang]             Base project language [e.g. java, rust, javascript]
+  -r, --recursive               Run the command for each project in the workspace
+  -x, --execute [command...]    Execute the command
+  -y, --yes                     Answer yes to all prompts
+  --cwd [dir]                   Set working directory
+  --commit                      Committing changes
+  --commit.signoff              Commit with signoff
+  --commit.stageAll             Stage all changes before commit
+  --commit.template <template>  Template for commit message
+  --commit.verify               Verify commit message
+  --push                        Pushing Commit to remote
+  --push.followTags             Pushing with follow tags
+  --push.branch <branch>        Branch name to push
+  --tag                         Tagging for release
+  --tag.template <template>     Template for tag message
+  -h, --help                    Display this message
+```
 
 ## Configuration
 
@@ -63,6 +75,8 @@ Here are some examples that cover all the parameters:
 export default {
     // ...
     "cross-release": {
+        // use for read current version number
+        main: "javascript",
         // "commit": false,
         commit: {
             // Whether to stage all un-staged files or stage only changed files
@@ -71,6 +85,7 @@ export default {
             template: "chore: release v%s",
             // Whether to invoke git pre-commit and commit-msg hook
             verify: true,
+            signoff: true,
         },
         cwd: "/path/to/run",
         dry: false,
@@ -78,8 +93,8 @@ export default {
         excludes: ["path/to/exclude"],
         // "push": false,
         push: {
-            branch: false,
             followTags: false,
+            branch: false,
         },
         recursive: false,
         // tag: false,

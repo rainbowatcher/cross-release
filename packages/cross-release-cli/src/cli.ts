@@ -37,7 +37,6 @@ export function createCliProgram(argv: string[]): ParsedArgv {
         .option("--push", "Pushing Commit to remote")
         .option("--push.followTags", "Pushing with follow tags")
         .option("--push.branch <branch>", "Branch name to push")
-        .option("--push.followTags", "pushing with follow tags")
         .option("--tag", "Tagging for release")
         .option("--tag.template <template>", "Template for tag message")
         .help()
