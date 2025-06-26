@@ -75,26 +75,26 @@ Here are some examples that cover all the parameters:
 export default {
     // ...
     "cross-release": {
-        // use for read current version number
-        main: "javascript",
         // "commit": false,
         commit: {
+            signoff: true,
             // Whether to stage all un-staged files or stage only changed files
             stageAll: false,
             // the symbol '%s' will be replace to the version number that you specified
             template: "chore: release v%s",
             // Whether to invoke git pre-commit and commit-msg hook
             verify: true,
-            signoff: true,
         },
         cwd: "/path/to/run",
         dry: false,
         // Your config will be append within default exclude folders
         excludes: ["path/to/exclude"],
+        // use for read current version number
+        main: "javascript",
         // "push": false,
         push: {
-            followTags: false,
             branch: false,
+            followTags: false,
         },
         recursive: false,
         // tag: false,

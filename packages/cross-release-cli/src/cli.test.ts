@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest"
 import { argvToReleaseOptions, createCliProgram, resolveAppOptions } from "./cli"
-import { resolveAltOptions } from "./config"
 
 
 function parseArg(...args: string[]) {

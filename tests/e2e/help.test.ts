@@ -12,10 +12,10 @@ function run(...args: string[]) {
 
 describe("help", () => {
 
-    it("bin script", ({ expect }) => {
+    it("should show help", ({ expect }) => {
         const { stdout } = run(`-Dh`)
         expect(stdout).toMatchInlineSnapshot(dedent`
-            "cross-release/0.3.0
+            "cross-release/${version}
 
             Usage:
               $ cross-release [version] [options]
