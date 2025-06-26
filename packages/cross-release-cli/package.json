@@ -30,7 +30,7 @@
         "build": "tsdown"
     },
     "dependencies": {
-        "@clack/prompts": "^0.10.1",
+        "@clack/prompts": "^0.11.0",
         "@rainbowatcher/common": "^0.7.0",
         "@rainbowatcher/fs-extra": "^0.7.0",
         "@rainbowatcher/path-extra": "^0.7.0",
@@ -38,11 +38,11 @@
         "cross-bump": "workspace:*",
         "debug": "^4.4.1",
         "defu": "^6.1.4",
-        "execa": "^9.5.3",
+        "execa": "^9.6.0",
         "is-unicode-supported": "^2.1.0",
         "picocolors": "^1.1.1",
         "unconfig": "^7.3.2",
-        "zod": "^3.24.4"
+        "zod": "^3.25.67"
     },
     "devDependencies": {
         "@rainbowatcher/maybe": "^0.7.0"

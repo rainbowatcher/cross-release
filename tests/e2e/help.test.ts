@@ -15,13 +15,14 @@ describe("help", () => {
     it("bin script", ({ expect }) => {
         const { stdout } = run(`-Dh`)
         expect(stdout).toMatchInlineSnapshot(dedent`
-            "cross-release/${version}
+            "cross-release/0.3.0
 
             Usage:
               $ cross-release [version] [options]
 
             Options:
               -v, --version                 Display version number 
+              -a, --all                     shortcut for --commit.stageAll 
               -c, --config [file]           Config file (auto detect by default) 
               -D, --dry                     Dry run 
               -d, --debug                   Enable debug mode 
@@ -32,8 +33,8 @@ describe("help", () => {
               -y, --yes                     Answer yes to all prompts 
               --cwd [dir]                   Set working directory 
               --commit                      Committing changes 
-              --commit.signoff              Pushing Commit with signoff 
-              --commit.stageAll             Stage all changes before pushing 
+              --commit.signoff              Commit with signoff 
+              --commit.stageAll             Stage all changes before commit 
               --commit.template <template>  Template for commit message 
               --commit.verify               Verify commit message 
               --push                        Pushing Commit to remote 
