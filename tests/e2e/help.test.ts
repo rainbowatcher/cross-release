@@ -40,7 +40,6 @@ describe("help", () => {
               --push                        Pushing Commit to remote 
               --push.followTags             Pushing with follow tags 
               --push.branch <branch>        Branch name to push 
-              --push.followTags             pushing with follow tags 
               --tag                         Tagging for release 
               --tag.template <template>     Template for tag message 
               -h, --help                    Display this message "
