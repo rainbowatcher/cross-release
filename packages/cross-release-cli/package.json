@@ -42,7 +42,7 @@
         "is-unicode-supported": "^2.1.0",
         "picocolors": "^1.1.1",
         "unconfig": "^7.3.2",
-        "zod": "^3.25.67"
+        "zod": "^4.0.17"
     },
     "devDependencies": {
         "@rainbowatcher/maybe": "^0.7.0"
