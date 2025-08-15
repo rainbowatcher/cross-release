@@ -208,10 +208,10 @@ type GitResetOptions = {
     commit?: string
     files?: string[]
     mode?: "hard" | "keep" | "merge" | "mixed" | "soft"
-} & DryAble
+} & CwdOption & DryAble
 
 export function gitReset(options: GitResetOptions = {}): boolean {
-    const { commit = "HEAD", dry, files = [], mode = "mixed" } = options ?? {}
+    const { commit = "HEAD", cwd = process.cwd(), dry, files = [], mode = "mixed" } = options ?? {}
     const s = spinner()
     s.start("resetting...")
     const args = []
@@ -223,7 +223,7 @@ export function gitReset(options: GitResetOptions = {}): boolean {
 
     debug(`command: git reset ${args.join(" ")}`)
     if (!dry) {
-        const { all, exitCode, failed, shortMessage } = execa("git", ["reset", ...args])
+        const { all, exitCode, failed, shortMessage } = execa("git", ["reset", ...args], { cwd })
         debug("git reset stdout:", all)
         if (failed) {
             s.stop(color.red(shortMessage), exitCode)
