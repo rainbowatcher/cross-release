@@ -26,6 +26,7 @@
 - [x] bump
 - [x] git (tag/push)
 - [x] user config
+- [ ] rewrite in rust but support install via npm / pip / cargo etc
 - [ ] support `jsr.json` / `jsr.jsonc` / `deno.json` / `deno.jsonc`
 - [ ] tauri support
 - [ ] changelog
