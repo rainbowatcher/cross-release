@@ -13,7 +13,7 @@ import { resolveAltOptions } from "./config"
 import { CONFIG_DEFAULT, ExitCode } from "./constants"
 import {
     getStagedFiles,
-    gitAdd, gitCommit, gitPush, gitTag,
+    gitAdd, gitCommit, gitLsRemote, gitPush, gitTag,
     isGitClean,
 } from "./git"
 import { chooseVersion } from "./prompt"
@@ -119,9 +119,19 @@ class App {
         const commit = resolveAltOptions(this._options, "commit")
         const isClean = isGitClean({ cwd })
         if (!isClean && !commit.stageAll) {
-            log.warn("git is not clean, please commit or stash your changes before release")
+            log.warn("git is not clean, please commit or stash your changes")
             this.#done()
             process.exit(ExitCode.GitDirty)
+        }
+    }
+
+    checkGitRemote(): void {
+        const { cwd } = this._options
+        const hasRemote = gitLsRemote({ cwd, mode: "branches" })
+        if (!hasRemote) {
+            log.warn("git remote not found, please add remote or check your network")
+            this.#done()
+            process.exit(ExitCode.GitUnreachable)
         }
     }
 
@@ -285,6 +295,7 @@ class App {
     async run(): Promise<void> {
         this.#start()
         this.checkGitClean()
+        this.checkGitRemote()
         this.resolveProjectFiles()
         await this.resolveNextVersion()
         this.resolveProjects()

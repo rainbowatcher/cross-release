@@ -11,6 +11,7 @@ export enum ExitCode {
     Canceled = 2,
     FatalError = 1,
     GitDirty = 3,
+    GitUnreachable = 4,
     InvalidArgument = 9,
     Success = 0,
 }

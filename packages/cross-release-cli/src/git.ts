@@ -15,6 +15,43 @@ type CwdOption = {
     cwd?: string
 }
 
+type GitLsRemoteOptions = {
+    mode?: "branches" | "refs" | "tags"
+    pattern?: string
+    remote?: string
+    repository?: string
+} & CwdOption & DryAble
+
+export function gitLsRemote(options: GitLsRemoteOptions) {
+    const {
+        cwd = process.cwd(),
+        dry = false,
+        mode = "branches",
+        pattern,
+        remote,
+        repository = "origin",
+    } = options
+    const s = spinner()
+    s.start("listing remote...")
+    const args = []
+    if (remote) args.push(remote)
+    if (mode) args.push(`--${mode}`)
+    args.push(repository)
+    if (pattern) args.push(pattern)
+
+    debug(`command: git ls-remote ${args.join(" ")}`)
+    if (!dry) {
+        const { all, exitCode, failed, shortMessage } = execa("git", ["ls-remote", ...args], { cwd })
+        debug("git ls-remote stdout:", all)
+        if (failed) {
+            s.stop(color.red(shortMessage), exitCode)
+            return false
+        }
+    }
+    s.stop(`listed remote`)
+    return true
+}
+
 type GitTagOptions = {
     del?: boolean
     force?: boolean
