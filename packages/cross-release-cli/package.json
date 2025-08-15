@@ -18,6 +18,7 @@
         "url": "https://github.com/rainbowatcher/cross-release/issues"
     },
     "main": "dist/index.js",
+    "types": "./dist/index.d.ts",
     "bin": {
         "cross-release": "./bin/cross-release.js"
     },
