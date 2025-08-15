@@ -126,8 +126,8 @@ class App {
     }
 
     checkGitRemote(): void {
-        const { cwd } = this._options
-        const hasRemote = gitLsRemote({ cwd, mode: "branches" })
+        const { cwd, debug, dry } = this._options
+        const hasRemote = gitLsRemote({ cwd, dry: dry || debug })
         if (!hasRemote) {
             log.warn("git remote not found, please add remote or check your network")
             this.#done()

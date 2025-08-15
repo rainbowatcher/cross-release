@@ -48,12 +48,12 @@ describe.skipIf(process.env.CI)("exec", () => {
     })
 
     it("should run", () => {
-        const { all } = run("--cwd", "fixture")
+        const { all } = run("-d", "--cwd", "fixture")
         expect(all, all).toContain("Pick a project version")
     })
 
     it("should run with dry", () => {
-        const { all } = run("--cwd", "fixture", "--dry")
+        const { all } = run("-d", "--cwd", "fixture", "--dry")
         expect(all).toContain("DRY")
     })
 
@@ -77,7 +77,7 @@ describe.skipIf(process.env.CI)("exec", () => {
     })
 
     it("should update version and commit", async () => {
-        const { all, failed } = run("--cwd", "fixture", "1.1.2", "-y", "--no-tag", "--no-push")
+        const { all, failed } = run("--cwd", "fixture", "1.1.2", "-dy", "--no-tag", "--no-push")
         expect(failed, all).toBeFalsy()
         expect(getJSProjectVersion(path.join(fixture, "package.json"))).toBe("1.1.2")
         const log = await git.log({ dir: fixture, fs })
