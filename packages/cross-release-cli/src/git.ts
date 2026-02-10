@@ -41,10 +41,10 @@ export function gitLsRemote(options: GitLsRemoteOptions) {
 
     debug(`command: git ls-remote ${args.join(" ")}`)
     if (!dry) {
-        const { all, exitCode, failed, shortMessage } = execa("git", ["ls-remote", ...args], { cwd })
+        const { all, failed, shortMessage } = execa("git", ["ls-remote", ...args], { cwd })
         debug("git ls-remote stdout:", all)
         if (failed) {
-            s.stop(color.red(shortMessage), exitCode)
+            s.error(shortMessage)
             return false
         }
     }
@@ -96,10 +96,10 @@ export function gitTag(options: GitTagOptions): boolean {
 
     debug(`command: git tag ${args.join(" ")}`)
     if (!dry) {
-        const { all, exitCode, failed, shortMessage } = execa("git", ["tag", ...args], { cwd })
+        const { all, failed, shortMessage } = execa("git", ["tag", ...args], { cwd })
         debug("git tag stdout:", all)
         if (failed) {
-            s.stop(color.red(shortMessage), exitCode)
+            s.error(shortMessage)
             return false
         }
     }
@@ -146,10 +146,10 @@ export function gitCommit(options: GitCommitOptions): boolean {
 
     debug(`command: git commit ${args.join(" ")}`)
     if (!dry) {
-        const { all, exitCode, failed, shortMessage } = execa("git", ["commit", ...args], { cwd })
+        const { all, failed, shortMessage } = execa("git", ["commit", ...args], { cwd })
         debug("git commit stdout: %s", all)
         if (failed) {
-            s.stop(color.red(shortMessage), exitCode)
+            s.error(shortMessage)
             return false
         }
     }
@@ -187,10 +187,10 @@ export function gitPush(options: GitPushOptions = {}): boolean {
 
     debug(`command: git push ${args.join(" ")}`)
     if (!dry) {
-        const { all, exitCode, failed, shortMessage } = execa("git", ["push", ...args], { cwd })
+        const { all, failed, shortMessage } = execa("git", ["push", ...args], { cwd })
         debug("git push stdout: %s", all)
         if (failed) {
-            s.stop(color.red(shortMessage), exitCode)
+            s.error(shortMessage)
             return false
         }
     }
@@ -223,10 +223,10 @@ export function gitReset(options: GitResetOptions = {}): boolean {
 
     debug(`command: git reset ${args.join(" ")}`)
     if (!dry) {
-        const { all, exitCode, failed, shortMessage } = execa("git", ["reset", ...args], { cwd })
+        const { all, failed, shortMessage } = execa("git", ["reset", ...args], { cwd })
         debug("git reset stdout:", all)
         if (failed) {
-            s.stop(color.red(shortMessage), exitCode)
+            s.error(shortMessage)
             return false
         }
     }
