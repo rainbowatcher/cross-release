@@ -2,6 +2,6 @@
 
 "use strict"
 
-const App = await import("../dist/app.js")
+const App = await import("../dist/app.mjs")
 const app = new App.default()
 void app.run()
